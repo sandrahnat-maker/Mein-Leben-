@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blutdruck</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#E8F5E9;color:#1A2E20;padding:.75rem;padding-bottom:4rem;max-width:420px;margin:0 auto}
+h1{font-size:1.05rem;font-weight:700;color:#2E7D4F;margin-bottom:.15rem}
+.sub{font-size:.65rem;color:#5a8a6a;margin-bottom:.8rem}
+
+/* Tabs */
+.tabs{display:flex;gap:.3rem;margin-bottom:.8rem}
+.tab{flex:1;padding:.38rem;border:1.5px solid rgba(46,125,79,.2);background:transparent;color:#5a8a6a;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.tab.on{background:#2E7D4F;color:#fff;border-color:#2E7D4F}
+
+/* Eingabe */
+.card{background:#fff;border-radius:12px;padding:.85rem;margin-bottom:.6rem;border:1px solid rgba(46,125,79,.12)}
+.card-title{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5a8a6a;margin-bottom:.6rem}
+.inp-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.inp-lbl{font-size:.72rem;color:#5a8a6a;width:5rem}
+.inp{flex:1;border:1px solid rgba(46,125,79,.2);border-radius:7px;padding:.35rem .5rem;font-size:1rem;font-weight:600;text-align:center;font-family:inherit;color:#1A2E20;background:#F5FBF7}
+.inp-unit{font-size:.65rem;color:#5a8a6a;width:2.5rem}
+.inp-date{width:100%;border:1px solid rgba(46,125,79,.2);border-radius:7px;padding:.35rem .5rem;font-size:.82rem;font-family:inherit;color:#1A2E20;background:#F5FBF7;margin-bottom:.5rem}
+.save-btn{width:100%;background:#2E7D4F;color:#fff;border:none;border-radius:9px;padding:.5rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.3rem}
+.rating{font-size:.72rem;font-weight:600;padding:.3rem .6rem;border-radius:6px;text-align:center;margin-top:.4rem}
+.r-opt{background:#E8F5E9;color:#2E7D4F}
+.r-norm{background:#E8F5E9;color:#2E7D4F}
+.r-high{background:#FFF3E0;color:#E65100}
+.r-vhigh{background:#FFEBEE;color:#C62828}
+
+/* Kurve */
+.chart-wrap{background:#fff;border-radius:12px;padding:.85rem;margin-bottom:.6rem;border:1px solid rgba(46,125,79,.12)}
+canvas{width:100%;height:160px;display:block}
+.legend{display:flex;gap:1rem;justify-content:center;margin-top:.4rem;font-size:.62rem}
+.leg-item{display:flex;align-items:center;gap:.3rem}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* Liste */
+.hist-item{background:#fff;border-radius:9px;padding:.55rem .75rem;margin-bottom:.3rem;border:1px solid rgba(46,125,79,.1);display:flex;justify-content:space-between;align-items:center}
+.hist-vals{font-size:.88rem;font-weight:600}
+.hist-meta{font-size:.62rem;color:#5a8a6a;text-align:right}
+.hist-badge{font-size:.58rem;padding:.1rem .35rem;border-radius:5px;margin-top:.15rem;display:inline-block}
+.del-btn{background:none;border:none;color:#ccc;font-size:.9rem;cursor:pointer;padding:.1rem .3rem}
+
+/* PDF */
+.pdf-btn{width:100%;background:#1565C0;color:#fff;border:none;border-radius:9px;padding:.5rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:.4rem}
+.pdf-info{font-size:.65rem;color:#5a8a6a;text-align:center;margin-bottom:.6rem}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.6rem}
+.stat-box{background:#fff;border-radius:10px;padding:.6rem;text-align:center;border:1px solid rgba(46,125,79,.1)}
+.stat-val{font-size:1.1rem;font-weight:700;color:#2E7D4F}
+.stat-lbl{font-size:.58rem;color:#5a8a6a;margin-top:.1rem}
+.fm4-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;background:#CC0000;color:#fff;border-radius:10px;padding:.45rem .9rem;font-size:.78rem;font-weight:700;text-decoration:none;margin-bottom:.6rem;}
+</style>
+</head>
+<body>
+<h1>🩺 Blutdruck-Tagebuch</h1>
+<p class="sub">Täglich messen · Kurve · PDF für den Arzt</p>
+
+<a class="fm4-btn" href="intent:#Intent;action=android.intent.action.MAIN;package=at.zuggabecka.radiofm4;end" onclick="setTimeout(function(){window.location.href='https://play.google.com/store/apps/details?id=at.zuggabecka.radiofm4'},1200);return true;">
+  📻 FM4 öffnen
+</a>
+<div class="tabs">
+  <button class="tab on" onclick="setTab(0)">➕ Eingabe</button>
+  <button class="tab" onclick="setTab(1)">📈 Kurve</button>
+  <button class="tab" onclick="setTab(2)">📋 Verlauf</button>
+  <button class="tab" onclick="setTab(3)">📄 PDF</button>
+</div>
+
+<!-- TAB 0: Eingabe -->
+<div id="tab0">
+  <div class="card">
+    <div class="card-title">Neue Messung</div>
+    <input class="inp-date" type="datetime-local" id="inpDate">
+    <div class="inp-row">
+      <span class="inp-lbl">Systolisch</span>
+      <input class="inp" id="sys" type="number" placeholder="120" min="80" max="220">
+      <span class="inp-unit">mmHg</span>
+    </div>
+    <div class="inp-row">
+      <span class="inp-lbl">Diastolisch</span>
+      <input class="inp" id="dia" type="number" placeholder="80" min="50" max="140">
+      <span class="inp-unit">mmHg</span>
+    </div>
+    <div class="inp-row">
+      <span class="inp-lbl">Puls</span>
+      <input class="inp" id="puls" type="number" placeholder="70" min="40" max="180">
+      <span class="inp-unit">/min</span>
+    </div>
+    <button class="save-btn" onclick="saveEntry()">💾 Speichern</button>
+    <div id="ratingBox"></div>
+  </div>
+  <div class="stats-grid" id="statsGrid"></div>
+</div>
+
+<!-- TAB 1: Kurve -->
+<div id="tab1" style="display:none">
+  <div class="chart-wrap">
+    <div class="card-title">Verlauf letzte 30 Messungen</div>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#C62828"></div><span>Systolisch</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:#1565C0"></div><span>Diastolisch</span></div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2E7D4F"></div><span>Puls</span></div>
+    </div>
+  </div>
+  <!-- Referenzlinien-Erklärung -->
+  <div class="card">
+    <div class="card-title">Referenzwerte (WHO)</div>
+    <div style="font-size:.7rem;line-height:1.8;color:#3a5a40">
+      <span style="color:#2E7D4F">●</span> <b>Optimal:</b> &lt; 120 / 80 mmHg<br>
+      <span style="color:#66BB6A">●</span> <b>Normal:</b> &lt; 130 / 85 mmHg<br>
+      <span style="color:#FFA726">●</span> <b>Hochnormal:</b> &lt; 140 / 90 mmHg<br>
+      <span style="color:#C62828">●</span> <b>Erhöht:</b> ≥ 140 / 90 mmHg
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: Verlauf -->
+<div id="tab2" style="display:none">
+  <div id="histList"></div>
+</div>
+
+<!-- TAB 3: PDF -->
+<div id="tab3" style="display:none">
+  <div class="card">
+    <div class="card-title">PDF für den Arzt</div>
+    <p style="font-size:.72rem;color:#3a5a40;margin-bottom:.6rem;line-height:1.5">
+      Erstellt ein übersichtliches Blutdruck-Protokoll mit allen Messwerten, Durchschnittswerten und Bewertung — bereit zum Ausdrucken oder Weiterleiten.
+    </p>
+    <div class="inp-row" style="margin-bottom:.5rem">
+      <span class="inp-lbl">Name</span>
+      <input class="inp" id="pdfName" type="text" placeholder="Ihr Name" style="text-align:left;font-size:.82rem;font-weight:400">
+    </div>
+    <div class="inp-row" style="margin-bottom:.5rem">
+      <span class="inp-lbl">Zeitraum</span>
+      <select class="inp" id="pdfRange" style="text-align:left;font-size:.82rem;font-weight:400">
+        <option value="7">Letzte 7 Tage</option>
+        <option value="14">Letzte 14 Tage</option>
+        <option value="30" selected>Letzte 30 Tage</option>
+        <option value="90">Letzte 90 Tage</option>
+        <option value="0">Alle Messungen</option>
+      </select>
+    </div>
+    <button class="pdf-btn" onclick="generatePDF()">📄 PDF erstellen & drucken</button>
+    <p class="pdf-info">Öffnet eine druckfertige Seite im Browser</p>
+  </div>
+</div>
+
+<script>
+var KEY = 'bp_v2';
+var history = [];
+var currentTab = 0;
+
+function load() {
+  try { history = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e) { history = []; }
+  // Datum-Input vorbelegen
+  var now = new Date();
+  var iso = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('inpDate').value = iso;
+}
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(history)); } catch(e) {}
+}
+
+function getRating(sys, dia) {
+  if (sys < 120 && dia < 80) return {text:'✓ Optimal', cls:'r-opt'};
+  if (sys < 130 && dia < 85) return {text:'✓ Normal', cls:'r-norm'};
+  if (sys < 140 && dia < 90) return {text:'⚠️ Hochnormal', cls:'r-high'};
+  return {text:'❗ Erhöht – bitte Arzt informieren', cls:'r-vhigh'};
+}
+
+function saveEntry() {
+  var sys = parseInt(document.getElementById('sys').value);
+  var dia = parseInt(document.getElementById('dia').value);
+  var puls = parseInt(document.getElementById('puls').value) || 0;
+  var dateStr = document.getElementById('inpDate').value;
+  if (!sys || !dia || sys < 60 || dia < 40) {
+    document.getElementById('ratingBox').innerHTML = '<div class="rating r-vhigh">Bitte Systolisch und Diastolisch eingeben</div>';
+    return;
+  }
+  var entry = { dt: dateStr || new Date().toISOString().slice(0,16), sys:sys, dia:dia, puls:puls };
+  history.unshift(entry);
+  if (history.length > 365) history = history.slice(0,365);
+  save();
+
+  var r = getRating(sys, dia);
+  document.getElementById('ratingBox').innerHTML = '<div class="rating '+r.cls+'">'+r.text+'</div>';
+  document.getElementById('sys').value = '';
+  document.getElementById('dia').value = '';
+  document.getElementById('puls').value = '';
+  // Datum neu setzen
+  var now = new Date();
+  document.getElementById('inpDate').value = new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  renderStats();
+}
+
+function fmtDt(dt) {
+  var d = new Date(dt);
+  return d.toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit'}) + ' ' +
+         d.toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderStats() {
+  var last7 = history.filter(function(e){ return new Date(e.dt) >= new Date(Date.now()-7*864e5); });
+  if (!last7.length) { document.getElementById('statsGrid').innerHTML=''; return; }
+  var avgSys = Math.round(last7.reduce(function(s,e){return s+e.sys;},0)/last7.length);
+  var avgDia = Math.round(last7.reduce(function(s,e){return s+e.dia;},0)/last7.length);
+  var avgPuls = Math.round(last7.filter(function(e){return e.puls;}).reduce(function(s,e){return s+e.puls;},0)/last7.filter(function(e){return e.puls;}).length)||0;
+  var maxSys = Math.max.apply(null, last7.map(function(e){return e.sys;}));
+  var r = getRating(avgSys, avgDia);
+  document.getElementById('statsGrid').innerHTML =
+    '<div class="stat-box"><div class="stat-val">'+avgSys+'/'+avgDia+'</div><div class="stat-lbl">Ø 7 Tage (mmHg)</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+avgPuls+'</div><div class="stat-lbl">Ø Puls 7 Tage</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+last7.length+'</div><div class="stat-lbl">Messungen (7 Tage)</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="font-size:.8rem">'+r.text.replace(/[✓⚠️❗]/g,'').trim()+'</div><div class="stat-lbl">Bewertung Ø</div></div>';
+}
+
+function renderChart() {
+  var canvas = document.getElementById('chart');
+  var data = history.slice(0,30).reverse();
+  if (!data.length) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.offsetWidth || 320;
+  var H = 160;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+
+  var pad = {t:10,r:10,b:25,l:35};
+  var cW = W - pad.l - pad.r;
+  var cH = H - pad.t - pad.b;
+
+  // Referenzlinien
+  var allVals = data.map(function(e){return e.sys;}).concat(data.map(function(e){return e.dia;}));
+  var minV = Math.max(40, Math.min.apply(null,allVals) - 10);
+  var maxV = Math.min(220, Math.max.apply(null,allVals) + 10);
+
+  function yPos(v) { return pad.t + cH - (v - minV) / (maxV - minV) * cH; }
+  function xPos(i) { return pad.l + (data.length===1 ? cW/2 : i/(data.length-1)*cW); }
+
+  // Grid
+  ctx.strokeStyle = 'rgba(46,125,79,.08)'; ctx.lineWidth = 1;
+  [80,90,120,140].forEach(function(v){
+    if (v >= minV && v <= maxV) {
+      var y = yPos(v);
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W-pad.r, y); ctx.stroke();
+      ctx.fillStyle='rgba(46,125,79,.4)'; ctx.font='9px sans-serif';
+      ctx.fillText(v, 2, y+3);
+    }
+  });
+
+  // Linien zeichnen
+  function drawLine(key, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin='round';
+    ctx.beginPath();
+    data.forEach(function(e,i){
+      var x=xPos(i), y=yPos(e[key]||0);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    // Punkte
+    data.forEach(function(e,i){
+      ctx.beginPath();
+      ctx.arc(xPos(i), yPos(e[key]||0), 3, 0, 2*Math.PI);
+      ctx.fillStyle=color; ctx.fill();
+    });
+  }
+
+  drawLine('sys', '#C62828');
+  drawLine('dia', '#1565C0');
+  if (data.some(function(e){return e.puls;})) drawLine('puls','#2E7D4F');
+
+  // X-Achse Beschriftung (max 5 Labels)
+  ctx.fillStyle='#5a8a6a'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  var step = Math.max(1, Math.floor(data.length/5));
+  data.forEach(function(e,i){
+    if (i%step===0 || i===data.length-1) {
+      var d = new Date(e.dt);
+      var lbl = (d.getDate())+'.'+(d.getMonth()+1)+'.';
+      ctx.fillText(lbl, xPos(i), H-5);
+    }
+  });
+}
+
+function renderHistory() {
+  if (!history.length) {
+    document.getElementById('histList').innerHTML='<p style="text-align:center;color:#5a8a6a;font-size:.8rem;padding:1rem">Noch keine Messungen</p>';
+    return;
+  }
+  var h = '';
+  history.forEach(function(e,i){
+    var r = getRating(e.sys, e.dia);
+    h += '<div class="hist-item">'
+      +'<div><div class="hist-vals">'+e.sys+'/'+e.dia+' mmHg'+(e.puls?' · '+e.puls+'/min':'')+'</div>'
+      +'<span class="hist-badge '+r.cls+'">'+r.text+'</span></div>'
+      +'<div style="display:flex;align-items:center;gap:.3rem">'
+      +'<div class="hist-meta">'+fmtDt(e.dt)+'</div>'
+      +'<button class="del-btn" onclick="delEntry('+i+')">✕</button>'
+      +'</div></div>';
+  });
+  document.getElementById('histList').innerHTML = h;
+}
+
+function delEntry(i) {
+  history.splice(i,1);
+  save();
+  renderHistory();
+  renderStats();
+}
+
+function setTab(n) {
+  currentTab = n;
+  for (var i=0;i<4;i++) {
+    document.getElementById('tab'+i).style.display = i===n?'':'none';
+    document.querySelectorAll('.tab')[i].className = 'tab'+(i===n?' on':'');
+  }
+  if (n===1) { renderChart(); }
+  if (n===2) { renderHistory(); }
+}
+
+function generatePDF() {
+  var name = document.getElementById('pdfName').value || 'Patient/in';
+  var days = parseInt(document.getElementById('pdfRange').value);
+  var data = days > 0
+    ? history.filter(function(e){ return new Date(e.dt) >= new Date(Date.now()-days*864e5); })
+    : history;
+
+  if (!data.length) { alert('Keine Messungen im gewählten Zeitraum.'); return; }
+
+  var avgSys = Math.round(data.reduce(function(s,e){return s+e.sys;},0)/data.length);
+  var avgDia = Math.round(data.reduce(function(s,e){return s+e.dia;},0)/data.length);
+  var pulsData = data.filter(function(e){return e.puls;});
+  var avgPuls = pulsData.length ? Math.round(pulsData.reduce(function(s,e){return s+e.puls;},0)/pulsData.length) : 0;
+  var maxSys = Math.max.apply(null,data.map(function(e){return e.sys;}));
+  var minSys = Math.min.apply(null,data.map(function(e){return e.sys;}));
+
+  var rows = data.map(function(e){
+    var r = getRating(e.sys,e.dia);
+    return '<tr><td>'+fmtDt(e.dt)+'</td><td style="font-weight:600">'+e.sys+'</td><td style="font-weight:600">'+e.dia+'</td><td>'+(e.puls||'–')+'</td><td>'+r.text+'</td></tr>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Blutdruck-Protokoll</title><style>'
+    +'body{font-family:Arial,sans-serif;padding:2cm;color:#111;font-size:11pt}'
+    +'h1{color:#2E7D4F;font-size:16pt;margin-bottom:.3cm}h2{font-size:12pt;color:#2E7D4F;margin:1cm 0 .3cm}'
+    +'.info{font-size:10pt;color:#555;margin-bottom:.8cm}'
+    +'.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.3cm;margin-bottom.8cm}'
+    +'.stat{border:1px solid #ccc;padding:.3cm;border-radius:4px;text-align:center}'
+    +'.stat b{display:block;font-size:14pt;color:#2E7D4F}'
+    +'.stat small{font-size:8pt;color:#666}'
+    +'table{width:100%;border-collapse:collapse;font-size:10pt}'
+    +'th{background:#2E7D4F;color:#fff;padding:.2cm;text-align:left}'
+    +'td{padding:.15cm .2cm;border-bottom:1px solid #eee}'
+    +'tr:nth-child(even){background:#f5f5f5}'
+    +'.footer{margin-top:1cm;font-size:9pt;color:#888;border-top:1px solid #ccc;padding-top:.3cm}'
+    +'@media print{body{padding:1cm}}'
+    +'</style></head><body>'
+    +'<h1>🩺 Blutdruck-Protokoll</h1>'
+    +'<div class="info">Name: <b>'+name+'</b> &nbsp;|&nbsp; Erstellt: '+new Date().toLocaleDateString('de-AT')+' &nbsp;|&nbsp; Zeitraum: '+(days>0?'letzte '+days+' Tage':'alle Messungen')+' &nbsp;|&nbsp; Anzahl: '+data.length+' Messungen</div>'
+    +'<h2>Zusammenfassung</h2>'
+    +'<div class="stats">'
+    +'<div class="stat"><b>'+avgSys+'/'+avgDia+'</b><small>Ø Blutdruck (mmHg)</small></div>'
+    +(avgPuls?'<div class="stat"><b>'+avgPuls+'</b><small>Ø Puls (/min)</small></div>':'')
+    +'<div class="stat"><b>'+maxSys+'/'+minSys+'</b><small>Max/Min Systolisch</small></div>'
+    +'<div class="stat"><b>'+getRating(avgSys,avgDia).text.replace(/[✓⚠️❗]/g,'').trim()+'</b><small>Bewertung Ø</small></div>'
+    +'</div>'
+    +'<h2>Alle Messungen</h2>'
+    +'<table><tr><th>Datum/Zeit</th><th>Systolisch</th><th>Diastolisch</th><th>Puls</th><th>Bewertung</th></tr>'+rows+'</table>'
+    +'<div class="footer">Referenz: Optimal &lt;120/80 · Normal &lt;130/85 · Hochnormal &lt;140/90 · Erhöht ≥140/90 mmHg (WHO) &nbsp;|&nbsp; Dieses Protokoll ersetzt keine ärztliche Diagnose.</div>'
+    +'</body></html>';
+
+  var w = window.open('','_blank');
+  if (w) { w.document.write(html); w.document.close(); setTimeout(function(){ w.print(); },500); }
+}
+
+load();
+renderStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K&#246;rpergewicht Training</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --green: #a8d5a2;
+    --green-bright: #c8e6c2;
+    --amber: #e8c87a;
+    --red: #e07070;
+    --muted: #666;
+    --text: #f0ece4;
+    --text2: #a0a0a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 2rem;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .container { max-width: 420px; width: 100%; position: relative; z-index: 1; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 0.5rem;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .header-title em {
+    font-style: italic;
+    color: var(--green-bright);
+  }
+  .header-sub {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+  }
+
+  /* Main timer display */
+  .timer-card {
+    background: var(--surface);
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .timer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(168,213,162,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .phase-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    transition: color 0.3s;
+  }
+  .phase-label.work { color: var(--green); }
+  .phase-label.rest { color: var(--amber); }
+  .phase-label.prep { color: var(--text2); }
+  .phase-label.done { color: var(--green-bright); }
+
+  .exercise-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+    min-height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .exercise-note {
+    font-size: 0.7rem;
+    color: var(--text2);
+    margin-bottom: 1.2rem;
+    min-height: 1.2em;
+  }
+
+  /* Big timer */
+  .big-timer {
+    font-size: 5rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+    font-variant-numeric: tabular-nums;
+  }
+  .big-timer.work { color: var(--green-bright); }
+  .big-timer.rest { color: var(--amber); }
+  .big-timer.prep { color: var(--text2); }
+  .big-timer.danger { color: var(--red); }
+
+  /* Progress bar */
+  .progress-wrap {
+    height: 3px;
+    background: #2a2a2a;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s linear, background 0.3s;
+  }
+
+  /* Round/exercise counter */
+  .counters {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  .counter-val { color: var(--text); font-weight: 500; }
+
+  /* Exercise list */
+  .exercises-card {
+    background: var(--surface);
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    margin-bottom: 1.2rem;
+    overflow: hidden;
+  }
+  .exercises-title {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .exercise-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    border-bottom: 1px solid #1e1e1e;
+    transition: background 0.3s;
+    font-size: 0.78rem;
+  }
+  .exercise-row:last-child { border-bottom: none; }
+  .exercise-row.active { background: rgba(168,213,162,0.07); }
+  .exercise-row.done { opacity: 0.35; }
+  .ex-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    transition: background 0.3s, color 0.3s;
+  }
+  .exercise-row.active .ex-num { background: var(--green); color: var(--bg); }
+  .exercise-row.done .ex-num { background: #222; }
+  .ex-name { flex: 1; }
+  .ex-hint { font-size: 0.65rem; color: var(--muted); }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: 1px solid #333;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: #555; background: var(--surface2); }
+  .btn-primary {
+    background: var(--green);
+    color: #0f0f0f;
+    border-color: var(--green);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--green-bright); border-color: var(--green-bright); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Volume & voice */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  .settings-row label { white-space: nowrap; }
+  input[type=range] {
+    flex: 1;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+  .voice-status {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: #222;
+    white-space: nowrap;
+  }
+  .voice-status.ok { color: var(--green); }
+  .voice-status.warn { color: var(--amber); }
+
+  /* Overall progress */
+  .overall-progress {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .op-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    transition: background 0.3s;
+  }
+  .op-dot.done { background: var(--green); }
+  .op-dot.active { background: var(--amber); }
+
+  /* Completion screen */
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    margin-bottom: 1.2rem;
+  }
+  .done-screen.visible { display: block; }
+  .done-emoji { font-size: 3rem; margin-bottom: 1rem; }
+  .done-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .done-sub { font-size: 0.78rem; color: var(--text2); }
+
+  /* Pulse animation for active */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(168,213,162,0.3); }
+    70% { box-shadow: 0 0 0 12px rgba(168,213,162,0); }
+    100% { box-shadow: 0 0 0 0 rgba(168,213,162,0); }
+  }
+  .timer-card.pulsing { animation: pulse-ring 1.5s ease-out infinite; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-label">Mo & Fr &#183; 10:00</div>
+    <h1 class="header-title">K&#246;rper<em>gewicht</em></h1>
+    <div class="header-sub">3 Runden &#183; 5 &#220;bungen &#183; 40 Sek Arbeit / 20 Sek Pause &#183; ~20 Min</div>
+  </div>
+
+  <!-- Overall dot progress -->
+  <div class="overall-progress" id="overallProgress"></div>
+
+  <!-- Main timer display -->
+  <div class="timer-card" id="timerCard">
+    <div class="phase-label prep" id="phaseLabel">BEREIT</div>
+    <div class="exercise-name" id="exerciseName">Bereit machen</div>
+    <div class="exercise-note" id="exerciseNote">Stell dich locker hin &#183; tief durchatmen</div>
+    <div class="big-timer prep" id="bigTimer">&#8211;</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:100%;background:#333;"></div>
+    </div>
+    <div class="counters">
+      <div>Runde <span class="counter-val" id="roundDisplay">&#8211;</span> / 3</div>
+      <div>&#220;bung <span class="counter-val" id="exerciseDisplay">&#8211;</span> / 5</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn" onclick="startWorkout()">&#9654; Starten</button>
+    <button class="btn" id="pauseBtn" onclick="togglePause()" style="display:none">&#9208; Pause</button>
+    <button class="btn" onclick="resetWorkout()">&#8634; Reset</button>
+  </div>
+
+  <!-- Android Ton-Unlock -->
+  <div id="audioUnlockBox" style="display:none;background:#1a1a1a;border:1px solid #e65100;border-radius:12px;padding:.7rem 1.2rem;margin-bottom:1.2rem;text-align:center">
+    <div style="font-size:.65rem;color:#ff8a65;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem">Android &#183; Ton aktivieren</div>
+    <button onclick="unlockAudioAndroid()" style="background:#e65100;color:#fff;border:none;border-radius:10px;padding:.7rem 1.5rem;font-family:'DM Mono',monospace;font-size:.78rem;cursor:pointer;width:100%">&#128266; Ton erlauben</button>
+  </div>
+  <!-- Volume -->
+  <div class="settings-row">
+    <label>&#128266; Lautst&#228;rke</label>
+    <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.9" oninput="updateVol()">
+    <div class="voice-status" id="voiceStatus">pr&#252;fe&#8230;</div>
+  </div>
+
+  <!-- Done screen -->
+  <div class="done-screen" id="doneScreen">
+    <div class="done-emoji">&#127807;</div>
+    <div class="done-title">Geschafft!</div>
+    <div class="done-sub">3 Runden &#183; 15 &#220;bungen &#183; ~20 Minuten<br>Du bist gro&#223;artig! Jetzt duschen &#128703;</div>
+  </div>
+
+  <!-- Exercise list -->
+  <div class="exercises-card">
+    <div class="exercises-title">&#220;bungsplan</div>
+    <div class="exercise-row" id="row-0">
+      <div class="ex-num">1</div>
+      <div><div class="ex-name">Squats</div><div class="ex-hint">F&#252;&#223;e schulterbreit &#183; Knie &#252;ber Zehen</div></div>
+    </div>
+    <div class="exercise-row" id="row-1">
+      <div class="ex-num">2</div>
+      <div><div class="ex-name">Wandliegest&#252;tze</div><div class="ex-hint">H&#228;nde auf Schulterh&#246;he &#183; K&#246;rper gerade</div></div>
+    </div>
+    <div class="exercise-row" id="row-2">
+      <div class="ex-num">3</div>
+      <div><div class="ex-name">Beckenheben</div><div class="ex-hint">R&#252;cken auf Boden &#183; Ges&#228;&#223; langsam heben</div></div>
+    </div>
+    <div class="exercise-row" id="row-3">
+      <div class="ex-num">4</div>
+      <div><div class="ex-name">Ausfallschritte</div><div class="ex-hint">Abwechselnd links/rechts &#183; aufrecht bleiben</div></div>
+    </div>
+    <div class="exercise-row" id="row-4">
+      <div class="ex-num">5</div>
+      <div><div class="ex-name">Plank</div><div class="ex-hint">Unterarme &#183; K&#246;rper gerade &#183; atmen!</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// &#9472;&#9472;&#9472; WORKOUT DATA &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+const EXERCISES = [
+  { name: "Squats",         note: "F&#252;&#223;e schulterbreit &#183; Knie &#252;ber Zehen &#183; tief runter", voice: "Squats! F&#252;&#223;e schulterbreit, Knie &#252;ber die Zehen, und tief in die Knie." },
+  { name: "Wandliegest&#252;tze", note: "H&#228;nde auf Schulterh&#246;he &#183; K&#246;rper gerade halten",   voice: "Wandliegest&#252;tze! H&#228;nde auf Schulterh&#246;he, K&#246;rper bleibt eine gerade Linie." },
+  { name: "Beckenheben",    note: "R&#252;cken auf Boden &#183; Ges&#228;&#223; langsam heben & senken",   voice: "Beckenheben! R&#252;cken auf dem Boden, F&#252;&#223;e aufgestellt, Ges&#228;&#223; langsam heben und senken." },
+  { name: "Ausfallschritte", note: "Abwechselnd links & rechts &#183; Knie 90 Grad",        voice: "Ausfallschritte! Abwechselnd links und rechts, Knie neunzig Grad, aufrecht bleiben." },
+  { name: "Plank",          note: "Unterarme auf Boden &#183; K&#246;rper gerade wie ein Brett", voice: "Plank! Unterarme auf dem Boden, K&#246;rper gerade wie ein Brett, und atmen!" }
+];
+const ROUNDS = 3;
+const WORK_TIME = 40;
+const REST_TIME = 20;
+const PREP_TIME = 5;
+const ROUND_REST = 30; // rest between rounds
+
+// &#9472;&#9472;&#9472; STATE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+let timer = null;
+let secondsLeft = 0;
+let currentRound = 0;
+let currentExercise = 0;
+let phase = 'idle'; // idle | prep | work | rest | round-rest | done
+let isPaused = false;
+let totalSeconds = 0;
+let elapsedPhase = 0;
+let phaseDuration = 0;
+let volume = 0.9;
+let synth = window.speechSynthesis;
+let audioUnlocked = false;
+let voices = [];
+let germanVoice = null;
+
+// &#9472;&#9472;&#9472; VOICE SETUP &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function loadVoices() {
+  voices = synth.getVoices();
+  // Prefer German female voices
+  const pref = ['Anna', 'Helena', 'Katrin', 'Marlene', 'Google Deutsch', 'de-DE', 'de-AT', 'de-CH'];
+  germanVoice = null;
+  for (let p of pref) {
+    germanVoice = voices.find(v => v.name.includes(p) || v.lang.startsWith('de'));
+    if (germanVoice) break;
+  }
+  if (!germanVoice) germanVoice = voices.find(v => v.lang.startsWith('de'));
+  
+  const status = document.getElementById('voiceStatus');
+  if (germanVoice) {
+    status.textContent = '&#10003; ' + germanVoice.name.split(' ')[0];
+    status.className = 'voice-status ok';
+  } else {
+    status.textContent = '&#9888; keine DE-Stimme';
+    status.className = 'voice-status warn';
+  }
+}
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+setTimeout(loadVoices, 500);
+
+function speak(text, rate = 0.95) {
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.volume = volume;
+  u.rate = rate;
+  u.pitch = 1.0;
+  u.lang = 'de-DE';
+  if (germanVoice) u.voice = germanVoice;
+  synth.speak(u);
+}
+
+function updateVol() {
+  volume = parseFloat(document.getElementById('volRange').value);
+}
+
+// &#9472;&#9472;&#9472; BUILD OVERALL PROGRESS DOTS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function buildDots() {
+  const wrap = document.getElementById('overallProgress');
+  wrap.innerHTML = '';
+  const total = ROUNDS * EXERCISES.length;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'op-dot';
+    d.id = 'dot-' + i;
+    wrap.appendChild(d);
+  }
+}
+buildDots();
+
+// &#9472;&#9472;&#9472; UI UPDATES &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function updateUI() {
+  const timerEl = document.getElementById('bigTimer');
+  const phaseEl = document.getElementById('phaseLabel');
+  const nameEl  = document.getElementById('exerciseName');
+  const noteEl  = document.getElementById('exerciseNote');
+  const barEl   = document.getElementById('progressBar');
+  const card    = document.getElementById('timerCard');
+
+  const secs = secondsLeft;
+  timerEl.textContent = secs < 0 ? '0' : secs;
+
+  const pct = phaseDuration > 0 ? ((phaseDuration - elapsedPhase) / phaseDuration) * 100 : 100;
+
+  if (phase === 'prep') {
+    phaseEl.textContent = 'VORBEREITUNG';
+    phaseEl.className = 'phase-label prep';
+    nameEl.textContent = 'Gleich geht\\'s los&#8230;';
+    noteEl.textContent = 'Matte ausrollen &#183; locker sch&#252;tteln';
+    timerEl.className = 'big-timer prep';
+    barEl.style.background = '#444';
+    barEl.style.width = pct + '%';
+    card.classList.remove('pulsing');
+    updateCounters(1, 1);
+
+  } else if (phase === 'work') {
+    const ex = EXERCISES[currentExercise];
+    phaseEl.textContent = 'ARBEIT';
+    phaseEl.className = 'phase-label work';
+    nameEl.textContent = ex.name;
+    noteEl.textContent = ex.note;
+    timerEl.className = secs <= 5 ? 'big-timer danger' : 'big-timer work';
+    barEl.style.background = secs <= 5 ? 'var(--red)' : 'var(--green)';
+    barEl.style.width = pct + '%';
+    card.classList.add('pulsing');
+    updateCounters(currentRound + 1, currentExercise + 1);
+
+  } else if (phase === 'rest') {
+    phaseEl.textContent = 'PAUSE';
+    phaseEl.className = 'phase-label rest';
+    const nextEx = EXERCISES[(currentExercise + 1) % EXERCISES.length];
+    const isLastInRound = currentExercise === EXERCISES.length - 1;
+    nameEl.textContent = isLastInRound ? 'Rundenende' : 'N&#228;chste: ' + nextEx.name;
+    noteEl.textContent = 'Durchatmen &#183; kurz entspannen';
+    timerEl.className = 'big-timer rest';
+    barEl.style.background = 'var(--amber)';
+    barEl.style.width = pct + '%';
+    card.classList.remove('pulsing');
+    updateCounters(currentRound + 1, currentExercise + 1);
+
+  } else if (phase === 'round-rest') {
+    phaseEl.textContent = 'RUNDENPAUSE';
+    phaseEl.className = 'phase-label rest';
+    nameEl.textContent = 'Runde ' + (currentRound + 1) + ' geschafft!';
+    noteEl.textContent = 'Kurz verschnaufen &#183; Wasser trinken';
+    timerEl.className = 'big-timer rest';
+    barEl.style.background = 'var(--amber)';
+    barEl.style.width = pct + '%';
+    card.classList.remove('pulsing');
+    updateCounters(currentRound + 1, 5);
+
+  } else if (phase === 'done') {
+    phaseEl.textContent = 'FERTIG!';
+    phaseEl.className = 'phase-label done';
+    nameEl.textContent = '&#127807; Geschafft!';
+    noteEl.textContent = 'Super Leistung! Jetzt duschen &#128703;';
+    timerEl.textContent = '&#10003;';
+    timerEl.className = 'big-timer work';
+    barEl.style.width = '100%';
+    barEl.style.background = 'var(--green)';
+    card.classList.remove('pulsing');
+    document.getElementById('doneScreen').classList.add('visible');
+  }
+
+  updateExerciseList();
+  updateDots();
+}
+
+function updateCounters(r, e) {
+  document.getElementById('roundDisplay').textContent = r;
+  document.getElementById('exerciseDisplay').textContent = e;
+}
+
+function updateExerciseList() {
+  EXERCISES.forEach((_, i) => {
+    const row = document.getElementById('row-' + i);
+    row.classList.remove('active', 'done');
+    if (phase === 'work' && i === currentExercise) row.classList.add('active');
+    else if (phase === 'rest' && i === currentExercise) row.classList.add('active');
+    else if (phase === 'done') row.classList.add('done');
+    else if (phase === 'work' && i < currentExercise) row.classList.add('done');
+    else if (phase === 'rest' && i < currentExercise) row.classList.add('done');
+  });
+}
+
+function updateDots() {
+  const completedThisRound = (phase === 'work' || phase === 'rest') ? currentExercise : (phase === 'round-rest' ? EXERCISES.length : 0);
+  for (let r = 0; r < ROUNDS; r++) {
+    for (let e = 0; e < EXERCISES.length; e++) {
+      const dotIdx = r * EXERCISES.length + e;
+      const dot = document.getElementById('dot-' + dotIdx);
+      if (!dot) continue;
+      if (r < currentRound) dot.className = 'op-dot done';
+      else if (r === currentRound) {
+        if (e < completedThisRound) dot.className = 'op-dot done';
+        else if (e === completedThisRound && (phase === 'work')) dot.className = 'op-dot active';
+        else dot.className = 'op-dot';
+      } else dot.className = 'op-dot';
+    }
+  }
+  if (phase === 'done') {
+    document.querySelectorAll('.op-dot').forEach(d => d.className = 'op-dot done');
+  }
+}
+
+// &#9472;&#9472;&#9472; WORKOUT LOGIC &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function unlockAudioAndroid() {
+  if (!synth) return;
+  const u = new SpeechSynthesisUtterance(' ');
+  u.volume = 0; u.lang = 'de-DE';
+  synth.cancel(); synth.speak(u);
+  audioUnlocked = true;
+  document.getElementById('audioUnlockBox').style.display = 'none';
+  const vs = document.getElementById('voiceStatus');
+  vs.textContent = '\u2705 Ton aktiv'; vs.className = 'voice-status ok';
+  loadVoices();
+}
+
+function startWorkout() {
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('pauseBtn').style.display = 'flex';
+  document.getElementById('doneScreen').classList.remove('visible');
+
+  currentRound = 0;
+  currentExercise = 0;
+  
+  if (!audioUnlocked && /Android/i.test(navigator.userAgent)) {
+    document.getElementById('audioUnlockBox').style.display = 'block';
+    return;
+  }
+  audioUnlocked = true;
+  speak("Training beginnt! Mach dich bereit. Gleich geht es los!", 0.9);
+  
+  startPhase('prep', PREP_TIME);
+}
+
+function startPhase(p, duration, extraFn) {
+  phase = p;
+  secondsLeft = duration;
+  phaseDuration = duration;
+  elapsedPhase = 0;
+  
+  if (extraFn) extraFn();
+  updateUI();
+
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    if (isPaused) return;
+    elapsedPhase++;
+    secondsLeft--;
+
+    // Countdown announcements
+    if (phase === 'work') {
+      if (secondsLeft === 10) speak("Zehn Sekunden!", 1.1);
+      if (secondsLeft === 5) speak("F&#252;nf!", 1.2);
+      if (secondsLeft === 3) speak("Drei!", 1.2);
+      if (secondsLeft === 2) speak("Zwei!", 1.2);
+      if (secondsLeft === 1) speak("Eins!", 1.2);
+    }
+    if (phase === 'rest' || phase === 'round-rest') {
+      if (secondsLeft === 3) speak("Drei, zwei, eins&#8230;", 1.1);
+    }
+
+    updateUI();
+
+    if (secondsLeft <= 0) {
+      clearInterval(timer);
+      nextPhase();
+    }
+  }, 1000);
+}
+
+function nextPhase() {
+  if (phase === 'prep') {
+    // Start first exercise
+    startPhase('work', WORK_TIME, () => {
+      const ex = EXERCISES[currentExercise];
+      speak(ex.voice, 0.9);
+    });
+
+  } else if (phase === 'work') {
+    // Check if last exercise in round
+    if (currentExercise === EXERCISES.length - 1) {
+      // End of round
+      if (currentRound === ROUNDS - 1) {
+        // Done!
+        phase = 'done';
+        updateUI();
+        speak("Training abgeschlossen! Fantastisch! Du hast alle drei Runden geschafft. Jetzt kurz dehnen und dann duschen!", 0.88);
+      } else {
+        // Round rest
+        startPhase('round-rest', ROUND_REST, () => {
+          speak("Runde " + (currentRound + 1) + " geschafft! Super! Kurz verschnaufen, Wasser trinken. In " + ROUND_REST + " Sekunden geht Runde " + (currentRound + 2) + " los.", 0.9);
+        });
+      }
+    } else {
+      // Rest between exercises
+      startPhase('rest', REST_TIME, () => {
+        const nextEx = EXERCISES[currentExercise + 1];
+        speak("Pause. Als n&#228;chstes: " + nextEx.name, 0.9);
+      });
+    }
+
+  } else if (phase === 'rest') {
+    currentExercise++;
+    startPhase('work', WORK_TIME, () => {
+      const ex = EXERCISES[currentExercise];
+      speak(ex.voice, 0.9);
+    });
+
+  } else if (phase === 'round-rest') {
+    currentRound++;
+    currentExercise = 0;
+    startPhase('work', WORK_TIME, () => {
+      speak("Runde " + (currentRound + 1) + "! Los geht's! " + EXERCISES[currentExercise].voice, 0.9);
+    });
+  }
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  const btn = document.getElementById('pauseBtn');
+  if (isPaused) {
+    btn.textContent = '&#9654; Weiter';
+    synth.cancel();
+    speak("Pause.", 0.9);
+  } else {
+    btn.textContent = '&#9208; Pause';
+    speak("Weiter!", 1.0);
+  }
+}
+
+function resetWorkout() {
+  if (timer) clearInterval(timer);
+  synth.cancel();
+  isPaused = false;
+  phase = 'idle';
+  currentRound = 0;
+  currentExercise = 0;
+  secondsLeft = 0;
+  elapsedPhase = 0;
+  phaseDuration = 0;
+
+  document.getElementById('startBtn').style.display = 'flex';
+  document.getElementById('pauseBtn').style.display = 'none';
+  document.getElementById('pauseBtn').textContent = '&#9208; Pause';
+  document.getElementById('doneScreen').classList.remove('visible');
+
+  document.getElementById('phaseLabel').textContent = 'BEREIT';
+  document.getElementById('phaseLabel').className = 'phase-label prep';
+  document.getElementById('exerciseName').textContent = 'Bereit machen';
+  document.getElementById('exerciseNote').textContent = 'Stell dich locker hin &#183; tief durchatmen';
+  document.getElementById('bigTimer').textContent = '&#8211;';
+  document.getElementById('bigTimer').className = 'big-timer prep';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressBar').style.background = '#333';
+  document.getElementById('roundDisplay').textContent = '&#8211;';
+  document.getElementById('exerciseDisplay').textContent = '&#8211;';
+  document.getElementById('timerCard').classList.remove('pulsing');
+
+  EXERCISES.forEach((_, i) => {
+    const row = document.getElementById('row-' + i);
+    row.classList.remove('active', 'done');
+  });
+  buildDots();
+}
+
+// Test voice on load
+setTimeout(() => {
+  loadVoices();
+  if (/Android/i.test(navigator.userAgent)) {
+    document.getElementById('audioUnlockBox').style.display = 'block';
+    const vs = document.getElementById('voiceStatus');
+    vs.textContent = '\u26A0 Ton-Unlock n\u00F6tig'; vs.className = 'voice-status warn';
+  } else {
+    audioUnlocked = true;
+  }
+}, 1000);
+</script>
+</body>
+</html>

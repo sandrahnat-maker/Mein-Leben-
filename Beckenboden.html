@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beckenboden</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#FDF0F8;color:#2a0a1e;min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:linear-gradient(135deg,#9C27B0,#CE93D8);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr h1{color:#fff;font-size:.95rem;font-weight:700}
+.hdr p{color:rgba(255,255,255,.8);font-size:.6rem;margin-top:.05rem}
+.reset-btn{background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:.3rem .6rem;font-size:.65rem;cursor:pointer;font-family:inherit}
+.prog-bar{height:3px;background:rgba(156,39,176,.1);flex-shrink:0}
+.prog-fill{height:100%;background:linear-gradient(90deg,#9C27B0,#CE93D8);transition:width .4s}
+
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;gap:.7rem;text-align:center}
+.intro-ico{font-size:3.2rem}
+.intro-title{font-size:1.05rem;font-weight:700;color:#4a0a5e}
+.intro-info{font-size:.73rem;color:#7a4a8a;line-height:1.6;max-width:280px}
+.ex-list{width:100%;max-width:300px;text-align:left}
+.ex-list-item{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:1px solid #f0d0f8;font-size:.73rem;color:#4a0a5e}
+.ex-list-item:last-child{border:none}
+.ex-dur{font-size:.62rem;color:#9C27B0;margin-left:auto;font-weight:700}
+.start-btn{background:linear-gradient(135deg,#9C27B0,#CE93D8);color:#fff;border:none;border-radius:12px;padding:.7rem 2rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;width:100%;max-width:280px;margin-top:.3rem}
+
+.ex-card{flex:1;display:flex;flex-direction:column;padding:.9rem;gap:.65rem;overflow-y:auto}
+.illus{background:#fff;border-radius:14px;border:1px solid #f0d0f8;padding:.9rem;text-align:center;flex-shrink:0}
+.ex-ico{font-size:3.8rem;display:block;margin-bottom:.3rem}
+.ex-zone{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#CE93D8;margin-bottom:.2rem}
+.ex-name{font-size:1.05rem;font-weight:700;color:#4a0a5e}
+.ex-reps{font-size:.72rem;font-weight:700;color:#9C27B0;background:#F8E8FF;padding:.18rem .5rem;border-radius:6px;display:inline-block;margin-top:.25rem}
+
+/* Grosser Puls-Timer für Beckenboden */
+.pulse-wrap{display:flex;flex-direction:column;align-items:center;gap:.4rem;flex-shrink:0}
+.pulse-circle{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#9C27B0,#CE93D8);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(156,39,176,.3);transition:transform .15s,box-shadow .15s}
+.pulse-circle.squeeze{transform:scale(1.12);box-shadow:0 8px 30px rgba(156,39,176,.5)}
+.pulse-circle.release{transform:scale(.92);box-shadow:0 2px 10px rgba(156,39,176,.15)}
+.pulse-num{font-size:2rem;font-weight:700;color:#fff;line-height:1}
+.pulse-lbl{font-size:.55rem;color:rgba(255,255,255,.85);letter-spacing:.08em;text-transform:uppercase;margin-top:.1rem}
+.phase-txt{font-size:.9rem;font-weight:700;color:#4a0a5e;text-align:center}
+.phase-sub{font-size:.68rem;color:#7a4a8a;text-align:center}
+
+.instruction{background:#fff;border-radius:12px;border:1px solid #f0d0f8;padding:.75rem .9rem;flex-shrink:0}
+.inst-title{font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#CE93D8;margin-bottom:.4rem}
+.inst-steps{list-style:none}
+.inst-steps li{font-size:.78rem;color:#2a0a1e;line-height:1.5;padding:.1rem 0;display:flex;gap:.45rem}
+.inst-steps li::before{content:"→";color:#CE93D8;flex-shrink:0}
+.inst-tip{font-size:.65rem;color:#7a4a8a;margin-top:.35rem;font-style:italic;line-height:1.4}
+
+.btns{display:flex;gap:.5rem;padding:.7rem .9rem;flex-shrink:0;background:#FDF0F8}
+.btn-prev{background:#fff;color:#9C27B0;border:1.5px solid #CE93D8;border-radius:10px;padding:.55rem;font-size:.82rem;cursor:pointer;font-family:inherit;flex:0 0 2.6rem}
+.btn-main{flex:1;background:linear-gradient(135deg,#9C27B0,#CE93D8);color:#fff;border:none;border-radius:10px;padding:.55rem;font-size:.85rem;cursor:pointer;font-family:inherit;font-weight:700}
+.btn-main.paused{background:linear-gradient(135deg,#CE93D8,#e8b0f8)}
+.btn-skip{background:#fff;color:#9C27B0;border:1.5px solid #CE93D8;border-radius:10px;padding:.55rem;font-size:.82rem;cursor:pointer;font-family:inherit;flex:0 0 2.6rem}
+.dots{display:flex;gap:.28rem;justify-content:center;padding:.3rem .9rem;flex-shrink:0;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(156,39,176,.15);cursor:pointer;transition:all .2s}
+.dot.done{background:#CE93D8}.dot.active{background:#9C27B0;transform:scale(1.35)}
+
+.done-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;gap:.8rem}
+.done-ico{font-size:3.5rem}
+.done-title{font-size:1.15rem;font-weight:700;color:#4a0a5e}
+.done-sub{font-size:.75rem;color:#7a4a8a;line-height:1.6;max-width:260px}
+.done-again{background:linear-gradient(135deg,#9C27B0,#CE93D8);color:#fff;border:none;border-radius:12px;padding:.6rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>🌸 Beckenboden</h1><p id="hdrSub">5 Übungen · ca. 3 Minuten</p></div>
+  <button class="reset-btn" onclick="goIntro()">↺ Neu</button>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+<div id="mainContent"></div>
+<script>
+var EXERCISES = [
+  {
+    name: "Langsame Anspannung",
+    zone: "💪 Tiefe Beckenbodenmuskulatur",
+    ico: "🌸",
+    reps: "10 Wiederholungen · je 5 Sek",
+    dur: 70,
+    type: "slow", holdSec: 5, relaxSec: 3, reps: 10,
+    steps: [
+      "Bequem sitzen oder liegen — Schultern entspannen",
+      "Beckenbodenmuskel anspannen — wie Pipi anhalten",
+      "Spannung 5 Sekunden halten — normal weiteratmen!",
+      "Vollständig loslassen — 3 Sekunden entspannen",
+      "Wichtig: Po und Bauch dabei NICHT anspannen"
+    ],
+    tip: "Der Beckenboden liegt zwischen Schambein und Steißbein. Stell dir vor, du ziehst ihn langsam nach innen und oben."
+  },
+  {
+    name: "Schnelle Impulse",
+    zone: "⚡ Schnelle Muskelfasern",
+    ico: "⚡",
+    reps: "15 schnelle Impulse",
+    dur: 40,
+    type: "fast", holdSec: 1, relaxSec: 1, reps: 15,
+    steps: [
+      "Beckenboden schnell und kräftig anspannen",
+      "Sofort wieder vollständig loslassen",
+      "Rhythmisch — wie ein schnelles Auf und Ab",
+      "15 Impulse hintereinander",
+      "Kurze Pause, dann nochmal"
+    ],
+    tip: "Trainiert die schnellen Fasern — wichtig für plötzlichen Druck (Husten, Niesen, Lachen)."
+  },
+  {
+    name: "Fahrstuhlübung",
+    zone: "🎯 Tiefste Schicht",
+    ico: "🛗",
+    reps: "5 Wiederholungen",
+    dur: 60,
+    type: "elevator",
+    steps: [
+      "Beckenboden ganz leicht anspannen — Erdgeschoss",
+      "Spannung stufenweise erhöhen: 1. Stock → 2. Stock → 3. Stock",
+      "Oben kurz halten — maximale Spannung",
+      "Dann stufenweise wieder hinunter: 2. Stock → 1. Stock → Erdgeschoss",
+      "Ganz loslassen — sogar leicht nach unten entspannen (Keller)"
+    ],
+    tip: "Diese Übung baut die feinste Körperwahrnehmung auf und aktiviert Muskelschichten, die bei normalen Übungen nicht erreicht werden."
+  },
+  {
+    name: "Atemkopplung",
+    zone: "🌊 Beckenboden & Zwerchfell",
+    ico: "🌬️",
+    reps: "10 Atemzüge",
+    dur: 55,
+    type: "breath",
+    steps: [
+      "Eine Hand auf den Bauch legen",
+      "Beim AUSATMEN: Beckenboden leicht anspannen und heben",
+      "Beim EINATMEN: Beckenboden vollständig loslassen und senken",
+      "Bauch hebt und senkt sich natürlich mit dem Atem",
+      "Ruhiger, tiefer Atemrhythmus — ca. 4 Sek ein, 4 Sek aus"
+    ],
+    tip: "Beckenboden und Zwerchfell arbeiten als Team. Diese Kopplung ist der Schlüssel zur nachhaltigen Beckenbodenstärkung."
+  },
+  {
+    name: "Entspannung & Nachspüren",
+    zone: "✨ Bewusstsein & Entspannung",
+    ico: "✨",
+    reps: "1 Minute",
+    dur: 60,
+    type: "relax",
+    steps: [
+      "Bequem sitzen oder liegen",
+      "Bewusst alle Spannung im Beckenboden loslassen",
+      "Spüre wie der Beckenboden sich nach unten öffnet",
+      "Tief durch die Nase atmen",
+      "Genieße das Kribbeln und die Wärme in der Region"
+    ],
+    tip: "Entspannung ist genauso wichtig wie Anspannung. Ein dauerhaft zu angespannter Beckenboden macht genauso Probleme wie ein schwacher."
+  }
+];
+
+var synth = window.speechSynthesis;
+var voice = null;
+var curIdx = 0;
+var sec = 0;
+var interval = null;
+var isRunning = false;
+var isPaused = false;
+var state = 'intro';
+var pulsePhase = 'squeeze'; // squeeze | release
+var pulseSec = 0;
+
+function loadVoice() {
+  var voices = synth.getVoices();
+  var pref = ['Anna','Helena','Katrin','Marlene','Google Deutsch'];
+  for (var i=0;i<pref.length;i++) {
+    var v = voices.find(function(v){ return v.name.indexOf(pref[i])>=0; });
+    if (v) { voice=v; break; }
+  }
+  if (!voice) voice = voices.find(function(v){ return v.lang&&v.lang.startsWith('de'); });
+}
+if (synth.onvoiceschanged!==undefined) synth.onvoiceschanged=loadVoice;
+setTimeout(loadVoice,500);
+
+function speak(txt) {
+  try { synth.cancel(); var u=new SpeechSynthesisUtterance(txt); u.lang='de-DE'; u.rate=.88; u.volume=1; if(voice)u.voice=voice; synth.speak(u); } catch(e){}
+}
+
+function goIntro() {
+  clearInterval(interval); isRunning=false; isPaused=false; curIdx=0; sec=0; state='intro'; pulseSec=0; pulsePhase='squeeze';
+  try{synth.cancel();}catch(e){}
+  render();
+}
+
+function startTraining() {
+  state='running'; curIdx=0; sec=0; isRunning=true; isPaused=false; pulseSec=0; pulsePhase='squeeze';
+  render();
+  speak('Übung 1: '+EXERCISES[0].name+'. '+EXERCISES[0].steps[0]);
+  startTimer();
+}
+
+function getHoldRelax(ex) {
+  if (ex.type==='slow') return {hold:5, relax:3};
+  if (ex.type==='fast') return {hold:1, relax:1};
+  return {hold:4, relax:4};
+}
+
+function startTimer() {
+  clearInterval(interval);
+  interval = setInterval(function(){
+    if (isPaused) return;
+    sec++; pulseSec++;
+    var ex = EXERCISES[curIdx];
+    var hr = getHoldRelax(ex);
+    var cycle = hr.hold + hr.relax;
+
+    // Pulsing animation & voice cues
+    if (ex.type==='slow'||ex.type==='fast') {
+      var pos = (pulseSec-1) % cycle;
+      if (pos===0) { pulsePhase='squeeze'; speak('Anspannen'); updatePulse(); }
+      else if (pos===hr.hold) { pulsePhase='release'; speak('Loslassen'); updatePulse(); }
+    } else if (ex.type==='breath') {
+      var pos = (pulseSec-1) % 8;
+      if (pos===0) { pulsePhase='release'; speak('Einatmen'); updatePulse(); }
+      else if (pos===4) { pulsePhase='squeeze'; speak('Ausatmen, anspannen'); updatePulse(); }
+    } else if (ex.type==='elevator') {
+      var pos = (pulseSec-1) % 12;
+      if (pos===0) speak('Erster Stock');
+      else if (pos===2) speak('Zweiter Stock');
+      else if (pos===4) speak('Dritter Stock, halten');
+      else if (pos===6) speak('Zweiter Stock');
+      else if (pos===8) speak('Erster Stock');
+      else if (pos===10) { speak('Ganz loslassen'); pulsePhase='release'; updatePulse(); }
+    }
+
+    var rem = Math.max(0, ex.dur - sec);
+    if (rem===10) speak('Noch 10 Sekunden.');
+    if (rem===0) {
+      clearInterval(interval);
+      if (curIdx < EXERCISES.length-1) {
+        setTimeout(function(){
+          curIdx++; sec=0; pulseSec=0; pulsePhase='squeeze';
+          render();
+          speak('Übung '+(curIdx+1)+': '+EXERCISES[curIdx].name+'. '+EXERCISES[curIdx].steps[0]);
+          startTimer();
+        }, 2000);
+      } else {
+        state='done';
+        speak('Ausgezeichnet! Beckenboden-Training abgeschlossen. Gut gemacht!');
+        render();
+      }
+    }
+    renderTimer();
+  }, 1000);
+}
+
+function updatePulse() {
+  var el = document.getElementById('pulseCircle');
+  if (!el) return;
+  el.className = 'pulse-circle ' + pulsePhase;
+  var lbl = document.getElementById('pulseLbl');
+  if (lbl) lbl.textContent = pulsePhase==='squeeze' ? 'ANSPANNEN' : 'LOSLASSEN';
+}
+
+function togglePause() {
+  if (!isRunning) return;
+  isPaused=!isPaused;
+  if (isPaused){try{synth.cancel();}catch(e){} speak('Pause.')} else speak('Weiter.');
+  var btn=document.getElementById('btnMain');
+  if(btn){btn.textContent=isPaused?'▶ Weiter':'⏸ Pause'; btn.className='btn-main'+(isPaused?' paused':'');}
+}
+
+function skipEx() {
+  if (!isRunning) return;
+  clearInterval(interval); try{synth.cancel();}catch(e){}
+  if (curIdx<EXERCISES.length-1){curIdx++;sec=0;pulseSec=0;pulsePhase='squeeze';render();speak('Übung '+(curIdx+1)+': '+EXERCISES[curIdx].name+'.');startTimer();}
+  else{state='done';render();}
+}
+
+function goToEx(i) {
+  if(state!=='running')return;
+  clearInterval(interval);try{synth.cancel();}catch(e){}
+  curIdx=i;sec=0;pulseSec=0;pulsePhase='squeeze';isPaused=false;render();
+  speak('Übung '+(i+1)+': '+EXERCISES[i].name+'. '+EXERCISES[i].steps[0]);
+  startTimer();
+}
+
+function renderTimer() {
+  var ex=EXERCISES[curIdx];
+  var rem=Math.max(0,ex.dur-sec);
+  var el=document.getElementById('pulseNum');
+  if(el) el.textContent=rem+'s';
+  var btn=document.getElementById('btnMain');
+  if(btn){btn.textContent=isPaused?'▶ Weiter':'⏸ Pause';btn.className='btn-main'+(isPaused?' paused':'');}
+}
+
+function render() {
+  var html='';
+  if (state==='intro') {
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('hdrSub').textContent=EXERCISES.length+' Übungen · ca. 3 Minuten';
+    html='<div class="intro"><div class="intro-ico">🌸</div>'
+      +'<div class="intro-title">Beckenboden-Training</div>'
+      +'<div class="intro-info">'+EXERCISES.length+' Übungen · geführt mit Timer & Ansage · täglich 3 Minuten</div>'
+      +'<div class="ex-list">';
+    EXERCISES.forEach(function(ex,i){
+      html+='<div class="ex-list-item"><span style="font-size:1.1rem">'+ex.ico+'</span><span>'+ex.name+'</span><span class="ex-dur">'+ex.dur+'s</span></div>';
+    });
+    html+='</div><button class="start-btn" onclick="startTraining()">▶ Starten</button></div>';
+  } else if (state==='done') {
+    document.getElementById('progFill').style.width='100%';
+    html='<div class="done-screen"><div class="done-ico">✨</div>'
+      +'<div class="done-title">Geschafft!</div>'
+      +'<div class="done-sub">Alle '+EXERCISES.length+' Übungen abgeschlossen.<br>Täglich 3 Minuten — große Wirkung! 🌸</div>'
+      +'<button class="done-again" onclick="goIntro()">↺ Nochmal</button></div>';
+  } else {
+    var ex=EXERCISES[curIdx];
+    document.getElementById('progFill').style.width=Math.round(curIdx/EXERCISES.length*100)+'%';
+    document.getElementById('hdrSub').textContent='Übung '+(curIdx+1)+' von '+EXERCISES.length;
+    var stepsHtml=ex.steps.map(function(s){return'<li>'+s+'</li>';}).join('');
+    var dotsHtml=EXERCISES.map(function(e,i){
+      var c=i<curIdx?'done':i===curIdx?'active':'';
+      return'<div class="dot '+c+'" onclick="goToEx('+i+')"></div>';
+    }).join('');
+
+    html='<div class="ex-card">'
+      +'<div class="illus"><span class="ex-ico">'+ex.ico+'</span>'
+      +'<div class="ex-zone">'+ex.zone+'</div>'
+      +'<div class="ex-name">'+ex.name+'</div>'
+      +'<div style="margin-top:.25rem"><span class="ex-reps">'+ex.reps+'</span></div></div>'
+      +'<div class="pulse-wrap">'
+      +'<div class="pulse-circle squeeze" id="pulseCircle">'
+      +'<div class="pulse-num" id="pulseNum">'+ex.dur+'s</div>'
+      +'<div class="pulse-lbl" id="pulseLbl">ANSPANNEN</div>'
+      +'</div>'
+      +'<div class="phase-txt" id="phaseTxt">Bereit</div>'
+      +'<div class="phase-sub">'+ex.reps+'</div>'
+      +'</div>'
+      +'<div class="instruction"><div class="inst-title">So geht\'s</div>'
+      +'<ul class="inst-steps">'+stepsHtml+'</ul>'
+      +(ex.tip?'<div class="inst-tip">💡 '+ex.tip+'</div>':'')
+      +'</div></div>'
+      +'<div class="dots">'+dotsHtml+'</div>'
+      +'<div class="btns">'
+      +'<button class="btn-prev" onclick="goToEx(Math.max(0,curIdx-1))">◀</button>'
+      +'<button class="btn-main" id="btnMain" onclick="togglePause()">⏸ Pause</button>'
+      +'<button class="btn-skip" onclick="skipEx()">▶▶</button>'
+      +'</div>';
+  }
+  document.getElementById('mainContent').innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>

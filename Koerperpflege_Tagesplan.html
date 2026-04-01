@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mein Körperpflege-Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#faf6f1;--warm:#f0e6d8;--rose:#c4856a;--rose-dark:#9e6249;--brown:#5c3d2e;--gold:#d4a96a;--green:#7a9e7e;--text:#3a2a1e;--light:#e8ddd4;--dm:#e30613;--bipa:#8b1a6b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;font-weight:300;}
+.hero{background:linear-gradient(135deg,#3a5c3a 0%,#6b9e6b 50%,#a3c4a8 100%);padding:44px 24px 32px;text-align:center;position:relative;overflow:hidden;}
+.hero h1{font-family:'Playfair Display',serif;font-size:2em;color:#fff;font-weight:400;line-height:1.3;position:relative;z-index:1;}
+.hero h1 em{font-style:italic;color:#f5e090;}
+.hero p{color:rgba(255,255,255,0.85);margin-top:8px;font-size:.88em;letter-spacing:.05em;position:relative;z-index:1;}
+.filter-bar{display:flex;gap:8px;justify-content:center;padding:18px 16px 0;flex-wrap:wrap;}
+.filter-btn{font-family:'Lato',sans-serif;font-size:.8em;font-weight:700;padding:7px 18px;border-radius:30px;border:2px solid transparent;cursor:pointer;transition:all .2s;}
+.filter-btn.all{background:var(--warm);color:var(--brown);border-color:var(--light);}
+.filter-btn.all.on{background:var(--brown);color:#fff;}
+.filter-btn.dm{background:#fff0f0;color:var(--dm);border-color:var(--dm);}
+.filter-btn.dm.on{background:var(--dm);color:#fff;}
+.filter-btn.bipa{background:#f9f0f7;color:var(--bipa);border-color:var(--bipa);}
+.filter-btn.bipa.on{background:var(--bipa);color:#fff;}
+.container{max-width:720px;margin:0 auto;padding:22px 14px 60px;}
+.intro-note{background:var(--warm);border-left:4px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;font-size:.88em;line-height:1.7;color:var(--brown);}
+.intro-note strong{color:var(--rose-dark);font-weight:700;}
+.section{margin-bottom:18px;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(60,80,60,.1);}
+.sec-header{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none;}
+.sec-header .ico{font-size:1.4em;flex-shrink:0;}
+.sec-header .tg{flex:1;}
+.sec-header h2{font-family:'Playfair Display',serif;font-size:1.1em;font-weight:600;color:#fff;}
+.sec-header .sub{font-size:.77em;color:rgba(255,255,255,.75);margin-top:2px;}
+.sec-header .tb{display:inline-block;background:rgba(255,255,255,.22);color:#fff;font-size:.72em;padding:2px 9px;border-radius:20px;margin-top:4px;}
+.chev{color:rgba(255,255,255,.7);font-size:.85em;transition:transform .3s;}
+.section.open .chev{transform:rotate(180deg);}
+.sec-body{background:#fff;max-height:0;overflow:hidden;transition:max-height .45s ease;}
+.section.open .sec-body{max-height:5000px;}
+.sec-inner{padding:18px 18px 10px;}
+.s-dusche    .sec-header{background:linear-gradient(90deg,#5c7a5c,#7a9e7e);}
+.s-massage   .sec-header{background:linear-gradient(90deg,#7a5c9e,#b08ac4);}
+.s-cellulite .sec-header{background:linear-gradient(90deg,#9e7a3a,#c4a86a);}
+.s-fuesse    .sec-header{background:linear-gradient(90deg,#5c3d2e,#9e6249);}
+.s-bewegung  .sec-header{background:linear-gradient(90deg,#3a5c3a,#6b9e6b);}
+.s-ernaehrung .sec-header{background:linear-gradient(90deg,#3a7a5c,#6bc4a0);}
+.s-schlaf    .sec-header{background:linear-gradient(90deg,#3a3a7a,#6b6bc4);}
+.s-profi     .sec-header{background:linear-gradient(90deg,#7a3a5c,#c46b9e);}
+.s-woche     .sec-header{background:linear-gradient(90deg,#7a8fa3,#a3b8c4);}
+.step{padding:13px 0;border-bottom:1px solid var(--light);}
+.step:last-child{border-bottom:none;}
+.step-top{display:flex;gap:12px;align-items:flex-start;}
+.step-num{background:var(--warm);color:var(--rose-dark);font-weight:700;font-size:.76em;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-content strong{display:block;font-weight:700;font-size:.92em;color:var(--brown);margin-bottom:3px;}
+.step-content p{font-size:.85em;color:#6b5144;line-height:1.6;}
+.products{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+.prod-card{border-radius:10px;padding:11px 14px;display:flex;align-items:flex-start;gap:12px;border:1.5px solid transparent;}
+.prod-card.dm-card{background:#fff5f5;border-color:#f5c0c0;}
+.prod-card.bipa-card{background:#f9f0f7;border-color:#e0b0d0;}
+.prod-card.hidden{display:none;}
+.shop-badge{font-size:.68em;font-weight:700;padding:3px 8px;border-radius:10px;flex-shrink:0;white-space:nowrap;margin-top:2px;}
+.shop-badge.dm{background:var(--dm);color:#fff;}
+.shop-badge.bipa{background:var(--bipa);color:#fff;}
+.prod-info .prod-brand{font-size:.78em;color:var(--rose-dark);font-weight:700;margin-bottom:2px;}
+.prod-info .prod-name{font-weight:700;font-size:.88em;color:var(--brown);}
+.prod-info .prod-desc{font-size:.8em;color:#7a6458;line-height:1.5;margin-top:3px;}
+.prod-info .prod-price{display:inline-block;margin-top:5px;background:var(--warm);color:var(--brown);font-size:.76em;font-weight:700;padding:2px 9px;border-radius:10px;}
+.prod-info .prod-note{display:inline-block;margin-top:5px;margin-left:4px;background:#e8f5e8;color:#3a6b42;font-size:.73em;font-weight:700;padding:2px 8px;border-radius:10px;}
+.tipp-box{background:#e8f5e8;border-left:3px solid #7a9e7e;padding:10px 14px;border-radius:0 8px 8px 0;font-size:.82em;color:#3a6b42;line-height:1.6;margin:10px 0;}
+.tipp-box strong{font-weight:700;}
+.info-box{background:#f0f4f8;border-left:3px solid #7a8fa3;padding:10px 14px;border-radius:0 8px 8px 0;font-size:.82em;color:#3a4a5c;line-height:1.6;margin:10px 0;}
+.info-box strong{font-weight:700;}
+.massage-steps{margin-top:10px;}
+.massage-step{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--light);font-size:.84em;color:#6b5144;line-height:1.5;}
+.massage-step:last-child{border-bottom:none;}
+.massage-step .ms-num{background:var(--warm);color:var(--rose-dark);font-weight:700;font-size:.8em;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.food-list{list-style:none;margin-top:5px;}
+.food-list li{font-size:.87em;color:#6b5144;padding:6px 0;border-bottom:1px solid var(--light);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.food-list li:last-child{border-bottom:none;}
+.food-list li::before{content:'✦';color:var(--gold);font-size:.7em;flex-shrink:0;margin-top:3px;}
+.food-list li strong{color:var(--brown);font-weight:700;}
+.sleep-grid,.profi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;}
+@media(max-width:480px){.sleep-grid,.profi-grid{grid-template-columns:1fr;}}
+.sleep-card,.profi-card{background:var(--warm);border-radius:10px;padding:12px 14px;}
+.sc-icon,.pc-icon{font-size:1.5em;margin-bottom:6px;}
+.sc-title,.pc-name{font-weight:700;font-size:.88em;color:var(--brown);margin-bottom:4px;}
+.sc-desc,.pc-desc{font-size:.8em;color:#6b5144;line-height:1.5;}
+.pc-cost{margin-top:6px;display:inline-block;background:#fff;color:var(--rose-dark);font-size:.76em;font-weight:700;padding:2px 8px;border-radius:10px;}
+.week-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+@media(max-width:480px){.week-grid{grid-template-columns:1fr;}}
+.week-card{background:var(--warm);border-radius:10px;padding:10px 12px;text-align:center;}
+.week-card .wday{font-weight:700;font-size:.78em;color:var(--rose-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.week-card .wact{font-size:.8em;color:#6b5144;line-height:1.4;}
+.ritual-box{background:#f0f4f8;border:1.5px solid #a3b8c4;border-radius:10px;padding:13px 16px;margin-top:10px;}
+.ritual-box h4{font-weight:700;font-size:.88em;color:#3a5a7a;margin-bottom:8px;}
+.ritual-box ol{padding-left:18px;}
+.ritual-box li{font-size:.83em;color:#4a6a8a;line-height:1.7;}
+.motivation{text-align:center;padding:28px 20px;background:linear-gradient(135deg,#eaf5ea,var(--cream));border-radius:14px;margin-top:8px;}
+.motivation p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.02em;color:var(--brown);line-height:1.7;}
+.motivation .sig{margin-top:10px;font-size:.78em;color:var(--green);letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Mein Körperpflege-<br><em>Tagesplan</em></h1>
+  <p>Naturkosmetik · Straffe Haut · Massage · Cellulite · Füße · DM &amp; BIPA Österreich</p>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn all on" onclick="setFilter('all',this)">🌿 Alle</button>
+  <button class="filter-btn dm"     onclick="setFilter('dm',this)">🔴 Nur DM</button>
+  <button class="filter-btn bipa"   onclick="setFilter('bipa',this)">🟣 Nur BIPA</button>
+</div>
+
+<div class="container">
+  <div class="intro-note">
+    <strong>Dein vollständiger Körperpflege-Plan:</strong> Tippe auf einen Abschnitt zum Aufklappen. Du findest hier Morgen- &amp; Abendroutine, Massage-Techniken, Cellulite-Pflege, Fußpflege, Ernährung, Schlaf und professionelle Optionen – alles mit Naturkosmetik-Produkten aus DM und BIPA Österreich.
+  </div>
+
+  <!-- 1. DUSCHE -->
+  <div class="section s-dusche open" id="s1">
+    <div class="sec-header" onclick="toggle('s1')">
+      <span class="ico">🚿</span>
+      <div class="tg"><h2>Morgens: Dusche &amp; Körperpflege</h2>
+      <div class="sub">Trockenbürsten · Duschen · Einölen</div>
+      <span class="tb">⏱ ca. 15 Min.</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="step">
+        <div class="step-top"><div class="step-num">1</div><div class="step-content">
+          <strong>Trockenbürsten VOR der Dusche – 3–5 Min.</strong>
+          <p>Mit einer Naturborsten-Körperbürste die trockene Haut von den Füßen aufwärts zum Herzen bürsten. Aktiviert Lymphe und Durchblutung, peelt sanft und ist der effektivste Heimtipp gegen Cellulite und schlaffe Haut überhaupt.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">ebelin / Badaccessoires bei DM</div>
+            <div class="prod-name">Körperbürste mit Naturborsten</div>
+            <div class="prod-desc">Mit langem Stiel für den Rücken. Auf echte Naturborsten achten – Kunstfasern sind zu weich für den Trockenbürsten-Effekt.</div>
+            <span class="prod-price">ca. € 5–12 · einmaliger Kauf</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">Kneipp oder BIPA Eigenmarke</div>
+            <div class="prod-name">Massagebürste Naturborsten</div>
+            <div class="prod-desc">In der Körperpflege-Abteilung. Sisal- oder Wildschweinborsten sind ideal.</div>
+            <span class="prod-price">ca. € 5–10 · einmaliger Kauf</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">2</div><div class="step-content">
+          <strong>Pflegedusche – lauwarm, kein heißes Wasser</strong>
+          <p>Heißes Wasser trocknet die Haut nach der Menopause stark aus. Lauwarm ist ideal. Zum Abschluss: 30–60 Sekunden kalt (Wechseldusche) – strafft die Haut nach wenigen Wochen sichtbar.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">alverde NATURKOSMETIK</div>
+            <div class="prod-name">Pflegedusche Mandel &amp; Kokos</div>
+            <div class="prod-desc">Mit Bio-Mandelöl und Bio-Kokosöl. Reinigt sanft und pflegt gleichzeitig – ideal für trockene, schlaffe Haut.</div>
+            <span class="prod-price">ca. € 2,45 · 250 ml</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">WELEDA</div>
+            <div class="prod-name">Citrus Erfrischungs-Duschgel</div>
+            <div class="prod-desc">100% Naturkosmetik, cremige Formel mit ätherischen Ölen. Reinigt ohne auszutrocknen, lässt die Haut samtig weich.</div>
+            <span class="prod-price">ca. € 7,99 · 200 ml</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">3</div><div class="step-content">
+          <strong>Körperöl auf noch feuchter Haut einmassieren</strong>
+          <p>Direkt nach der Dusche auf leicht feuchter Haut auftragen – dann zieht es am besten ein. Von unten nach oben einmassieren.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">alverde NATURKOSMETIK</div>
+            <div class="prod-name">Körperöl Cellulite Zitrone Rosmarin</div>
+            <div class="prod-desc">Mit ätherischen Ölen, regt den Hautstoffwechsel an. 4,6★ bei 290+ Bewertungen. Auch als All-in-One Mandel-Kokos-Öl erhältlich.</div>
+            <span class="prod-price">ca. € 4,75 · 100 ml</span><span class="prod-note">★ Bestseller</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">WELEDA</div>
+            <div class="prod-name">Granatapfel Körperöl</div>
+            <div class="prod-desc">Mit Granatapfelsamenöl, Jojobaöl und Macadamiaöl – strafft die Haut sichtbar. Beim Einmassieren fördern ätherische Öle die Durchblutung.</div>
+            <span class="prod-price">ca. € 17,99 · 100 ml</span><span class="prod-note">★ Premium</span>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 2. MASSAGE -->
+  <div class="section s-massage" id="s2">
+    <div class="sec-header" onclick="toggle('s2')">
+      <span class="ico">🙌</span>
+      <div class="tg"><h2>Massage – Selbst &amp; Profi</h2>
+      <div class="sub">Lymphdrainage · Faszienrolle · Cupping · Wechseldusche</div>
+      <span class="tb">⏱ täglich 5–10 Min.</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="tipp-box"><strong>Warum Massage so wirksam ist:</strong> Neben Bewegung ist Massage die effektivste Maßnahme gegen Cellulite. Sie aktiviert den Lymphfluss, verbessert die Durchblutung und regt die Kollagenproduktion nachweislich an.</div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">1</div><div class="step-content">
+          <strong>Selbstmassage täglich – 5 Min. nach der Dusche</strong>
+          <p>Körperöl auftragen, dann mit kräftigen, knetenden Bewegungen massieren – wie Brotteig. Immer von unten nach oben, Richtung Herz und Lymphknoten.</p>
+        </div></div>
+        <div class="massage-steps">
+          <div class="massage-step"><div class="ms-num">→</div><div><strong>Oberschenkel:</strong> Von Knie bis Hüfte ausstreichen, dann kräftig auskneten. 2 Min. pro Seite.</div></div>
+          <div class="massage-step"><div class="ms-num">→</div><div><strong>Po:</strong> Kreisende Knetbewegungen mit Knöcheln – besonders auf Dellen konzentrieren. 2 Min.</div></div>
+          <div class="massage-step"><div class="ms-num">→</div><div><strong>Bauch:</strong> Im Uhrzeigersinn kreisen – fördert auch Verdauung und Lymphdrainage.</div></div>
+          <div class="massage-step"><div class="ms-num">→</div><div><strong>Abschluss:</strong> Mit flachen Händen alles von unten nach oben ausstreichen – Beine, Arme, Seiten.</div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">2</div><div class="step-content">
+          <strong>Faszienrolle – 3× pro Woche, 10 Min.</strong>
+          <p>Löst Verklebungen im Bindegewebe, verbessert Durchblutung und reduziert Cellulite sichtbar. Oberschenkel, Po, Wade und Rücken langsam ausrollen – mit Körpergewicht. Bei Schmerz kurz pausieren und weiteratmen.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">Sport-Abteilung DM</div>
+            <div class="prod-name">Faszienrolle / Foam Roller</div>
+            <div class="prod-desc">Harte Rollen sind wirksamer als weiche. Alternativ: Igelball für gezielte Punkte. Einmaliger Kauf, jahrelang nutzbar.</div>
+            <span class="prod-price">ca. € 8–18</span><span class="prod-note">✓ Einmaliger Kauf</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">Wellness-Abteilung BIPA</div>
+            <div class="prod-name">Stachelroller / Massagerolle</div>
+            <div class="prod-desc">Günstiger als eine Faszienrolle, ideal für Schenkel und Po. Mit Cellulite-Öl kombinieren für maximale Wirkung.</div>
+            <span class="prod-price">ca. € 5–12</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">3</div><div class="step-content">
+          <strong>Cupping / Schröpfmassage – 2× pro Woche</strong>
+          <p>Silikonschröpfköpfe mit etwas Öl auf der Haut festsaugen und in kreisenden Bewegungen führen. Der Saugeffekt löst das Bindegewebe von innen. Nach 4–6 Wochen sichtbare Ergebnisse – echter Geheimtipp! Niemals auf trockener Haut anwenden.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">Körperpflege-Zubehör DM</div>
+            <div class="prod-name">Silikon-Schröpfköpfe / Vakuummassage-Set</div>
+            <div class="prod-desc">Set mit 2–4 Größen. Immer mit Massageöl (alverde Cellulite-Öl) verwenden.</div>
+            <span class="prod-price">ca. € 5–12</span><span class="prod-note">★ Geheimtipp</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">Wellness-Zubehör BIPA</div>
+            <div class="prod-name">Massage-Schröpfköpfe Silikon</div>
+            <div class="prod-desc">Perfekt mit WELEDA Birken Cellulite-Öl: Öl auftragen, dann schröpfen – maximale Tiefenwirkung.</div>
+            <span class="prod-price">ca. € 5–10</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">4</div><div class="step-content">
+          <strong>Wechseldusche – täglich zum Dusch-Abschluss</strong>
+          <p>Die letzten 30–60 Sekunden kalt stellen – besonders auf Oberschenkel, Po und Bauch richten. Strafft die Haut nach wenigen Wochen sichtbar und gibt Energie für den Tag.</p>
+        </div></div>
+        <div class="tipp-box"><strong>So starten:</strong> Erst 10 Sekunden kalt – jeden Tag 5 Sekunden länger. Nach 2 Wochen schaffst du 60 Sekunden problemlos.</div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">5</div><div class="step-content">
+          <strong>Professionelle Lymphdrainage – 1× monatlich</strong>
+          <p>Eine Physiotherapeutin führt die manuelle Lymphdrainage durch – entfernt Giftstoffe aus dem Bindegewebe, reduziert Schwellungen und Cellulite. Sehr entspannend und hochwirksam.</p>
+        </div></div>
+        <div class="tipp-box"><strong>💡 Kassentipp Österreich:</strong> Bei Lipödem oder Venenschwäche kann Lymphdrainage von der Krankenkasse übernommen werden – mit deiner Ärztin besprechen!</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 3. CELLULITE -->
+  <div class="section s-cellulite" id="s3">
+    <div class="sec-header" onclick="toggle('s3')">
+      <span class="ico">💆‍♀️</span>
+      <div class="tg"><h2>Cellulite-Öl-Routine</h2>
+      <div class="sub">Täglich nach der Dusche · Öl + Technik</div>
+      <span class="tb">⏱ 5 Min. täglich</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="info-box"><strong>Ehrlich gesagt:</strong> Cellulite ist zu 90% genetisch. Aber konsequente Massage + Öl + Trockenbürsten + Bewegung können das Erscheinungsbild über Wochen messbar verbessern – das ist wissenschaftlich belegt.</div>
+      <div class="products" style="margin-top:12px;">
+        <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+          <div class="prod-brand">WELEDA (auch bei DM erhältlich)</div>
+          <div class="prod-name">Birke Cellulite-Öl</div>
+          <div class="prod-desc">Das bekannteste Naturkosmetik-Produkt gegen Cellulite weltweit. Birkenblätter-Extrakt, Rosmarin und Ruscus aktivieren den Hautstoffwechsel. Dermatologisch bestätigt: nach 28 Tagen messbar straffere Haut. Öko-Test Sehr Gut.</div>
+          <span class="prod-price">ca. € 14,99 · 100 ml</span><span class="prod-note">★ Testsieger</span>
+        </div></div>
+        <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+          <div class="prod-brand">WELEDA</div>
+          <div class="prod-name">Birke Cellulite-Öl 200 ml Vorteilsgröße</div>
+          <div class="prod-desc">Bei BIPA oft in der 200ml-Größe erhältlich – günstiger pro ml. Gleiche bewährte Formel mit Bio-Jojobaöl, Weizenkeimöl und Aprikosenkernöl.</div>
+          <span class="prod-price">ca. € 23–26 · 200 ml</span><span class="prod-note">★ Beste Wahl</span>
+        </div></div>
+      </div>
+      <div class="step" style="margin-top:12px;">
+        <div class="step-top"><div class="step-num">+</div><div class="step-content">
+          <strong>Körperpeeling 1× pro Woche vor dem Öl</strong>
+          <p>Peeling entfernt tote Hautzellen und macht die Haut aufnahmefähiger für das Cellulite-Öl. Direkt vor dem Öl anwenden – Wirkung wird verdoppelt.</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">alverde NATURKOSMETIK</div>
+            <div class="prod-name">Körperpeeling Himalaya-Salz oder Kaffee-Kokos</div>
+            <div class="prod-desc">Natürliche Peelingpartikel regen die Durchblutung an. Besonders auf Cellulite-Zonen anwenden.</div>
+            <span class="prod-price">ca. € 3,25 · 200 ml</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">WELEDA</div>
+            <div class="prod-name">Birke Körperpeeling</div>
+            <div class="prod-desc">Passt perfekt zum Birken Cellulite-Öl. Mit Birkenblatttinktur – ideal als Vorbereitung vor dem Öl.</div>
+            <span class="prod-price">ca. € 12,99 · 150 ml</span><span class="prod-note">★ Perfekte Kombi</span>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 4. ABEND KÖRPER -->
+  <div class="section s-dusche" id="s4">
+    <div class="sec-header" onclick="toggle('s4')">
+      <span class="ico">🌙</span>
+      <div class="tg"><h2>Abends: Intensive Körperpflege</h2>
+      <div class="sub">Reichhaltige Nachtpflege · Dekolleté · Hals</div>
+      <span class="tb">⏱ 5 Min.</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="step">
+        <div class="step-top"><div class="step-num">1</div><div class="step-content">
+          <strong>Reichhaltige Körperbutter abends</strong>
+          <p>Abends eine reichhaltigere Pflege als morgens – der Körper regeneriert nachts. Besonders Oberschenkel, Po, Bauch, Oberarme und Dekolleté einmassieren. Hals nicht vergessen!</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">lavera (bei DM)</div>
+            <div class="prod-name">Straffende Body Lotion mit Sheabutter</div>
+            <div class="prod-desc">Mit Bio-Sheabutter und pflanzlichen Ceramiden. Spendet Feuchtigkeit bis zu 24 Stunden, speziell für erschlaffte Haut.</div>
+            <span class="prod-price">ca. € 8,95 · 200 ml</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">WELEDA</div>
+            <div class="prod-name">Skin Food Body Butter</div>
+            <div class="prod-desc">Vegane Körperbutter mit Sheabutter und Kakaobutter – unvergleichlich reichhaltig für sehr trockene, schlaffe Haut. Öko-Test Sieger.</div>
+            <span class="prod-price">ca. € 14,99 · 150 ml</span><span class="prod-note">★ Kultstatus</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-top"><div class="step-num">2</div><div class="step-content">
+          <strong>Fußcreme mit Söckchen – täglich abends</strong>
+          <p>Großzügig auf Fersen, Ballen und Zehen auftragen, dann Söckchen anziehen. Die Wärme hilft beim Einziehen und macht die Creme doppelt so wirksam gegen Hornhaut!</p>
+        </div></div>
+        <div class="products">
+          <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+            <div class="prod-brand">alverde NATURKOSMETIK</div>
+            <div class="prod-name">5in1 Fußcreme Bio-Salbei &amp; Bio-Weidenrinde</div>
+            <div class="prod-desc">Schützt vor Hornhaut, wirkt antimikrobiell, desodoriert und pflegt intensiv. Mit Kokosöl, Jojobaöl, Aloe Vera und Sheabutter.</div>
+            <span class="prod-price">ca. € 2,75 · 75 ml</span><span class="prod-note">★ Preis-Leistung</span>
+          </div></div>
+          <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+            <div class="prod-brand">WELEDA</div>
+            <div class="prod-name">Fußbalsam mit Myrrhe &amp; Calendula</div>
+            <div class="prod-desc">Kräftigt die Haut, beugt Hornhaut- und Schrundenbildung vor. Olivenöl und Wollwachs pflegen intensiv. Öko-Test Sehr Gut.</div>
+            <span class="prod-price">ca. € 7,99 · 75 ml</span><span class="prod-note">★ Öko-Test</span>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 5. FÜSSE -->
+  <div class="section s-fuesse" id="s5">
+    <div class="sec-header" onclick="toggle('s5')">
+      <span class="ico">🦶</span>
+      <div class="tg"><h2>Fußpflege – Hornhaut</h2>
+      <div class="sub">Wöchentliches Ritual gegen Hornhaut &amp; rissige Fersen</div>
+      <span class="tb">1× pro Woche · 15 Min.</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="info-box"><strong>Wichtig:</strong> Nicht zu aggressiv abfeilen! Hornhaut schützt die Fersen. Ziel ist weiche, gepflegte Haut – tägliches Eincremen ist wirksamer als gelegentliches intensives Abfeilen.</div>
+      <div class="ritual-box" style="margin-top:12px;">
+        <h4>🛁 Wöchentliches Fußritual (15 Min.)</h4>
+        <ol>
+          <li>Fußbad: warmes Wasser mit 1 EL Natron oder Meersalz – 10 Min. einweichen</li>
+          <li>Hornhaut mit Bimsstein sanft abrubbeln (Fersen, Ballen) – niemals trocken!</li>
+          <li>Füße abtrocknen und großzügig Fußcreme einmassieren</li>
+          <li>Söckchen anziehen, 20 Min. oder über Nacht einwirken lassen</li>
+        </ol>
+      </div>
+      <div class="products" style="margin-top:12px;">
+        <div class="prod-card dm-card" data-shop="dm"><span class="shop-badge dm">DM</span><div class="prod-info">
+          <div class="prod-brand">alverde NATURKOSMETIK</div>
+          <div class="prod-name">Fußbutter Pinie &amp; Sheabutter</div>
+          <div class="prod-desc">Besonders intensive Pflege für stark rissige Fersen. Reichhaltige Buttertextur für die wöchentliche Intensivpflege über Nacht.</div>
+          <span class="prod-price">ca. € 3,25 · 75 ml</span>
+        </div></div>
+        <div class="prod-card bipa-card" data-shop="bipa"><span class="shop-badge bipa">BIPA</span><div class="prod-info">
+          <div class="prod-brand">lavera</div>
+          <div class="prod-name">Basis Sensitiv Fußcreme mit Bio-Sanddorn</div>
+          <div class="prod-desc">Für empfindliche, trockene Haut – beruhigt und regeneriert gereizte Fußhaut intensiv. Zertifizierte Naturkosmetik.</div>
+          <span class="prod-price">ca. € 5,99 · 75 ml</span>
+        </div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 6. BEWEGUNG -->
+  <div class="section s-bewegung" id="s6">
+    <div class="sec-header" onclick="toggle('s6')">
+      <span class="ico">🏃‍♀️</span>
+      <div class="tg"><h2>Bewegung – unverzichtbar</h2>
+      <div class="sub">Das Wirksamste gegen schlaffe Haut &amp; Cellulite</div>
+      <span class="tb">mind. 3–5× pro Woche</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="tipp-box"><strong>Kein Produkt ersetzt Bewegung:</strong> Nach der Menopause verliert der Körper Muskelmasse – das macht die Haut schlaff. Bewegung ist die einzige Maßnahme, die von innen wirklich strafft.</div>
+      <div class="step"><div class="step-top"><div class="step-num">1</div><div class="step-content">
+        <strong>Schwimmen – die Königsdisziplin</strong>
+        <p>Der Wasserwiderstand massiert beim Schwimmen die gesamte Haut. Alle Muskelgruppen werden trainiert ohne Gelenkbelastung. 2–3× pro Woche, 30–45 Min. Aqua-Fitness ist auch ideal.</p>
+      </div></div></div>
+      <div class="step"><div class="step-top"><div class="step-num">2</div><div class="step-content">
+        <strong>Täglich 30 Min. zügig gehen</strong>
+        <p>Aktiviert Beinvenen (wichtig gegen Cellulite!), verbrennt Fett, fördert Lymphzirkulation. Treppen statt Lift. Der einfachste, kostenloseste und trotzdem einer der wirksamsten Tipps.</p>
+      </div></div></div>
+      <div class="step"><div class="step-top"><div class="step-num">3</div><div class="step-content">
+        <strong>Krafttraining 2× pro Woche – strafft von innen</strong>
+        <p>Mit eigenem Körpergewicht: Kniebeugen, Ausfallschritte, Liegestütze (kniend), Brücke – jeweils 3 Sätze à 12 Wiederholungen. Muskelaufbau ist das Wirksamste gegen schlaffe Haut.</p>
+      </div></div>
+      <div class="tipp-box"><strong>★ Kniebeugen</strong> sind die effektivste Übung gegen schlaffe Oberschenkel- und Po-Haut. Täglich 3×15 – nach 6 Wochen spürbar straffere Haut.</div>
+      </div>
+      <div class="step"><div class="step-top"><div class="step-num">4</div><div class="step-content">
+        <strong>Yoga oder Pilates 1–2× pro Woche</strong>
+        <p>Dehnt Faszien, verbessert die Körperhaltung (schlechte Haltung verstärkt schlaffe Haut optisch enorm!) und reduziert Stresshormone. Kostenlos auf YouTube verfügbar.</p>
+      </div></div></div>
+    </div></div>
+  </div>
+
+  <!-- 7. ERNÄHRUNG -->
+  <div class="section s-ernaehrung" id="s7">
+    <div class="sec-header" onclick="toggle('s7')">
+      <span class="ico">🥗</span>
+      <div class="tg"><h2>Ernährung &amp; Supplements</h2>
+      <div class="sub">Kollagen von innen aufbauen</div>
+      <span class="tb">täglich</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <ul class="food-list">
+        <li><strong>1,5–2 Liter Wasser täglich</strong> – Cellulite wird durch Dehydration stark verschlechtert</li>
+        <li><strong>Protein bei jeder Mahlzeit:</strong> Hülsenfrüchte, Eier, Fisch, Geflügel – ab 50 braucht der Körper mehr für Kollagen und Muskelaufbau</li>
+        <li><strong>Vitamin C täglich:</strong> rote Paprika, Brokkoli, Petersilie, Zitrusfrüchte – essenziell für die Kollagensynthese</li>
+        <li><strong>Zucker stark reduzieren</strong> – schädigt Kollagen direkt und verschlimmert Cellulite durch Entzündungen</li>
+        <li><strong>Omega-3-Fettsäuren:</strong> Lachs, Walnüsse, Leinsamen – entzündungshemmend, stärken Hautbarriere</li>
+        <li><strong>Wenig Salz &amp; Alkohol</strong> – beides fördert Wassereinlagerungen, die Cellulite verstärken</li>
+        <li><strong>Siliziumreiche Lebensmittel:</strong> Hirse, Hafer – Baustein für Kollagen und Bindegewebe</li>
+        <li><strong>Kollagen-Supplement:</strong> 10g täglich über mind. 3 Monate – bei DM und BIPA erhältlich</li>
+        <li><strong>Vitamin D:</strong> Nach der Menopause häufig mangelhaft – Blut testen lassen, ggf. supplementieren</li>
+        <li><strong>Magnesium:</strong> Entspannt Muskeln, verbessert Schlaf – wichtig für Hautregeneration</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <!-- 8. SCHLAF & STRESS -->
+  <div class="section s-schlaf" id="s8">
+    <div class="sec-header" onclick="toggle('s8')">
+      <span class="ico">😴</span>
+      <div class="tg"><h2>Schlaf &amp; Stressmanagement</h2>
+      <div class="sub">Unterschätzt – aber entscheidend für die Haut</div>
+      <span class="tb">täglich</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="info-box"><strong>Warum Schlaf so wichtig ist:</strong> Im Schlaf produziert der Körper Wachstumshormon – der stärkste natürliche Kollagen-Booster. Stress erhöht Cortisol, das Kollagen direkt abbaut. Kein Serum gleicht das aus.</div>
+      <div class="sleep-grid">
+        <div class="sleep-card"><div class="sc-icon">💤</div><div class="sc-title">7–8 Stunden Schlaf</div><div class="sc-desc">Regelmäßige Schlafzeiten. Im Schlaf regeneriert sich Kollagen – jede Stunde weniger ist in der Haut sichtbar.</div></div>
+        <div class="sleep-card"><div class="sc-icon">🛏</div><div class="sc-title">Rückenlage &amp; Seidenkissen</div><div class="sc-desc">Auf dem Rücken schlafen vermindert Druckfalten. Seidenkissenbezug reduziert den Zug auf die Haut.</div></div>
+        <div class="sleep-card"><div class="sc-icon">🧘‍♀️</div><div class="sc-title">Stress aktiv reduzieren</div><div class="sc-desc">Cortisol baut Kollagen ab und verstärkt Cellulite. Täglich 10 Min. Atemübungen oder Spaziergang helfen messbar.</div></div>
+        <div class="sleep-card"><div class="sc-icon">🌿</div><div class="sc-title">Abend-Ritual</div><div class="sc-desc">Lavendelöl, Körpermassage, warmer Kräutertee, kein Bildschirm 1h vor dem Schlafen – signalisiert: jetzt regenerieren.</div></div>
+        <div class="sleep-card"><div class="sc-icon">🚫</div><div class="sc-title">Nicht rauchen</div><div class="sc-desc">Nikotin zerstört Kollagen massiver als alles andere und verschlechtert die Hautdurchblutung sofort.</div></div>
+        <div class="sleep-card"><div class="sc-icon">☀️</div><div class="sc-title">Sonnenschutz am Körper</div><div class="sc-desc">Auch am Dekolleté und den Armen! UV ist Hauptgrund für schlaffe, faltige Körperhaut. LSF 30–50 täglich.</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 9. PROFESSIONELL -->
+  <div class="section s-profi" id="s9">
+    <div class="sec-header" onclick="toggle('s9')">
+      <span class="ico">🏥</span>
+      <div class="tg"><h2>Professionelle Behandlungen</h2>
+      <div class="sub">Wenn Heimroutine allein nicht reicht</div>
+      <span class="tb">monatlich / nach Bedarf</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <div class="info-box"><strong>Wann lohnt es sich?</strong> Wenn nach 3 Monaten konsequenter Heimroutine keine zufriedenstellende Verbesserung sichtbar ist, oder du schnellere Ergebnisse möchtest.</div>
+      <div class="profi-grid">
+        <div class="profi-card"><div class="pc-icon">🌊</div><div class="pc-name">LPG-Endermologie</div><div class="pc-desc">Medizinische Vakuummassage – Goldstandard gegen Cellulite, dermatologisch bestätigt wirksam.</div><div class="pc-cost">€ 60–100 / Sitzung</div></div>
+        <div class="profi-card"><div class="pc-icon">⚡</div><div class="pc-name">Radiofrequenz</div><div class="pc-desc">Wärmt tiefe Hautschichten, regt Kollagen an. Sehr gut gegen schlaffe Haut an Oberschenkeln und Bauch.</div><div class="pc-cost">€ 80–200 / Behandlung</div></div>
+        <div class="profi-card"><div class="pc-icon">🔊</div><div class="pc-name">HIFU (Ultraschall-Lifting)</div><div class="pc-desc">Fokussierter Ultraschall strafft tief unter der Haut. Ergebnis hält 12–18 Monate.</div><div class="pc-cost">€ 200–500 / Zone</div></div>
+        <div class="profi-card"><div class="pc-icon">❄️</div><div class="pc-name">Kryolipolyse</div><div class="pc-desc">Kälte zerstört Fettzellen dauerhaft. Gut für lokale Fettdepots an Bauch, Oberschenkel, Taille.</div><div class="pc-cost">€ 200–500 / Zone</div></div>
+        <div class="profi-card"><div class="pc-icon">💉</div><div class="pc-name">Mesotherapie</div><div class="pc-desc">Mikroinjektionen mit Vitaminen und Hyaluronsäure direkt ins Bindegewebe – sehr wirksam gegen Cellulite.</div><div class="pc-cost">€ 100–300 / Sitzung</div></div>
+        <div class="profi-card"><div class="pc-icon">🧪</div><div class="pc-name">Hormontherapie</div><div class="pc-desc">Östrogen verbessert nachweislich Hautdicke und Kollagengehalt. Mit Gynäkologin besprechen.</div><div class="pc-cost">Arztgespräch empfohlen</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 10. WOCHENÜBERSICHT -->
+  <div class="section s-woche" id="s10">
+    <div class="sec-header" onclick="toggle('s10')">
+      <span class="ico">📅</span>
+      <div class="tg"><h2>Wochenübersicht</h2>
+      <div class="sub">Was täglich · wöchentlich · monatlich</div>
+      <span class="tb">Schnellübersicht</span></div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="sec-body"><div class="sec-inner">
+      <p style="font-size:.84em;font-weight:700;color:var(--brown);margin-bottom:8px;">🔄 TÄGLICH</p>
+      <div class="week-grid" style="margin-bottom:16px;">
+        <div class="week-card"><div class="wday">Morgens</div><div class="wact">Trockenbürsten · Dusche · Körperöl · Wechseldusche</div></div>
+        <div class="week-card"><div class="wday">Tagsüber</div><div class="wact">30 Min. Gehen · Treppen · viel Wasser · Sonnenschutz</div></div>
+        <div class="week-card"><div class="wday">Abends</div><div class="wact">5 Min. Cellulite-Massage · Fußcreme + Söckchen · Nachtcreme</div></div>
+      </div>
+      <p style="font-size:.84em;font-weight:700;color:var(--brown);margin-bottom:8px;">📅 2–3× PRO WOCHE</p>
+      <div class="week-grid" style="margin-bottom:16px;">
+        <div class="week-card"><div class="wday">Cupping</div><div class="wact">Schröpfmassage mit Öl auf Problemzonen</div></div>
+        <div class="week-card"><div class="wday">Faszienrolle</div><div class="wact">Oberschenkel, Po, Wade ausrollen</div></div>
+        <div class="week-card"><div class="wday">Schwimmen</div><div class="wact">30–45 Min. oder Krafttraining</div></div>
+      </div>
+      <p style="font-size:.84em;font-weight:700;color:var(--brown);margin-bottom:8px;">🗓 1× PRO WOCHE</p>
+      <div class="week-grid">
+        <div class="week-card"><div class="wday">Körperpeeling</div><div class="wact">Vor der Dusche auf Cellulite-Zonen</div></div>
+        <div class="week-card"><div class="wday">Fußritual</div><div class="wact">Fußbad · Bimsstein · Intensivpflege</div></div>
+        <div class="week-card"><div class="wday">Lymphdrainage</div><div class="wact">Professionell (monatlich) oder intensive Selbstmassage</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="motivation">
+    <p>„Dein Körper hat 54 Jahre lang für dich gearbeitet. Täglich 15 Minuten, konsequent über 3 Monate – und du wirst einen echten Unterschied sehen und spüren."</p>
+    <div class="sig">DEIN VOLLSTÄNDIGER KÖRPERPFLEGE-PLAN · MIT LIEBE ERSTELLT 🌿</div>
+  </div>
+
+</div>
+<script>
+function toggle(id){document.getElementById(id).classList.toggle('open');}
+function setFilter(f,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.prod-card').forEach(card=>{
+    card.classList.toggle('hidden',f!=='all'&&card.dataset.shop!==f);
+  });
+}
+</script>
+</body>
+</html>

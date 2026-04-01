@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surfbalanceboard Training</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a1628;
+    --surface: #111e35;
+    --surface2: #172540;
+    --blue: #7ec8e3;
+    --blue-bright: #b0dff0;
+    --amber: #e8c87a;
+    --red: #e07070;
+    --muted: #4a6080;
+    --text: #e8f4f8;
+    --text2: #7a9ab0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 2rem;
+    overflow-x: hidden;
+  }
+
+  /* Wave background */
+  body::before {
+    content: '';
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 35vh;
+    background: radial-gradient(ellipse at 50% 100%, rgba(126,200,227,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .container { max-width: 420px; width: 100%; position: relative; z-index: 1; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 1.8rem; }
+  .header-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 0.5rem;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .header-title em { font-style: italic; color: var(--blue-bright); }
+  .header-sub {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+  }
+
+  /* Phase dots */
+  .phase-dots {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .pd { width: 8px; height: 8px; border-radius: 50%; background: #1e3050; transition: background 0.4s; }
+  .pd.done { background: var(--blue); }
+  .pd.active { background: var(--amber); }
+
+  /* Main card */
+  .timer-card {
+    background: var(--surface);
+    border: 1px solid #1e3050;
+    border-radius: 20px;
+    padding: 1.8rem 1.5rem 1.5rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .timer-card::before {
+    content: '';
+    position: absolute;
+    top: -60%; left: -30%;
+    width: 160%; height: 120%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(126,200,227,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .phase-label {
+    font-size: 0.63rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+    transition: color 0.3s;
+  }
+  .phase-label.work  { color: var(--blue); }
+  .phase-label.rest  { color: var(--amber); }
+  .phase-label.free  { color: var(--blue-bright); }
+  .phase-label.prep  { color: var(--text2); }
+  .phase-label.done  { color: var(--blue-bright); }
+
+  .exercise-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    line-height: 1.2;
+    min-height: 1.9em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+  }
+  .exercise-note {
+    font-size: 0.7rem;
+    color: var(--text2);
+    min-height: 2.5em;
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+
+  .big-timer {
+    font-size: 4.8rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s;
+  }
+  .big-timer.work   { color: var(--blue-bright); }
+  .big-timer.rest   { color: var(--amber); }
+  .big-timer.free   { color: var(--blue-bright); }
+  .big-timer.prep   { color: var(--text2); }
+  .big-timer.danger { color: var(--red); }
+
+  .progress-wrap {
+    height: 3px;
+    background: #1e3050;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s linear, background 0.3s;
+  }
+
+  .counters {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  .counter-val { color: var(--text); font-weight: 500; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  .btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: 1px solid #1e3050;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: #2e4570; background: var(--surface2); }
+  .btn-primary {
+    background: var(--blue);
+    color: #0a1628;
+    border-color: var(--blue);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--blue-bright); border-color: var(--blue-bright); }
+
+  /* Settings */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid #1e3050;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  input[type=range] { flex: 1; accent-color: var(--blue); cursor: pointer; }
+  .voice-status {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: #0f1e38;
+    white-space: nowrap;
+  }
+  .voice-status.ok   { color: var(--blue); }
+  .voice-status.warn { color: var(--amber); }
+
+  /* Exercise plan */
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid #1e3050;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+  }
+  .plan-title {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.63rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+    border-bottom: 1px solid #1a2e4a;
+  }
+  .plan-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.65rem 1.2rem;
+    border-bottom: 1px solid #141e32;
+    font-size: 0.78rem;
+    transition: background 0.3s;
+  }
+  .plan-row:last-child { border-bottom: none; }
+  .plan-row.active { background: rgba(126,200,227,0.07); }
+  .plan-row.done   { opacity: 0.3; }
+  .plan-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #1e3050;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .plan-row.active .plan-num { background: var(--blue); color: #0a1628; }
+  .plan-info { flex: 1; }
+  .plan-name { font-weight: 500; margin-bottom: 2px; }
+  .plan-hint { font-size: 0.65rem; color: var(--muted); line-height: 1.4; }
+  .plan-dur {
+    font-size: 0.65rem;
+    color: var(--text2);
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* Done screen */
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid #1e3050;
+    border-radius: 20px;
+    margin-bottom: 1.2rem;
+  }
+  .done-screen.visible { display: block; }
+  .done-emoji { font-size: 3rem; margin-bottom: 1rem; }
+  .done-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .done-sub { font-size: 0.78rem; color: var(--text2); line-height: 1.7; }
+
+  /* Pulse */
+  @keyframes wave-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(126,200,227,0.25); }
+    70%  { box-shadow: 0 0 0 14px rgba(126,200,227,0); }
+    100% { box-shadow: 0 0 0 0 rgba(126,200,227,0); }
+  }
+  .timer-card.pulsing { animation: wave-pulse 2s ease-out infinite; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-label">Mittwoch · 10:00</div>
+    <h1 class="header-title">Surf<em>balance</em>board</h1>
+    <div class="header-sub">6 Phasen · Balance · Koordination · ~30 Min</div>
+  </div>
+
+  <div class="phase-dots" id="phaseDots"></div>
+
+  <!-- Timer card -->
+  <div class="timer-card" id="timerCard">
+    <div class="phase-label prep" id="phaseLabel">BEREIT</div>
+    <div class="exercise-name" id="exerciseName">Bereit machen</div>
+    <div class="exercise-note" id="exerciseNote">Board bereitstellen · barfuß oder Socken · locker schütteln</div>
+    <div class="big-timer prep" id="bigTimer">–</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:100%;background:#1e3050;"></div>
+    </div>
+    <div class="counters">
+      <div>Phase <span class="counter-val" id="phaseDisplay">–</span> / 6</div>
+      <div>Zeit <span class="counter-val" id="timeDisplay">30:00</span></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn" onclick="startWorkout()">▶ Starten</button>
+    <button class="btn" id="pauseBtn" onclick="togglePause()" style="display:none">⏸ Pause</button>
+    <button class="btn" onclick="resetWorkout()">↺ Reset</button>
+  </div>
+
+  <!-- Volume -->
+  <div class="settings-row">
+    <label>🔊 Lautstärke</label>
+    <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.9" oninput="updateVol()">
+    <div class="voice-status" id="voiceStatus">prüfe…</div>
+  </div>
+
+  <!-- Done screen -->
+  <div class="done-screen" id="doneScreen">
+    <div class="done-emoji">🏄</div>
+    <div class="done-title">Surfer-Feeling!</div>
+    <div class="done-sub">30 Minuten Gleichgewicht · Balance · Koordination<br>Deine Tiefenmuskulatur sagt danke 🌊<br>Jetzt duschen! 🚿</div>
+  </div>
+
+  <!-- Plan -->
+  <div class="plan-card">
+    <div class="plan-title">Trainingsplan</div>
+    <div class="plan-row" id="prow-0">
+      <div class="plan-num">1</div>
+      <div class="plan-info">
+        <div class="plan-name">Warm-up: Grundbalance</div>
+        <div class="plan-hint">Beide Füße mittig · Arme locker ausgestreckt · einpendeln lassen</div>
+      </div>
+      <div class="plan-dur">5 Min</div>
+    </div>
+    <div class="plan-row" id="prow-1">
+      <div class="plan-num">2</div>
+      <div class="plan-info">
+        <div class="plan-name">Gewichtsverlagerung</div>
+        <div class="plan-hint">Langsam links → rechts · Board nie ganz aufsetzen</div>
+      </div>
+      <div class="plan-dur">5 Min</div>
+    </div>
+    <div class="plan-row" id="prow-2">
+      <div class="plan-num">3</div>
+      <div class="plan-info">
+        <div class="plan-name">Squats auf dem Board</div>
+        <div class="plan-hint">Langsam in die Knie · Balance halten · 3 × 10 Wdh</div>
+      </div>
+      <div class="plan-dur">5 Min</div>
+    </div>
+    <div class="plan-row" id="prow-3">
+      <div class="plan-num">4</div>
+      <div class="plan-info">
+        <div class="plan-name">Einbeinstand</div>
+        <div class="plan-hint">Abwechselnd links/rechts · Blick auf fixen Punkt · 30 Sek pro Seite</div>
+      </div>
+      <div class="plan-dur">5 Min</div>
+    </div>
+    <div class="plan-row" id="prow-4">
+      <div class="plan-num">5</div>
+      <div class="plan-info">
+        <div class="plan-name">Dreher & Rotation</div>
+        <div class="plan-hint">Oberkörper langsam links/rechts drehen · Hüfte stabil</div>
+      </div>
+      <div class="plan-dur">3 Min</div>
+    </div>
+    <div class="plan-row" id="prow-5">
+      <div class="plan-num">6</div>
+      <div class="plan-info">
+        <div class="plan-name">Freies Balancieren</div>
+        <div class="plan-hint">Einfach spielen · keine Vorgabe · Musik an wenn du magst!</div>
+      </div>
+      <div class="plan-dur">7 Min</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── PHASES ─────────────────────────────────────────────────────────────────
+const PHASES = [
+  {
+    name: "Warm-up: Grundbalance",
+    note: "Beide Füße mittig · Arme locker ausgestreckt · ruhig atmen",
+    duration: 5 * 60,
+    type: "work",
+    voiceStart: "Warm-up! Stell dich mit beiden Füßen mittig auf das Board. Arme locker ausgestreckt zur Seite. Lass das Board ruhig einpendeln und atme gleichmäßig. Keine Hektik, einfach ankommen.",
+    voiceMid: "Du machst das toll. Spür wie dein Körper die Balance sucht. Lass die Muskeln arbeiten.",
+    voiceEnd: null
+  },
+  {
+    name: "Gewichtsverlagerung",
+    note: "Langsam links → rechts · kontrolliert · Board nie ganz aufsetzen",
+    duration: 5 * 60,
+    type: "work",
+    voiceStart: "Jetzt Gewichtsverlagerung. Verlagere dein Gewicht langsam von links nach rechts. Kontrolliert und gleichmäßig. Das Board soll nie ganz auf dem Boden aufsetzen.",
+    voiceMid: "Schön ruhig. Links, rechts, links, rechts. Stell dir vor du surfst auf einer kleinen Welle.",
+    voiceEnd: null
+  },
+  {
+    name: "Squats auf dem Board",
+    note: "Langsam in die Knie · Balance halten · Tiefe langsam steigern",
+    duration: 5 * 60,
+    type: "work",
+    voiceStart: "Squats auf dem Board! Füße schulterbreit, und jetzt langsam in die Knie. Viel langsamer als normal, weil du gleichzeitig die Balance halten musst. Das ist die Herausforderung!",
+    voiceMid: "Tief und langsam. Rücken gerade. Die Balance-Arbeit macht die Squats doppelt so effektiv.",
+    voiceEnd: null
+  },
+  {
+    name: "Einbeinstand",
+    note: "Abwechselnd links/rechts · Blick auf fixen Punkt · 30 Sek pro Seite",
+    duration: 5 * 60,
+    type: "work",
+    voiceStart: "Einbeinstand! Such dir einen fixen Punkt vor dir aus, und heb ein Bein an. Halte dreißig Sekunden, dann Seite wechseln. Der Blickpunkt hilft dir die Balance zu halten.",
+    voiceMid: "Wechsle jetzt die Seite wenn du noch nicht gewechselt hast. Blick bleibt auf dem fixen Punkt.",
+    voiceEnd: null
+  },
+  {
+    name: "Dreher & Rotation",
+    note: "Oberkörper langsam drehen · Hüfte stabil · gut für die Taille",
+    duration: 3 * 60,
+    type: "work",
+    voiceStart: "Dreher und Rotation! Steh stabil auf dem Board und drehe deinen Oberkörper langsam nach links, dann nach rechts. Die Hüfte bleibt so ruhig wie möglich. Diese Übung ist super für die Taille!",
+    voiceMid: "Langsam und bewusst. Links, Mitte, rechts, Mitte. Atme dabei gleichmäßig.",
+    voiceEnd: null
+  },
+  {
+    name: "Freies Balancieren",
+    note: "Einfach spielen · keine Vorgabe · genieße es!",
+    duration: 7 * 60,
+    type: "free",
+    voiceStart: "Und jetzt der schönste Teil: sieben Minuten freies Balancieren! Keine Vorgaben, kein Stress. Spiel einfach mit dem Board. Mach was sich gut anfühlt. Du kannst Musik anmachen und einfach genießen!",
+    voiceMid: "Du bist auf einer Welle. Genieß das Gefühl. Probier ruhig neue Bewegungen aus.",
+    voiceEnd: "Gleich fertig! Noch eine Minute. Komm langsam zur Ruhe."
+  }
+];
+
+// Transition messages between phases
+const TRANSITIONS = [
+  "Sehr gut! Jetzt kommen wir zur Gewichtsverlagerung.",
+  "Wunderbar! Jetzt Squats auf dem Board. Das wird spannend!",
+  "Super! Jetzt der Einbeinstand. Such dir deinen fixen Punkt.",
+  "Toll! Jetzt Dreher und Rotation. Nur noch zwei Phasen!",
+  "Fast fertig! Jetzt sieben Minuten freies Balancieren. Das hast du dir verdient!"
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let timer = null;
+let currentPhase = 0;
+let secondsLeft = 0;
+let phaseDuration = 0;
+let elapsedPhase = 0;
+let totalElapsed = 0;
+const TOTAL_DURATION = PHASES.reduce((s, p) => s + p.duration, 0);
+let phase = 'idle';
+let isPaused = false;
+let volume = 0.9;
+let midSpoken = false;
+let endSpoken = false;
+
+// ─── VOICE ───────────────────────────────────────────────────────────────────
+let synth = window.speechSynthesis;
+let germanVoice = null;
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  const pref = ['Anna', 'Helena', 'Katrin', 'Marlene', 'Google Deutsch'];
+  germanVoice = null;
+  for (let p of pref) {
+    germanVoice = voices.find(v => v.name.includes(p));
+    if (germanVoice) break;
+  }
+  if (!germanVoice) germanVoice = voices.find(v => v.lang.startsWith('de'));
+  const status = document.getElementById('voiceStatus');
+  if (germanVoice) {
+    status.textContent = '✓ ' + germanVoice.name.split(' ')[0];
+    status.className = 'voice-status ok';
+  } else {
+    status.textContent = '⚠ keine DE-Stimme';
+    status.className = 'voice-status warn';
+  }
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+setTimeout(loadVoices, 500);
+
+function speak(text, rate = 0.92) {
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.volume = volume;
+  u.rate = rate;
+  u.pitch = 1.0;
+  u.lang = 'de-DE';
+  if (germanVoice) u.voice = germanVoice;
+  synth.speak(u);
+}
+
+function updateVol() {
+  volume = parseFloat(document.getElementById('volRange').value);
+}
+
+// ─── DOTS ────────────────────────────────────────────────────────────────────
+function buildDots() {
+  const wrap = document.getElementById('phaseDots');
+  wrap.innerHTML = '';
+  PHASES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pd';
+    d.id = 'pd-' + i;
+    wrap.appendChild(d);
+  });
+}
+buildDots();
+
+function updateDots() {
+  PHASES.forEach((_, i) => {
+    const d = document.getElementById('pd-' + i);
+    if (i < currentPhase) d.className = 'pd done';
+    else if (i === currentPhase && phase === 'running') d.className = 'pd active';
+    else d.className = 'pd';
+  });
+  if (phase === 'done') document.querySelectorAll('.pd').forEach(d => d.className = 'pd done');
+}
+
+// ─── UI UPDATE ───────────────────────────────────────────────────────────────
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function updateUI() {
+  const timerEl   = document.getElementById('bigTimer');
+  const phaseEl   = document.getElementById('phaseLabel');
+  const nameEl    = document.getElementById('exerciseName');
+  const noteEl    = document.getElementById('exerciseNote');
+  const barEl     = document.getElementById('progressBar');
+  const card      = document.getElementById('timerCard');
+  const phDispEl  = document.getElementById('phaseDisplay');
+  const timeDispEl= document.getElementById('timeDisplay');
+
+  const remaining = TOTAL_DURATION - totalElapsed;
+  timeDispEl.textContent = formatTime(Math.max(0, remaining));
+
+  const pct = phaseDuration > 0 ? ((phaseDuration - elapsedPhase) / phaseDuration) * 100 : 100;
+
+  if (phase === 'idle') {
+    phaseEl.textContent = 'BEREIT';
+    phaseEl.className = 'phase-label prep';
+    timerEl.className = 'big-timer prep';
+    barEl.style.background = '#1e3050';
+    barEl.style.width = '100%';
+    card.classList.remove('pulsing');
+    return;
+  }
+
+  if (phase === 'prep') {
+    phaseEl.textContent = 'VORBEREITUNG';
+    phaseEl.className = 'phase-label prep';
+    nameEl.textContent = 'Gleich geht\'s los…';
+    noteEl.textContent = 'Board bereitstellen · barfuß oder Socken · locker schütteln';
+    timerEl.textContent = secondsLeft;
+    timerEl.className = 'big-timer prep';
+    barEl.style.background = '#2e4570';
+    barEl.style.width = pct + '%';
+    card.classList.remove('pulsing');
+    phDispEl.textContent = '–';
+    return;
+  }
+
+  if (phase === 'transition') {
+    phaseEl.textContent = 'WEITER';
+    phaseEl.className = 'phase-label rest';
+    nameEl.textContent = 'Kurze Pause';
+    const next = PHASES[currentPhase];
+    noteEl.textContent = 'Als nächstes: ' + next.name;
+    timerEl.textContent = secondsLeft;
+    timerEl.className = 'big-timer rest';
+    barEl.style.background = 'var(--amber)';
+    barEl.style.width = pct + '%';
+    card.classList.remove('pulsing');
+    phDispEl.textContent = currentPhase + 1;
+    updateRowHighlight(currentPhase);
+    updateDots();
+    return;
+  }
+
+  if (phase === 'running') {
+    const p = PHASES[currentPhase];
+    phaseEl.textContent = p.type === 'free' ? 'FREIES BALANCIEREN' : 'TRAINING';
+    phaseEl.className = 'phase-label ' + (p.type === 'free' ? 'free' : 'work');
+    nameEl.textContent = p.name;
+    noteEl.textContent = p.note;
+    timerEl.textContent = secondsLeft <= 9 ? secondsLeft : formatTime(secondsLeft);
+    timerEl.className = secondsLeft <= 10 ? 'big-timer danger' : ('big-timer ' + (p.type === 'free' ? 'free' : 'work'));
+    barEl.style.background = secondsLeft <= 10 ? 'var(--red)' : (p.type === 'free' ? 'var(--blue-bright)' : 'var(--blue)');
+    barEl.style.width = pct + '%';
+    card.classList.add('pulsing');
+    phDispEl.textContent = currentPhase + 1;
+    updateRowHighlight(currentPhase);
+    updateDots();
+    return;
+  }
+
+  if (phase === 'done') {
+    phaseEl.textContent = 'FERTIG!';
+    phaseEl.className = 'phase-label done';
+    nameEl.textContent = '🏄 Geschafft!';
+    noteEl.textContent = '30 Minuten Balance · Koordination · Stabilität';
+    timerEl.textContent = '✓';
+    timerEl.className = 'big-timer work';
+    barEl.style.width = '100%';
+    barEl.style.background = 'var(--blue)';
+    card.classList.remove('pulsing');
+    phDispEl.textContent = '6';
+    document.getElementById('doneScreen').classList.add('visible');
+    PHASES.forEach((_, i) => {
+      const row = document.getElementById('prow-' + i);
+      row.classList.remove('active');
+      row.classList.add('done');
+    });
+    updateDots();
+  }
+}
+
+function updateRowHighlight(active) {
+  PHASES.forEach((_, i) => {
+    const row = document.getElementById('prow-' + i);
+    row.classList.remove('active', 'done');
+    if (i < active) row.classList.add('done');
+    else if (i === active) row.classList.add('active');
+  });
+}
+
+// ─── TIMER LOGIC ─────────────────────────────────────────────────────────────
+function startPhaseTimer(p, dur, onTick) {
+  phase = p;
+  secondsLeft = dur;
+  phaseDuration = dur;
+  elapsedPhase = 0;
+  midSpoken = false;
+  endSpoken = false;
+
+  updateUI();
+  if (timer) clearInterval(timer);
+
+  timer = setInterval(() => {
+    if (isPaused) return;
+    elapsedPhase++;
+    secondsLeft--;
+    totalElapsed++;
+    if (onTick) onTick(secondsLeft, elapsedPhase, dur);
+    updateUI();
+    if (secondsLeft <= 0) {
+      clearInterval(timer);
+      onPhaseEnd();
+    }
+  }, 1000);
+}
+
+function onPhaseEnd() {
+  if (phase === 'prep') {
+    startRunningPhase(0);
+  } else if (phase === 'transition') {
+    startRunningPhase(currentPhase);
+  } else if (phase === 'running') {
+    if (currentPhase >= PHASES.length - 1) {
+      // Done
+      phase = 'done';
+      updateUI();
+      speak("Training abgeschlossen! Dreißig Minuten Balance und Koordination! Du hast heute etwas Wunderbares für deine Gesundheit getan. Genieß die Dusche!", 0.88);
+    } else {
+      // Transition to next phase
+      const msg = TRANSITIONS[currentPhase] || "Weiter zur nächsten Phase.";
+      currentPhase++;
+      startPhaseTimer('transition', 8, null);
+      speak(msg, 0.92);
+    }
+  }
+}
+
+function startRunningPhase(idx) {
+  currentPhase = idx;
+  const p = PHASES[idx];
+
+  startPhaseTimer('running', p.duration, (sLeft, elapsed, total) => {
+    // Mid-point announcement
+    const midPoint = Math.floor(total / 2);
+    if (!midSpoken && elapsed === midPoint) {
+      midSpoken = true;
+      setTimeout(() => speak(p.voiceMid, 0.9), 100);
+    }
+    // End announcement (if defined)
+    if (!endSpoken && p.voiceEnd && sLeft === 60) {
+      endSpoken = true;
+      speak(p.voiceEnd, 0.92);
+    }
+    // Last 10 seconds countdown
+    if (sLeft === 10) speak("Zehn Sekunden!", 1.05);
+    if (sLeft === 5)  speak("Fünf!", 1.1);
+    if (sLeft === 3)  speak("Drei!", 1.1);
+    if (sLeft === 2)  speak("Zwei!", 1.1);
+    if (sLeft === 1)  speak("Eins!", 1.1);
+  });
+
+  speak(p.voiceStart, 0.9);
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+function startWorkout() {
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('pauseBtn').style.display = 'flex';
+  document.getElementById('doneScreen').classList.remove('visible');
+  totalElapsed = 0;
+  currentPhase = 0;
+
+  speak("Surfbalanceboard Training beginnt! Stell das Board bereit, nimm Schuhe aus, und mach dich locker. In fünf Sekunden geht es los!", 0.9);
+  startPhaseTimer('prep', 5, null);
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  const btn = document.getElementById('pauseBtn');
+  if (isPaused) {
+    btn.textContent = '▶ Weiter';
+    synth.cancel();
+    speak("Pause.", 0.9);
+  } else {
+    btn.textContent = '⏸ Pause';
+    speak("Weiter! Du schaffst das.", 1.0);
+  }
+}
+
+function resetWorkout() {
+  if (timer) clearInterval(timer);
+  synth.cancel();
+  isPaused = false;
+  phase = 'idle';
+  currentPhase = 0;
+  secondsLeft = 0;
+  elapsedPhase = 0;
+  phaseDuration = 0;
+  totalElapsed = 0;
+
+  document.getElementById('startBtn').style.display = 'flex';
+  document.getElementById('pauseBtn').style.display = 'none';
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  document.getElementById('doneScreen').classList.remove('visible');
+  document.getElementById('phaseLabel').textContent = 'BEREIT';
+  document.getElementById('phaseLabel').className = 'phase-label prep';
+  document.getElementById('exerciseName').textContent = 'Bereit machen';
+  document.getElementById('exerciseNote').textContent = 'Board bereitstellen · barfuß oder Socken · locker schütteln';
+  document.getElementById('bigTimer').textContent = '–';
+  document.getElementById('bigTimer').className = 'big-timer prep';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressBar').style.background = '#1e3050';
+  document.getElementById('phaseDisplay').textContent = '–';
+  document.getElementById('timeDisplay').textContent = '30:00';
+  document.getElementById('timerCard').classList.remove('pulsing');
+
+  PHASES.forEach((_, i) => {
+    const row = document.getElementById('prow-' + i);
+    row.classList.remove('active', 'done');
+  });
+  buildDots();
+}
+
+setTimeout(loadVoices, 1000);
+</script>
+</body>
+</html>

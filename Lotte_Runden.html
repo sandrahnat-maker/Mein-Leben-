@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lottes Runden 🐾</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;600&display=swap');
+  :root {
+    --bg:#F7F2EB; --card:#FFF; --accent:#8B6020; --accent2:#C4873A;
+    --text:#1E1A14; --muted:#8A7D6A; --border:rgba(139,96,32,.15);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;padding:1.5rem 1rem 3rem;}
+  h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--accent);text-align:center;margin-bottom:.2rem;}
+  .subtitle{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:1.4rem;}
+  .today-card{
+    background:linear-gradient(135deg,#8B6020,#C4873A);
+    border-radius:18px;padding:1.3rem 1.1rem;color:#fff;
+    margin-bottom:1.4rem;box-shadow:0 8px 24px rgba(139,96,32,.3);
+    position:relative;overflow:hidden;
+  }
+  .today-card::before{content:'🐾';position:absolute;right:.8rem;top:.6rem;font-size:3rem;opacity:.2;pointer-events:none;}
+  .today-label{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:.25rem;}
+  .today-day{font-family:'Playfair Display',serif;font-size:1.35rem;margin-bottom:.5rem;}
+  .today-route{font-size:.84rem;line-height:1.8;opacity:.95;margin-bottom:.9rem;}
+  .arr{color:rgba(255,255,255,.6);margin:0 .2rem;}
+  .arr-dark{color:var(--accent2);margin:0 .2rem;}
+  .btn-row{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .btn-maps{
+    background:#fff;color:var(--accent);border:none;border-radius:30px;
+    padding:.5rem 1.1rem;font-size:.82rem;font-weight:700;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;
+  }
+  .btn-speak{
+    background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);
+    color:#fff;border-radius:30px;padding:.5rem 1.1rem;font-size:.82rem;font-weight:600;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.4rem;
+  }
+  .days-grid{display:flex;flex-direction:column;gap:.7rem;}
+  .day-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;}
+  .day-card.today-day{border-color:var(--accent);box-shadow:0 4px 16px rgba(139,96,32,.15);}
+  .day-header{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;cursor:pointer;}
+  .day-left{display:flex;align-items:center;gap:.6rem;}
+  .day-name{font-weight:600;font-size:.92rem;}
+  .day-tag{font-size:.65rem;background:var(--bg);color:var(--muted);border-radius:20px;padding:.12rem .55rem;font-weight:600;}
+  .today-day .day-tag{background:var(--accent);color:#fff;}
+  .day-dur{font-size:.72rem;color:var(--muted);}
+  .chevron{color:var(--muted);font-size:.75rem;transition:transform .2s;display:inline-block;}
+  .day-card.open .chevron{transform:rotate(180deg);}
+  .day-body{display:none;padding:0 1rem .9rem;}
+  .day-card.open .day-body{display:block;}
+  .route-text{font-size:.83rem;line-height:1.9;color:var(--text);margin-bottom:.75rem;}
+  .btn-row-small{display:flex;gap:.5rem;flex-wrap:wrap;}
+  .btn-maps-small{
+    background:var(--accent);color:#fff;border:none;border-radius:20px;
+    padding:.4rem .95rem;font-size:.75rem;font-weight:700;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;
+  }
+  .btn-speak-small{
+    background:var(--bg);border:1.5px solid var(--border);color:var(--accent);
+    border-radius:20px;padding:.4rem .95rem;font-size:.75rem;font-weight:600;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.35rem;
+  }
+  .btn-osmand-small{
+    background:#1a5c38;color:#fff;border:none;border-radius:20px;
+    padding:.4rem .95rem;font-size:.75rem;font-weight:700;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;
+  }
+  .btn-osmand{
+    background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.5);
+    color:#fff;border-radius:30px;padding:.5rem 1.1rem;font-size:.82rem;font-weight:700;
+    font-family:'DM Sans',sans-serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;
+  }
+  .tip{text-align:center;font-size:.72rem;color:var(--muted);margin-top:1.4rem;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<h1>Lottes Runden 🐾</h1>
+<p class="subtitle">Magdalenenstraße 4 · 1060 Wien</p>
+
+<div class="today-card">
+  <div class="today-label">Heute</div>
+  <div class="today-day" id="todayDay">–</div>
+  <div class="today-route" id="todayRoute">–</div>
+  <div class="btn-row">
+    <a id="btnMapsToday" href="#" target="_blank" class="btn-maps">🗺 Navigation starten</a>
+    <a id="btnOsmandToday" href="#" target="_blank" class="btn-osmand">🧭 OsmAnd</a>
+    <button class="btn-speak" id="btnSpeakToday" onclick="speakToday()">🔊 Vorlesen</button>
+  </div>
+</div>
+
+<div class="days-grid" id="daysGrid"></div>
+
+<p class="tip">Tippe auf einen Tag zum Aufklappen<br>🗺 öffnet Google Maps mit Navigation · 🔊 liest die Route vor</p>
+
+<script>
+var BASE = 'https://raw.githubusercontent.com/sandrahnat-maker/Kalender_2203/main/';
+var ROUTES = [
+  {
+    day:'Montag', short:'Mo', dur:'~30 Min', dow:1,
+    text:'Magdalenenstr. → Stiegengasse → Theobaldgasse → Windmühlgasse → Amerlingstraße → Esterházypark außen → Millergasse → Magdalenenstr.',
+    speak:'Montags-Runde, etwa dreißig Minuten. Östliche Grün-Schleife. Geh aus der Magdalenenstraße die Stiegengasse hinauf. An der Theobaldgasse links – die ruhige Querverbindung. Dann die Windmühlgasse runter. In die Amerlingstraße abbiegen und am Esterházypark außen entlanggehen – schön grün! Auf der Millergasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19940,16.35630/48.19870,16.35310/48.19720,16.35180/48.19600,16.35380/48.19772,16.35490/@48.198,16.354,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Montag_Lottes_Runde.gpx'
+  },
+  {
+    day:'Dienstag', short:'Di', dur:'~30 Min', dow:2,
+    text:'Magdalenenstr. → Liniengasse → Haydngasse → Kaunitzgasse → Mollardgasse → Wallgasse → Sandwirtgasse → Magdalenenstr.',
+    speak:'Dienstags-Runde, etwa dreißig Minuten. Westliche Gassen-Schleife. Geh aus der Magdalenenstraße in die Liniengasse. Dann in die ruhige Haydngasse abbiegen. Weiter durch die Kaunitzgasse – sehr ruhig! Die Mollardgasse kurz queren. Durch die Wallgasse und die Sandwirtgasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19900,16.35200/48.19750,16.34980/48.19580,16.34900/48.19480,16.35050/48.19530,16.35250/48.19640,16.35310/48.19772,16.35490/@48.197,16.352,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Dienstag_Lottes_Runde.gpx'
+  },
+  {
+    day:'Mittwoch', short:'Mi', dur:'~30 Min', dow:3,
+    text:'Magdalenenstr. → Millergasse → Fillgradergasse → Luftbadgasse → Therapiepark außen → Amerlingstraße → Theobaldgasse → Stiegengasse → Magdalenenstr.',
+    speak:'Mittwochs-Runde, etwa dreißig Minuten. Therapiepark-Schleife. Geh aus der Magdalenenstraße durch die Millergasse. In die Fillgradergasse biegen – schön ruhig. Weiter durch die Luftbadgasse zum Therapiepark. Den grünen Therapiepark außen entlang. Über die Amerlingstraße weiter in die Theobaldgasse. Dann die Stiegengasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19630,16.35380/48.19540,16.35200/48.19490,16.35050/48.19620,16.35090/48.19780,16.35310/48.19900,16.35500/48.19772,16.35490/@48.197,16.352,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Mittwoch_Lottes_Runde.gpx'
+  },
+  {
+    day:'Donnerstag', short:'Do', dur:'~30 Min', dow:4,
+    text:'Magdalenenstr. → Windmühlgasse → Sandwirtgasse → Wallgasse → Aegidigasse → Laimgrubengasse → Fillgradergasse → Esterházypark außen → Millergasse → Magdalenenstr.',
+    speak:'Donnerstags-Runde, etwa dreißig Minuten. Laimgruben-Schleife. Geh aus der Magdalenenstraße die Windmühlgasse hinunter. Durch die Sandwirtgasse und Wallgasse. Weiter durch die ruhige Aegidigasse. Durch die Laimgrubengasse und die Fillgradergasse. Am Esterházypark außen entlang – grün! Auf der Millergasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19820,16.35290/48.19640,16.35310/48.19530,16.35250/48.19480,16.35050/48.19540,16.35110/48.19560,16.35200/48.19650,16.35430/48.19772,16.35490/@48.197,16.352,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Donnerstag_Lottes_Runde.gpx'
+  },
+  {
+    day:'Freitag', short:'Fr', dur:'~30 Min', dow:5,
+    text:'Magdalenenstr. → Millergasse → Esterházypark außen → Windmühlgasse → Chwallagasse → Liniengasse → Stiegengasse → Magdalenenstr.',
+    speak:'Freitags-Runde, etwa dreißig Minuten. Nordöstliche Schleife. Geh aus der Magdalenenstraße durch die Millergasse. Am Esterházypark außen entlang – grüner Start! Die Windmühlgasse hinaufgehen. In die ruhige Chwallagasse abbiegen. Durch die Liniengasse weiter. Dann die Stiegengasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19630,16.35380/48.19720,16.35180/48.19820,16.35290/48.19950,16.35350/48.19900,16.35200/48.19900,16.35500/48.19772,16.35490/@48.198,16.353,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Freitag_Lottes_Runde.gpx'
+  },
+  {
+    day:'Samstag', short:'Sa', dur:'~30 Min', dow:6,
+    text:'Magdalenenstr. → Stiegengasse → Liniengasse → Chwallagasse → Windmühlgasse → Amerlingstraße → Therapiepark außen → Luftbadgasse → Fillgradergasse → Laimgrubengasse → Sandwirtgasse → Magdalenenstr.',
+    speak:'Samstags-Runde, etwa dreißig Minuten. Die große Doppelpark-Runde! Geh aus der Magdalenenstraße die Stiegengasse hinauf. Durch die Liniengasse und Chwallagasse. Die Windmühlgasse hinunter zur Amerlingstraße. Am Therapiepark außen entlanggehen – grün! Durch die Luftbadgasse und Fillgradergasse. Weiter durch die Laimgrubengasse und Sandwirtgasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19900,16.35500/48.19900,16.35200/48.19820,16.35290/48.19490,16.35050/48.19540,16.35110/48.19560,16.35200/48.19640,16.35310/48.19772,16.35490/@48.197,16.352,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Samstag_Lottes_Runde.gpx'
+  },
+  {
+    day:'Sonntag', short:'So', dur:'~30 Min', dow:0,
+    text:'Magdalenenstr. → Sandwirtgasse → Aegidigasse → Laimgrubengasse → Fillgradergasse → Esterházypark außen → Amerlingstraße → Theobaldgasse → Liniengasse → Haydngasse → Magdalenenstr.',
+    speak:'Sonntags-Runde, etwa dreißig Minuten. Gemütliche Sonntagsrunde. Geh aus der Magdalenenstraße durch die Sandwirtgasse. Dann durch die ruhige Aegidigasse und die Laimgrubengasse. Die Fillgradergasse entlanggehen zum Esterházypark. Den Park außen umgehen – schön grün! Über die Amerlingstraße und Theobaldgasse in die Liniengasse. Durch die Haydngasse zurück zur Magdalenenstraße.',
+    maps:'https://www.google.com/maps/dir/48.19772,16.35490/48.19640,16.35310/48.19480,16.35050/48.19540,16.35110/48.19560,16.35200/48.19650,16.35430/48.19720,16.35180/48.19780,16.35310/48.19900,16.35200/48.19750,16.34980/48.19772,16.35490/@48.197,16.352,16z/am=t/data=!4m2!4m1!3e2',
+    gpx:'Sonntag_Lottes_Runde.gpx'
+  }
+];
+
+var currentSpeakText = null;
+
+function formatRoute(text, light) {
+  var cl = light ? 'arr' : 'arr-dark';
+  return text.split('→').map(function(s,i){
+    return i===0 ? '<span>'+s.trim()+'</span>' : '<span class="'+cl+'">→</span><span>'+s.trim()+'</span>';
+  }).join('');
+}
+
+function speakText(text, btn) {
+  if (!window.speechSynthesis) { alert('Sprachausgabe nicht verfügbar'); return; }
+  if (currentSpeakText === text) {
+    window.speechSynthesis.cancel();
+    currentSpeakText = null;
+    if (btn) btn.innerHTML = btn.innerHTML.replace('⏹ Stop','🔊 Vorlesen');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  currentSpeakText = text;
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'de-AT';
+  utt.rate = 0.9;
+  if (btn) btn.innerHTML = btn.innerHTML.replace('🔊 Vorlesen','⏹ Stop');
+  utt.onend = function() {
+    currentSpeakText = null;
+    if (btn) btn.innerHTML = btn.innerHTML.replace('⏹ Stop','🔊 Vorlesen');
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+function speakToday() {
+  var r = getTodayRoute();
+  speakText(r.speak, document.getElementById('btnSpeakToday'));
+}
+
+function getTodayRoute() {
+  var dow = new Date().getDay();
+  for (var i=0; i<ROUTES.length; i++) {
+    if (ROUTES[i].dow === dow) return ROUTES[i];
+  }
+  return ROUTES[0];
+}
+
+function toggleCard(card) {
+  card.classList.toggle('open');
+}
+
+function init() {
+  var today = getTodayRoute();
+  var dow = new Date().getDay();
+
+  document.getElementById('todayDay').textContent = today.day + ' · ' + today.dur;
+  document.getElementById('todayRoute').innerHTML = formatRoute(today.text, true);
+  document.getElementById('btnMapsToday').href = today.maps;
+  document.getElementById('btnOsmandToday').href = 'https://osmand.net/go?url=' + encodeURIComponent(BASE + today.gpx);
+
+  var grid = document.getElementById('daysGrid');
+  ROUTES.forEach(function(r) {
+    var isToday = r.dow === dow;
+    var osmandUrl = 'https://osmand.net/go?url=' + encodeURIComponent(BASE + r.gpx);
+    var card = document.createElement('div');
+    card.className = 'day-card' + (isToday ? ' today-day open' : '');
+    card.innerHTML =
+      '<div class="day-header" onclick="toggleCard(this.parentElement)">' +
+        '<div class="day-left">' +
+          '<span class="day-name">' + r.day + '</span>' +
+          '<span class="day-tag">' + (isToday ? 'Heute' : r.short) + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:.6rem">' +
+          '<span class="day-dur">' + r.dur + '</span>' +
+          '<span class="chevron">▼</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="day-body">' +
+        '<div class="route-text">' + formatRoute(r.text, false) + '</div>' +
+        '<div class="btn-row-small">' +
+          '<a href="' + r.maps + '" target="_blank" class="btn-maps-small">🗺 Maps</a>' +
+          '<a href="' + osmandUrl + '" target="_blank" class="btn-osmand-small">🧭 OsmAnd</a>' +
+          '<button class="btn-speak-small" data-speak="' + r.speak.replace(/"/g,'&quot;') + '" onclick="speakText(this.dataset.speak, this)">🔊 Vorlesen</button>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+init();
+</script>
+</body>
+</html>

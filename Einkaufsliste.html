@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Einkaufsliste</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#faf6f1;color:#2a1a0a;padding:.7rem;padding-bottom:3rem}
+h1{font-size:1rem;font-weight:700;color:#8B6020;text-align:center;margin-bottom:.3rem}
+.sub{font-size:.7rem;color:#aaa;text-align:center;margin-bottom:.7rem}
+.tabs{display:flex;gap:5px;margin-bottom:.6rem}
+.tab{flex:1;padding:.45rem .3rem;border:1.5px solid #e0d0b8;border-radius:10px;background:#fff;font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;color:#8B6020;font-family:inherit}
+.tab.on{background:#8B6020;color:#fff;border-color:#8B6020}
+.week-badge{background:#FFFDE7;border:1px solid #FFD54F;border-radius:8px;padding:.4rem .7rem;font-size:.7rem;color:#6D4C00;margin-bottom:.6rem}
+.progress-wrap{margin-bottom:.7rem}
+.prog-label{display:flex;justify-content:space-between;font-size:.68rem;color:#999;margin-bottom:.25rem}
+.prog-bar{height:4px;background:#DDD;border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#2E7D32,#F9A825);border-radius:99px;transition:width .4s}
+.group-hdr{border-radius:8px;padding:.45rem .7rem;margin-bottom:.35rem;font-weight:700;font-size:.72rem;display:flex;justify-content:space-between}
+.item{display:flex;gap:.6rem;align-items:flex-start;background:#fff;border-radius:9px;padding:.5rem .65rem;margin-bottom:.3rem;border:1.5px solid rgba(0,0,0,.05);cursor:pointer;transition:all .2s}
+.item.done{opacity:.5}
+.item.done .iname{text-decoration:line-through}
+.icb{width:19px;height:19px;border-radius:5px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
+.iname{font-size:.82rem;font-weight:600;font-family:sans-serif}
+.idetail{font-size:.68rem;color:#888;margin-top:1px;font-family:sans-serif}
+.btns{display:flex;gap:6px;margin-top:.7rem}
+.btn{flex:1;background:#fff;border:1.5px solid #e0d0b8;color:#999;border-radius:8px;padding:.45rem;font-size:.7rem;cursor:pointer;font-family:inherit}
+.btn.save{background:#8B6020;border-color:#8B6020;color:#fff;font-weight:700}
+.tip-box{background:#E8F5E9;border-radius:10px;padding:.6rem .8rem;border:1px solid #A5D6A7;margin-top:.7rem;font-size:.7rem;color:#2E7D32;line-height:1.7;font-family:sans-serif}
+.main-tabs{display:flex;gap:5px;margin-bottom:.7rem}
+.main-tab{flex:1;padding:.55rem .3rem;border:2px solid rgba(0,0,0,.1);border-radius:12px;background:rgba(255,255,255,.5);font-size:.78rem;font-weight:400;cursor:pointer;text-align:center;color:#888;font-family:inherit}
+.main-tab.on{border-color:#2E7D32;color:#2E7D32;background:rgba(255,255,255,.97);font-weight:700}
+.brand-hdr{border-radius:10px;padding:.6rem .8rem;margin-bottom:.5rem}
+.brand-title{font-weight:700;font-size:.82rem}
+.brand-sub{font-size:.68rem;opacity:.8;margin-top:.1rem}
+.brand-where{font-size:.65rem;color:#888;margin-top:.15rem;font-family:sans-serif}
+.pflege-app{font-size:.65rem;font-weight:700;margin-top:.15rem}
+</style>
+</head>
+<body>
+<h1>&#128717; Einkaufsliste</h1>
+<p class="sub">Lebensmittel &middot; Pflege &middot; Beauty</p>
+
+<div class="main-tabs">
+  <button class="main-tab on" id="mt0" onclick="switchMain(0)">&#128722; Lebensmittel</button>
+  <button class="main-tab" id="mt1" onclick="switchMain(1)">&#127807; Pflege &amp; Beauty</button>
+</div>
+
+<div id="food-section">
+  <div class="tabs">
+    <button class="tab on" id="wt0" onclick="switchWeek('diese')">&#128197; Diese Woche</button>
+    <button class="tab" id="wt1" onclick="switchWeek('naechste')">&#128198; N&#228;chste Woche</button>
+  </div>
+  <div class="week-badge" id="weekInfo"></div>
+  <div class="progress-wrap">
+    <div class="prog-label"><span>Im Warenkorb</span><span id="foodCount">0 / 0</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="foodBar" style="width:0%"></div></div>
+  </div>
+  <div id="foodList"></div>
+  <div class="btns">
+    <button class="btn" onclick="clearDone()">Erledigte l&#246;schen</button>
+    <button class="btn save" onclick="resetWeek()">Woche zur&#252;cksetzen</button>
+  </div>
+  <div class="tip-box">&#128260; <b>Automatisch:</b> Zeigt Zutaten f&#252;r aktuelle + n&#228;chste Woche. Antippen = in den Warenkorb.</div>
+</div>
+
+<div id="pflege-section" style="display:none">
+  <div class="progress-wrap">
+    <div class="prog-label"><span>Im Warenkorb</span><span id="pflegeCount">0 / 0</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="pflegeBar" style="width:0%"></div></div>
+  </div>
+  <div id="pflegeList"></div>
+  <div class="tip-box">&#128048; <b>Nur tierversuchsfreie Produkte</b> - PETA zertifiziert.<br>Lavera: NATRUE. Benecos: BDIH. Kein China-Verkauf.</div>
+</div>
+
+<script>
+const ZUTATEN_WOCHE = {
+  1: [
+    { name: "Haferflocken / Porridge", detail: "Mo/Di/Fr t\u00E4glich \u00B7 70-90g = 3g Beta-Glucan \u2192 LDL senken", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Hafermilch (3 Liter)", detail: "3 \u00D7 1L \u00B7 f\u00FCr Porridge, Tee, M\u00FCsli", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Vollkornbrot / Roggenkn\u00E4ckebrot", detail: "Do/Sa t\u00E4glich \u00B7 Roggenkn\u00E4ckebrot Di", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Rote Linsen (Packung)", detail: "Mo Mittag: Linsensuppe", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Kichererbsen (Dose)", detail: "Di Mittag: Zucchini-Kichererbsen-Pfanne", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Pasta (500g)", detail: "Mi: GENUSS Pasta", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Naturjoghurt (500g)", detail: "Mi/Fr/Sa/So t\u00E4glich", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Topfen / Quark (250g)", detail: "Di Abend", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Kr\u00E4uterfrischk\u00E4se", detail: "Mo Abend + Fr Fr\u00FCh", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Sauerrahm", detail: "Do Mittag: Kartoffelsuppe", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Eier (8 Stk)", detail: "Mi/Do: R\u00FChrei+Spiegelei \u00B7 Sa Abend \u00B7 So", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Oliven\u00F6l", detail: "t\u00E4glich kochen", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Karotte (4 Stk)", detail: "Mo: Linsensuppe \u00B7 Rohkost Fr", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Paprika (3 Stk)", detail: "Di: Pfanne \u00B7 Fr: Rohkost", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zucchini (2 Stk)", detail: "Di: Kichererbsen-Pfanne \u00B7 Sa Abend", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Tomate (4 Stk)", detail: "Mo/Do/Fr t\u00E4glich", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Gurke (2 Stk)", detail: "Mo Abend \u00B7 Fr Rohkost", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Radieschen", detail: "Do Abend", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zwiebel (3 Stk)", detail: "Di Pfanne \u00B7 So: Flammkuchen", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Kartoffel (500g)", detail: "Do Mittag: Kartoffelsuppe", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Knoblauch", detail: "Di: Pfanne \u00B7 t\u00E4glich Herzschutz", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Apfel (4 Stk)", detail: "Sa Jause", group: "\uD83C\uDF4E Obst" },
+    { name: "Heidelbeeren (TK oder frisch)", detail: "Fr Fr\u00FCh: Haferbrei", group: "\uD83C\uDF4E Obst" },
+    { name: "Waln\u00FCsse / Mandeln (T\u00FCte)", detail: "t\u00E4glich 30g \u00B7 LDL -4 bis -8%", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Leinsamen (geschrotet)", detail: "t\u00E4glich 1-2 EL ins Porridge", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Oliven (Glas)", detail: "Fr Abend: Rohkost", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Dosentomaten / Passata", detail: "Mi: Tomatensauce \u00B7 Di: Tomatensuppe", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Hummus (Becher)", detail: "Sa: Jause / Frischk\u00E4se-Wrap", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Kurkumapulver", detail: "t\u00E4glich in Suppen \u00B7 LDL-Oxidation hemmen", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Kreuzk\u00FCmmel / Cumin", detail: "Mo: Linsensuppe", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Schnittlauch", detail: "Mo/Do t\u00E4glich frisch", group: "\uD83C\uDF3F Kr\u00E4uter" },
+    { name: "Basilikum", detail: "Mi: Tomatensauce \u00B7 Fr", group: "\uD83C\uDF3F Kr\u00E4uter" },
+    { name: "Petersilie", detail: "Mo: Linsensuppe \u00B7 Suppen allgemein", group: "\uD83C\uDF3F Kr\u00E4uter" },
+  ],
+  2: [
+    { name: "Haferflocken / Porridge", detail: "Mo+Sa t\u00E4glich \u00B7 Beta-Glucan", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Hafermilch (3 Liter)", detail: "3 \u00D7 1L \u00B7 f\u00FCr Porridge, Tee, M\u00FCsli", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Vollkornbrot / Kn\u00E4ckebrot", detail: "Mo/Fr/Sa t\u00E4glich", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Linsen aus Dose (2 Dosen)", detail: "Mi Mittag: Linsensalat", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Pasta (500g)", detail: "Di: GENUSS Pasta Carbonara", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Reis (500g)", detail: "Fr Mittag: Tomaten-Reis-Pfanne", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Naturjoghurt (750g)", detail: "Di/Do/Fr/Sa/So t\u00E4glich", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Topfen / Quark (250g)", detail: "Mo Abend: Topfenaufstrich", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Ricotta (250g)", detail: "Mi Abend: Ricotta-Toast", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Kr\u00E4uterfrischk\u00E4se", detail: "Fr Fr\u00FCh", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Feta (200g)", detail: "Mi: Linsensalat \u00B7 Sa: Jause", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Bergk\u00E4se (St\u00FCck)", detail: "So: Flammkuchen", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Sauerrahm light", detail: "So: Flammkuchen", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Parmesan (gerieben)", detail: "Di: Pasta Carbonara vegetarisch", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Eier (8 Stk)", detail: "Mi: R\u00FChrei \u00B7 Do: Eierspeise \u00B7 Sa/So: R\u00FChrei", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Oliven\u00F6l", detail: "t\u00E4glich kochen", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Paprika (3 Stk)", detail: "Do: Eierspeise \u00B7 Sa: Jause", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Tomate (4 Stk)", detail: "Do Abend \u00B7 Fr: Tomaten-Reis", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Gurke (2 Stk)", detail: "Mi Abend: Ricotta-Toast", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zwiebel (3 Stk)", detail: "Do: Eierspeise \u00B7 So: Flammkuchen", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Rote Bete (Dose oder frisch)", detail: "Fr Mittag: Rote-Bete-Salat", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Brokkoli (Kopf)", detail: "Do Mittag: Brokkoli-Kartoffel-P\u00FCree", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Kartoffel (400g)", detail: "Do Mittag: P\u00FCree", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Birne (3 Stk)", detail: "Mo Fr\u00FCh: Haferbrei", group: "\uD83C\uDF4E Obst" },
+    { name: "Apfel (3 Stk)", detail: "Do: M\u00FCsli \u00B7 Obst allgemein", group: "\uD83C\uDF4E Obst" },
+    { name: "Himbeeren (TK)", detail: "Di Fr\u00FCh: Joghurt \u00B7 Di Abend: TK-Beeren", group: "\uD83C\uDF4E Obst" },
+    { name: "Tiefk\u00FChlbeeren (Beutel)", detail: "Di Abend: Joghurt mit Beeren", group: "\uD83C\uDF4E Obst" },
+    { name: "Waln\u00FCsse (T\u00FCte)", detail: "Mo: Haferbrei \u00B7 Fr Abend \u00B7 Sa Jause", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Mandeln (200g)", detail: "t\u00E4glich 30g \u00B7 LDL senken", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Dosentomaten", detail: "Fr: Tomaten-Reis-Pfanne", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Kurkumapulver", detail: "t\u00E4glich in Suppen", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Honig (Glas)", detail: "Fr Abend: Joghurt mit Honig", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Zimt", detail: "Mo: Porridge", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Dill (frisch o. TK)", detail: "Mi Abend: Ricotta-Toast", group: "\uD83C\uDF3F Kr\u00E4uter" },
+    { name: "Schnittlauch", detail: "Mo Abend \u00B7 Mi Fr\u00FCh \u00B7 t\u00E4glich", group: "\uD83C\uDF3F Kr\u00E4uter" },
+    { name: "Basilikum", detail: "Do Abend: Rohkost", group: "\uD83C\uDF3F Kr\u00E4uter" },
+  ],
+  3: [
+    { name: "Haferflocken / Porridge", detail: "Mo/Di/Fr t\u00E4glich \u00B7 Beta-Glucan", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Hafermilch (3 Liter)", detail: "3 \u00D7 1L \u00B7 f\u00FCr Porridge, Tee, M\u00FCsli", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Vollkornbrot / Toast", detail: "Di/Fr/Sa t\u00E4glich", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Quinoa (Packung)", detail: "Di Mittag: Quinoa-Bowl", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Nudeln kurz (Penne 500g)", detail: "Fr Mittag: Minestrone", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Sp\u00E4tzle (Packung)", detail: "Mi: GENUSS K\u00E4ssp\u00E4tzle", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Dosengem\u00FCse gemischt (2 Dosen)", detail: "Fr Mittag: Minestrone", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Kokosmilch (Dose)", detail: "Mo Mittag: K\u00FCrbissuppe", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Naturjoghurt (750g)", detail: "Mo/Mi/Do/Sa/So t\u00E4glich", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Griechisches Joghurt (200g)", detail: "Fr Abend", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Topfen / Quark (250g)", detail: "Di Abend: Topfenbrot", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Mascarpone (250g)", detail: "Mo Abend + Fr Fr\u00FCh", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Frischk\u00E4se", detail: "Sa Abend: Frischk\u00E4sebrot", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Ziegenfrischk\u00E4se", detail: "Do Abend: Toast mit Feige & Rucola", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Bergk\u00E4se / Emmentaler gerieben", detail: "Mi: K\u00E4ssp\u00E4tzle", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Eier (8 Stk)", detail: "Di/Fr: R\u00FChrei \u00B7 Do: Salat \u00B7 Sa \u00B7 So: Pfannkuchen", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Milch (0,5L)", detail: "So: Pfannkuchen-Teig", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Mehl (200g)", detail: "So: Pfannkuchen", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Butter", detail: "So: Pfannkuchen", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Oliven\u00F6l", detail: "t\u00E4glich", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "K\u00FCrbis (mittel oder TK)", detail: "Mo Mittag: K\u00FCrbissuppe", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Paprika (3 Stk)", detail: "Di: Quinoa-Bowl", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zucchini (2 Stk)", detail: "Di: Quinoa-Bowl", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Tomate (4 Stk)", detail: "Mo Abend \u00B7 So: Gem\u00FCsepizza", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Radieschen", detail: "Di Abend: Topfenbrot", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Rucola (Sackerl)", detail: "Do Abend: Ziegenfrischk\u00E4se-Toast", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zwiebel (4 Stk)", detail: "Mi: K\u00E4ssp\u00E4tzle R\u00F6stzwiebeln", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Gr\u00FCner Salat (Kopf)", detail: "Do Mittag: Salat mit Ei", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Ingwer (St\u00FCck)", detail: "Mo: K\u00FCrbissuppe \u00B7 t\u00E4glich Tee", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Apfel (3 Stk)", detail: "Sa Jause", group: "\uD83C\uDF4E Obst" },
+    { name: "Birne (3 Stk)", detail: "Sa Jause", group: "\uD83C\uDF4E Obst" },
+    { name: "Beeren gemischt (TK)", detail: "Mo Fr\u00FCh: Joghurt", group: "\uD83C\uDF4E Obst" },
+    { name: "Himbeeren (TK)", detail: "Fr Fr\u00FCh: Haferbrei", group: "\uD83C\uDF4E Obst" },
+    { name: "Feige (frisch o. getrocknet)", detail: "Do Abend: Ziegenfrischk\u00E4se-Toast", group: "\uD83C\uDF4E Obst" },
+    { name: "Waln\u00FCsse (T\u00FCte)", detail: "Do: M\u00FCsli \u00B7 t\u00E4glich", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Mandeln (200g)", detail: "t\u00E4glich 30g \u00B7 LDL senken", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Chiasamen", detail: "Mo Fr\u00FCh: Haferbrei mit Chiasamen", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Croutons", detail: "Do: Salat", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Marmelade", detail: "So: Pfannkuchen GENUSS", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Kurkumapulver", detail: "Mo: K\u00FCrbissuppe \u00B7 t\u00E4glich in Suppen", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Senf (Tube)", detail: "Do: Senfdressing", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Kakaopulver", detail: "Mi: Porridge mit Kakao & Birne", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Birne (4 Stk)", detail: "Mi: Porridge mit Kakao & Birne (statt Banane)", group: "\uD83C\uDF4E Obst" },
+    { name: "Zitrone (2 Stk)", detail: "Di: Quinoa Dressing \u00B7 Tee", group: "\uD83C\uDF4E Obst" },
+    { name: "Schnittlauch", detail: "Mo/Di/Fr t\u00E4glich frisch", group: "\uD83C\uDF3F Kr\u00E4uter" },
+    { name: "Basilikum", detail: "Mo Abend \u00B7 So: Pizza", group: "\uD83C\uDF3F Kr\u00E4uter" },
+  ],
+  4: [
+    { name: "Haferflocken / Porridge", detail: "Mo/Do t\u00E4glich \u00B7 Beta-Glucan", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Hafermilch (3 Liter)", detail: "3 \u00D7 1L \u00B7 f\u00FCr Porridge, Tee, M\u00FCsli", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Vollkornbrot / Toast", detail: "Do/Sa/So t\u00E4glich", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Kichererbsen (Dose, 2 Stk)", detail: "Mo Mittag: Kichererbsen-Salat", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Dosentomaten / Passata", detail: "Mi: Tortellini Tomatensauce", group: "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven" },
+    { name: "Tortellini (Packung)", detail: "Mi: GENUSS Tortellini", group: "\uD83C\uDF5D Nudeln & Reis" },
+    { name: "Naturjoghurt (750g)", detail: "Di/Mi/Fr/Sa/So t\u00E4glich", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Griechisches Joghurt", detail: "Mo Fr\u00FCh: mit Granola", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Ricotta (250g)", detail: "Di Abend: Ricotta mit Honig", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Feta (200g)", detail: "Mo: Kichererbsen-Salat", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Kr\u00E4uterfrischk\u00E4se", detail: "Do/Sa Abend", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Ziegenfrischk\u00E4se", detail: "Sa Jause", group: "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se" },
+    { name: "Sauerrahm", detail: "So Mittag: R\u00F6sti", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Eier (8 Stk)", detail: "Di: Omelette \u00B7 Do/Sa/So: R\u00FChrei+Spiegelei", group: "\uD83E\uDD5A Eier & Milch" },
+    { name: "Granola (Packung)", detail: "Mo Fr\u00FCh + Di: Joghurt mit Granola", group: "\uD83C\uDF5E Brot & Getreide" },
+    { name: "Oliven\u00F6l", detail: "t\u00E4glich", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Paprika (3 Stk)", detail: "Di: Omelette", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Zucchini (2 Stk)", detail: "Di: Omelette", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Tomate (4 Stk)", detail: "Mo: Kichererbsen-Salat \u00B7 Fr: Frischk\u00E4se", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Gurke (2 Stk)", detail: "Mo: Salat \u00B7 Do Abend", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Radieschen", detail: "Do/Sa Abend", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Brokkoli (Kopf o. TK)", detail: "Do Mittag: Brokkoli-Suppe", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Babyspinat (Sackerl)", detail: "Do Fr\u00FCh: R\u00FChrei mit Babyspinat", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Kartoffel (500g)", detail: "So Mittag: R\u00F6sti", group: "\uD83E\uDD66 Gem\u00FCse" },
+    { name: "Apfel (4 Stk)", detail: "Fr: M\u00FCsli \u00B7 Sa Jause", group: "\uD83C\uDF4E Obst" },
+    { name: "Beeren (TK-Beutel)", detail: "Di Fr\u00FCh: Joghurt mit Beeren", group: "\uD83C\uDF4E Obst" },
+    { name: "Waln\u00FCsse / N\u00FCsse", detail: "Sa Jause \u00B7 t\u00E4glich", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Mandeln (200g)", detail: "t\u00E4glich 30g \u00B7 LDL senken", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Leinsamen (geschrotet)", detail: "Mo: Porridge \u00B7 t\u00E4glich", group: "\uD83E\uDD5C N\u00FCsse & Samen" },
+    { name: "Honig", detail: "Di Abend: Ricotta mit Honig", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Kurkumapulver", detail: "Do: Brokkoli-Suppe \u00B7 t\u00E4glich", group: "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l" },
+    { name: "Schnittlauch", detail: "t\u00E4glich frisch", group: "\uD83C\uDF3F Kr\u00E4uter" },
+  ],
+};
+
+// NEM & Tee - immer relevant
+
+const NEM_ITEMS = [
+  { name: "Flohsamenschalen", detail: "1 TL/Tag in 400ml Wasser \u00B7 LDL -3 bis -5%", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Apfelpektin-Pulver", detail: "5-10g/Tag ins M\u00FCsli \u00B7 Lp(a) -27% (Studie)", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Omega-3 Kapseln EPA/DHA", detail: "2g/Tag zur Mahlzeit \u00B7 Lp(a) + Triglyzeride", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Vitamin D3 + K2 Kapseln", detail: "1000-2000 IE/Tag morgens \u00B7 Lp(a) + Blutdruck", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Magnesiumcitrat 300mg", detail: "Abends \u00B7 Blutdruck + Schlaf", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Bergamotte-Extrakt 500mg", detail: "LDL -22 bis -31% (RCTs) \u00B7 Arzt fragen!", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Rhodiola Rosea (Avitale)", detail: "2 \u00D7 200mg/Tag \u00B7 Fr\u00FCh + Mittag \u00B7 Stress + Stimmung", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Hibiskustee", detail: "3 Tassen/Tag Mo+Do \u00B7 Blutdruck -7 bis -13 mmHg", group: "\uD83C\uDF75 Tee & Kr\u00E4uter" },
+  { name: "Gr\u00FCntee Sencha", detail: "1-2 Tassen/Tag Di+Sa \u00B7 LDL-Oxidation hemmen", group: "\uD83C\uDF75 Tee & Kr\u00E4uter" },
+  { name: "Wei\u00DFdorntee", detail: "1-2 Tassen/Tag Fr \u00B7 Herz & Blutgef\u00E4sse", group: "\uD83C\uDF75 Tee & Kr\u00E4uter" },
+  { name: "Kurkuma-Ingwer-Tee (lose)", detail: "Mi+So morgens \u00B7 1 TL Kurkuma + Ingwer + Pfeffer", group: "\uD83C\uDF75 Tee & Kr\u00E4uter" },
+  { name: "Hamamelis-Wasser (250ml)", detail: "H\u00E4morrhoiden & Venenpflege \u00B7 k\u00FChlend & entz\u00FCndungshemmend \u00B7 Apotheke/BIPA", group: "\uD83D\uDC8A NEM & Herzschutz" },
+  { name: "Hamamelis-Salbe / Suppositorien", detail: "Bei akuten Beschwerden \u00B7 Apotheke \u00B7 Weleda oder Hametum", group: "\uD83D\uDC8A NEM & Herzschutz" },
+];
+
+// Reinigungsmittel & Utensilien (immer relevant, monatlich kontrollieren)
+const REINIGUNGS_ITEMS = [
+  // \u2500\u2500 REINIGUNGSMITTEL (BIPA: Frosch, bi good, Sodasan) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  { name: "Frosch Allzweckreiniger (Essig)", detail: "F\u00FCr Arbeitsfl\u00E4chen, Herd, Bad \u00B7 pflanzlich \u00B7 BIPA", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch WC-Reiniger", detail: "Kalkl\u00F6ser, WC-Becken innen \u00B7 BIPA \u00B7 Nachf\u00FCllpack spart Plastik", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch Bad & Dusche Reiniger", detail: "Kalk & Seifenreste \u00B7 f\u00FCr Badewanne & Armaturen \u00B7 BIPA", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch Geschirrsp\u00FClmittel", detail: "Konzentrat \u00B7 pflanzliche Tenside \u00B7 BIPA \u00B7 Nachf\u00FCllbeutel", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch Glasreiniger", detail: "Spiegel, Fenster, TV \u00B7 streifenfrei \u00B7 BIPA", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch Kraft-Reiniger Aktiv-Soda", detail: "Hartn\u00E4ckige Flecken, Herd, K\u00FCche \u00B7 BIPA", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch / bi good Waschmittel Color", detail: "Pflanzenbasiert \u00B7 BIPA \u00B7 bi good hat Greenpeace-G\u00FCtezeichen", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Frosch Scheuermilch", detail: "F\u00FCr Waschbecken, Badewanne, Fugen schrubb \u00B7 BIPA", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Sodasan Essigreiniger (Konzentrat)", detail: "Kalk, Armaturen, Duschkopf \u00B7 60% weniger Verpackung \u00B7 BIPA/dm", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Natron (Backpulver-Qualit\u00E4t 500g)", detail: "Ger\u00FCche neutralisieren, Abfluss, Backrohr \u00B7 Drogerie/Supermarkt", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  { name: "Zitronens\u00E4ure (Pulver 250g)", detail: "Kaffeemaschine entkalken, Waschmaschine \u00B7 Drogerie", group: "\uD83E\uDDF4 Reinigungsmittel" },
+  // \u2500\u2500 PUTZUTENSILIEN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  { name: "Mikrofasert\u00FCcher (Multipack)", detail: "F\u00FCr Staub, Fl\u00E4chen, Spiegel \u00B7 wiederverwendbar \u00B7 dm/BIPA", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "Mikrofaser-Wischmop Ersatztuch", detail: "F\u00FCr Bodenwischen \u00B7 alle 2\u20133 Monate erneuern", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "WC-B\u00FCrste (Ersatz)", detail: "Alle 3\u20136 Monate wechseln \u00B7 Bad & Klo separat", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "Schwamm / Scheuerschwamm", detail: "K\u00FCche & Bad \u00B7 w\u00F6chentlich hei\u00DF aussp\u00FClen \u00B7 monatlich wechseln", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "M\u00FClls\u00E4cke (versch. Gr\u00F6\u00DFen)", detail: "Klein (10L Klo/Bad), Mittel (20L K\u00FCche), Gro\u00DF (35L Rest)", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "Staubsaugerbeutel / -filter", detail: "Je nach Modell \u00B7 bei 2/3 voll wechseln", group: "\uD83E\uDEA3 Putzutensilien" },
+  { name: "Abflussreiniger (bio, z.B. Frosch)", detail: "Monatlich pr\u00E4ventiv \u00B7 f\u00FCr Bad & K\u00FCche", group: "\uD83E\uDEA3 Putzutensilien" },
+];
+
+
+// Welche Wochen sind aktuell? sind aktuell? (berechne live)
+function getMealWeekNum(date) {
+  const kw11_2026 = new Date("2026-03-09T00:00:00");
+  const diff = Math.floor((date - kw11_2026) / (7 * 864e5));
+  return ((diff % 4) + 4) % 4 + 1; // 1\u20134
+}
+
+function getCurrentWeeks() {
+  const now = new Date();
+  // Anfang dieser Woche (Montag)
+  const dow = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  monday.setHours(0, 0, 0, 0);
+  const nextMonday = new Date(monday);
+  nextMonday.setDate(monday.getDate() + 7);
+
+  const currentWeek = getMealWeekNum(monday);
+  const nextWeek = getMealWeekNum(nextMonday);
+
+  // Datumsbereich
+  const friday = new Date(monday); friday.setDate(monday.getDate() + 6);
+  const nextFriday = new Date(nextMonday); nextFriday.setDate(nextMonday.getDate() + 6);
+
+  const fmt = d => d.toLocaleDateString("de-AT", { day: "numeric", month: "numeric" });
+
+  return {
+    currentWeek,
+    nextWeek,
+    currentLabel: `KW ${getKW(monday)} \u00B7 ${fmt(monday)}\u2013${fmt(friday)}`,
+    nextLabel: `KW ${getKW(nextMonday)} \u00B7 ${fmt(nextMonday)}\u2013${fmt(nextFriday)}`,
+  };
+}
+
+function getKW(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// \u2500\u2500\u2500 PFLEGE-KATEGORIEN (unver\u00E4ndert) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+const GROUP_ORDER = ["\uD83E\uDD5A Eier & Milch", "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se", "\uD83C\uDF5E Brot & Getreide", "\uD83C\uDF5D Nudeln & Reis", "\uD83E\uDD66 Gem\u00FCse", "\uD83C\uDF4E Obst", "\uD83E\uDD5C N\u00FCsse & Samen", "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven", "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l", "\uD83C\uDF3F Kr\u00E4uter", "\uD83D\uDC8A NEM & Herzschutz", "\uD83C\uDF75 Tee & Kr\u00E4uter", "\uD83E\uDDF4 Reinigungsmittel", "\uD83E\uDEA3 Putzutensilien"]
+
+const GROUP_COLORS = {
+  "\uD83E\uDD5A Eier & Milch":    { bg: "#FFFDE7", accent: "#F9A825", color: "#6D4C00" },
+  "\uD83E\uDDC0 K\u00E4se & Frischk\u00E4se": { bg: "#FFF8E1", accent: "#FFB300", color: "#5D4000" },
+  "\uD83C\uDF5E Brot & Getreide": { bg: "#FBE9E7", accent: "#FF8A65", color: "#5D2A00" },
+  "\uD83C\uDF5D Nudeln & Reis":   { bg: "#FFF3E0", accent: "#FFB74D", color: "#6D3A00" },
+  "\uD83E\uDD66 Gem\u00FCse":          { bg: "#E8F5E9", accent: "#66BB6A", color: "#1B5E20" },
+  "\uD83C\uDF4E Obst":            { bg: "#FCE4EC", accent: "#EF9A9A", color: "#880E4F" },
+  "\uD83E\uDD5C N\u00FCsse & Samen":   { bg: "#EFEBE9", accent: "#A1887F", color: "#3E2723" },
+  "\uD83E\uDD6B H\u00FClsenfr\u00FCchte & Konserven": { bg: "#E3F2FD", accent: "#64B5F6", color: "#0D47A1" },
+  "\uD83E\uDDC2 Gew\u00FCrze & \u00D6l":    { bg: "#F3E5F5", accent: "#CE93D8", color: "#4A148C" },
+  "\uD83C\uDF3F Kr\u00E4uter":         { bg: "#E0F2F1", accent: "#4DB6AC", color: "#004D40" },
+  "\uD83D\uDC8A NEM & Herzschutz":  { bg: "#F3E5F5", accent: "#AB47BC", color: "#6A1B9A" },
+  "\uD83C\uDF75 Tee & Kr\u00E4uter":    { bg: "#E0F2F1", accent: "#26A69A", color: "#004D40" },
+  "\uD83E\uDDF4 Reinigungsmittel":  { bg: "#FFF8E8", accent: "#E67E22", color: "#8B4513" },
+  "\uD83E\uDEA3 Putzutensilien":    { bg: "#F0F8FF", accent: "#2980B9", color: "#1A5276" },
+}
+
+const pflegeCategories = [
+  {
+    id: "lavera", label: "\uD83C\uDF3F Lavera", sub: "PETA approved \u00B7 NATRUE \u00B7 kein China-Verkauf",
+    color: "#2E7D32", bg: "#E8F5E9", accent: "#81C784",
+    where: "BIPA, Rossmann, M\u00FCller, online (lavera.de, ecco-verde.de)",
+    items: [
+      { name: "Lavera Repair Shampoo", detail: "Bio-Macadamia & Argan\u00F6l \u2013 sulfatfrei", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Lavera Repair Pflegesp\u00FClung", detail: "silikonfrei, 2 Min. einwirken", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Lavera Repair & Care Haarkur", detail: "Feuchtigkeitsmaske 20\u201330 Min.", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Lavera Repair & Care Haar\u00F6l", detail: "\u00D6lbehandlung, Kopfhautmassage & t\u00E4glich", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Lavera Repair & Care Pflegespray", detail: "Hitzeschutz vor dem F\u00F6hnen", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Lavera Basis Sensitiv Handcreme", detail: "t\u00E4glich \u2013 auch ins Nagelbett", app: "\uD83D\uDC85 Nagel" },
+      { name: "Lavera Basis Sensitiv Reinigungsmilch", detail: "morgens & abends", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera Straffendes Serum 3-fach Hyaluron & Bakuchiol", detail: "abends nach Reinigung", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera My Age Intensiv \u00D6l-Serum", detail: "abends \u2013 tiefe Feuchtigkeitspflege", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera My Age Tagescreme", detail: "morgens nach Serum", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera Straffende Nachtpflege mit Bakuchiol & Hyaluron", detail: "abends \u2013 letzter Schritt", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera Sonnencreme Anti-Age LSF 30", detail: "morgens \u2013 t\u00E4glich auch im Winter!", app: "\uD83C\uDF38 Gesicht" },
+      { name: "Lavera Straffende Body Lotion mit Sheabutter", detail: "nach dem Duschen auf feuchter Haut", app: "\uD83E\uDDF4 K\u00F6rper" },
+      { name: "Lavera Basis Sensitiv Fu\u00DFcreme mit Bio-Sanddorn", detail: "abends mit S\u00F6ckchen dr\u00FCber", app: "\uD83E\uDDF4 K\u00F6rper" },
+      { name: "Lavera Tinted Moisturizer", detail: "BB Cream / leichte Grundierung", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Natural Concealer", detail: "unter Augen sanft eintippen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Illuminating Powder", detail: "Highlighter \u2013 Jochbein & Nasenr\u00FCcken", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Brow Styler dunkelbraun", detail: "haarfeine Striche in Wuchsrichtung", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Quattro Lidschatten \u2013 warm tones", detail: "Bronze/Kupfer/Braun f\u00FCr blaue Augen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Eyeliner braun", detail: "d\u00FCnn \u2013 nur Oberlid", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Mascara Volume", detail: "nur Oberwimpern", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Natural Blush ros\u00E9", detail: "Wangen\u00E4pfel \u2013 l\u00E4cheln beim Auftragen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Lip Liner nude rose", detail: "Lippenkontur zuerst", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Natural Lip Colour mauve rose", detail: "auf Liner auftragen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Lavera Lip Gloss transparent", detail: "nur Lippenmitte \u2013 macht voller", app: "\uD83D\uDC84 Make-up" },
+    ],
+  },
+  {
+    id: "benecos", label: "\uD83D\uDC30 Benecos", sub: "PETA approved \u00B7 BDIH \u00B7 kein China-Verkauf",
+    color: "#6A2E7D", bg: "#F3E5F5", accent: "#CE93D8",
+    where: "Rossmann, online (cosmondial.com, ecco-verde.de)",
+    items: [
+      { name: "Benecos Nail Strengthener", detail: "transparenter Schutzlack \u2013 einrei\u00DFender Nagel", app: "\uD83D\uDC85 Nagel" },
+      { name: "Benecos BB Cream Natural", detail: "leichte Grundierung", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos CC Concealer", detail: "unter Augen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Beauty ID Highlighter", detail: "champagner/gold", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Eyebrow Designer braun", detail: "Brauenstift", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Beauty ID Eyeshadow warm palette", detail: "Bronze/Kupfer \u2013 f\u00FCr blaue Augen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Eyeliner dunkelbraun", detail: "nur Oberlid", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Natural Mascara", detail: "Oberwimpern", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Blush pfirsich", detail: "Wangen\u00E4pfel", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Lip Liner natural rose", detail: "Lippenkontur", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Natural Lipstick nude", detail: "auf Liner auftragen", app: "\uD83D\uDC84 Make-up" },
+      { name: "Benecos Shiny Lip Colour", detail: "Lipgloss \u2013 Lippenmitte", app: "\uD83D\uDC84 Make-up" },
+    ],
+  },
+  {
+    id: "diy", label: "\uD83C\uDFE1 Natur & DIY", sub: "Supermarkt \u00B7 Reformhaus \u00B7 Apotheke",
+    color: "#7A5A3A", bg: "#F5EEE6", accent: "#B8926A",
+    where: "Supermarkt, Reformhaus, Apotheke, Drogerie",
+    items: [
+      { name: "Argan\u00F6l pur", detail: "2\u20133 Tropfen ins feuchte Haar t\u00E4glich", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "S\u00FC\u00DFmandel\u00F6l", detail: "\u00D6lbehandlung Haar & Kopfhautmassage", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Apfelessig", detail: "1 EL auf 1 L Wasser \u2013 Sp\u00FClung gegen Frizz", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Seidenkissenbezug", detail: "sch\u00FCtzt Wellen & Feuchtigkeit \u00FCber Nacht", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Oliven\u00F6l", detail: "Nageleinweichbad & Haarmaske", app: "\uD83D\uDC85 Nagel \u00B7 \uD83D\uDC86\u200D\u2640\uFE0F Haar" },
+      { name: "Jojoba\u00F6l", detail: "t\u00E4glich 1 Tropfen ins Nagelbett \u2013 wichtigste Nagelpflege!", app: "\uD83D\uDC85 Nagel" },
+      { name: "Vitamin E Kapseln", detail: "aufstechen & auf Nagelbett \u2013 monatliche Intensivkur", app: "\uD83D\uDC85 Nagel" },
+      { name: "Glasfeile", detail: "in eine Richtung feilen \u2013 nie s\u00E4gen!", app: "\uD83D\uDC85 Nagel" },
+      { name: "Holzst\u00E4bchen (Orangewood Stick)", detail: "Nagelhaut sanft zur\u00FCckschieben", app: "\uD83D\uDC85 Nagel" },
+      { name: "Biotin-Kapseln", detail: "Haar & N\u00E4gel \u2013 Wirkung nach 2\u20133 Monaten", app: "\uD83D\uDC86\u200D\u2640\uFE0F Haar \u00B7 \uD83D\uDC85 Nagel" },
+      { name: "Lavendel\u00F6l", detail: "Abend-Ritual \u2013 Tropfen aufs Kissen oder in Massage\u00F6l", app: "\uD83E\uDDF4 K\u00F6rper" },
+      { name: "Faszienrolle / Foam Roller", detail: "Cellulite-Massage \u2013 einmaliger Kauf", app: "\uD83E\uDDF4 K\u00F6rper" },
+      { name: "Silikon-Schr\u00F6pfk\u00F6pfe", detail: "Vakuummassage gegen Cellulite", app: "\uD83E\uDDF4 K\u00F6rper" },
+      { name: "Baumwolls\u00F6ckchen (alt)", detail: "\u00FCber Fu\u00DFcreme nachts \u2013 verdoppelt die Wirkung", app: "\uD83E\uDDF4 K\u00F6rper" },
+    ],
+  },
+]
+
+function getMealWeekNum(date) {
+  const kw11_2026 = new Date("2026-03-09T00:00:00");
+  const diff = Math.floor((date - kw11_2026) / (7 * 864e5));
+  return ((diff % 4) + 4) % 4 + 1; // 1\u20134
+}
+
+function getCurrentWeeks() {
+  const now = new Date();
+  // Anfang dieser Woche (Montag)
+  const dow = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  monday.setHours(0, 0, 0, 0);
+  const nextMonday = new Date(monday);
+  nextMonday.setDate(monday.getDate() + 7);
+
+  const currentWeek = getMealWeekNum(monday);
+  const nextWeek = getMealWeekNum(nextMonday);
+
+  // Datumsbereich
+  const friday = new Date(monday); friday.setDate(monday.getDate() + 6);
+  const nextFriday = new Date(nextMonday); nextFriday.setDate(nextMonday.getDate() + 6);
+
+  const fmt = d => d.toLocaleDateString("de-AT", { day: "numeric", month: "numeric" });
+
+  return {
+    currentWeek,
+    nextWeek,
+    currentLabel: `KW ${getKW(monday)} \u00B7 ${fmt(monday)}\u2013${fmt(friday)}`,
+    nextLabel: `KW ${getKW(nextMonday)} \u00B7 ${fmt(nextMonday)}\u2013${fmt(nextFriday)}`,
+  };
+}
+
+function getKW(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+var EL_KEY = 'einkauf_checked_v1';
+var checked = (function(){ try{ return JSON.parse(localStorage.getItem(EL_KEY)||'{}'); }catch(e){ return {}; } })();
+function saveChecked(){ try{ localStorage.setItem(EL_KEY, JSON.stringify(checked)); }catch(e){} }
+var mainTab = 0;
+var weekTab = 'diese';
+var weekInfo = getCurrentWeeks();
+
+function getWeekNum(tab) {
+  return tab === 'diese' ? weekInfo.currentWeek : weekInfo.nextWeek;
+}
+
+function switchMain(n) {
+  mainTab = n;
+  document.getElementById('food-section').style.display = n===0 ? '' : 'none';
+  document.getElementById('pflege-section').style.display = n===1 ? '' : 'none';
+  document.getElementById('mt0').className = 'main-tab' + (n===0?' on':'');
+  document.getElementById('mt1').className = 'main-tab' + (n===1?' on':'');
+  renderAll();
+}
+
+function switchWeek(w) {
+  weekTab = w;
+  document.getElementById('wt0').className = 'tab' + (w==='diese'?' on':'');
+  document.getElementById('wt1').className = 'tab' + (w==='naechste'?' on':'');
+  renderFood();
+}
+
+function toggleFood(wk, idx) {
+  var k = 'f_'+wk+'_'+idx;
+  checked[k] = !checked[k];
+  saveChecked();
+  renderFood();
+}
+
+function renderFood() {
+  var wk = getWeekNum(weekTab);
+  var lbl = weekTab === 'diese' ? weekInfo.currentLabel : weekInfo.nextLabel;
+  document.getElementById('weekInfo').textContent = 'Mahlzeitenplan Woche ' + wk + ' - ' + lbl;
+  var items = (ZUTATEN_WOCHE[wk] || []).concat(NEM_ITEMS || []).concat(REINIGUNGS_ITEMS || []);
+  var grouped = {};
+  items.forEach(function(it, i) {
+    if (!grouped[it.group]) grouped[it.group] = [];
+    grouped[it.group].push({item: it, idx: i});
+  });
+  var done = items.filter(function(_, i) { return !!checked['f_'+wk+'_'+i]; }).length;
+  var pct = items.length ? Math.round(done/items.length*100) : 0;
+  document.getElementById('foodCount').textContent = done + ' / ' + items.length;
+  document.getElementById('foodBar').style.width = pct + '%';
+  var html = '';
+  GROUP_ORDER.forEach(function(g) {
+    if (!grouped[g]) return;
+    var gc = GROUP_COLORS[g] || {bg:'#f5f5f5',accent:'#ccc',color:'#333'};
+    var gDone = grouped[g].filter(function(x){ return !!checked['f_'+wk+'_'+x.idx]; }).length;
+    html += '<div class="group-hdr" style="background:'+gc.bg+';color:'+gc.color+'">';
+    html += '<span>'+g+'</span><span style="font-size:.65rem;opacity:.7">'+gDone+'/'+grouped[g].length+'</span></div>';
+    grouped[g].forEach(function(x) {
+      var k = 'f_'+wk+'_'+x.idx;
+      var d = !!checked[k];
+      html += '<div class="item'+(d?' done':'')+'" onclick="toggleFood('+wk+','+x.idx+')">';
+      html += '<div class="icb" style="background:'+(d?gc.color:'transparent')+';border:2px solid '+(d?gc.color:'#ccc')+'">';
+      if(d) html += 'v';
+      html += '</div><div><div class="iname">'+x.item.name+'</div>';
+      if(x.item.detail) html += '<div class="idetail">'+x.item.detail+'</div>';
+      html += '</div></div>';
+    });
+  });
+  document.getElementById('foodList').innerHTML = html;
+}
+
+function clearDone() {
+  var wk = getWeekNum(weekTab);
+  Object.keys(checked).forEach(function(k){ if(k.startsWith('f_'+wk+'_')) delete checked[k]; });
+  renderFood();
+}
+
+function resetWeek() {
+  var wk = getWeekNum(weekTab);
+  Object.keys(checked).forEach(function(k){ if(k.startsWith('f_'+wk+'_')) delete checked[k]; });
+  renderFood();
+}
+
+function togglePflege(catId, idx) {
+  var k = 'p_'+catId+'_'+idx;
+  checked[k] = !checked[k];
+  saveChecked();
+  renderPflege();
+}
+
+function renderPflege() {
+  var total = 0, done = 0;
+  pflegeCategories.forEach(function(cat) { total += cat.items.length; cat.items.forEach(function(it,i){ if(checked['p_'+cat.id+'_'+i]) done++; }); });
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('pflegeCount').textContent = done + ' / ' + total;
+  document.getElementById('pflegeBar').style.width = pct + '%';
+  var html = '';
+  pflegeCategories.forEach(function(cat) {
+    html += '<div class="brand-hdr" style="background:'+cat.bg+';border:1.5px solid '+cat.accent+'">';
+    html += '<div class="brand-title" style="color:'+cat.color+'">'+cat.label+'</div>';
+    html += '<div class="brand-sub" style="color:'+cat.color+'">'+cat.sub+'</div>';
+    html += '<div class="brand-where">&#128205; '+cat.where+'</div></div>';
+    cat.items.forEach(function(it, i) {
+      var k = 'p_'+cat.id+'_'+i;
+      var d = !!checked[k];
+      html += '<div class="item'+(d?' done':'')+'" onclick="togglePflege(\''+cat.id+'\','+i+')">';
+      html += '<div class="icb" style="background:'+(d?cat.color:'transparent')+';border:2px solid '+(d?cat.color:'#ccc')+'">';
+      if(d) html += 'v';
+      html += '</div><div><div class="iname">'+it.name+'</div>';
+      if(it.detail) html += '<div class="idetail">'+it.detail+'</div>';
+      html += '<div class="pflege-app" style="color:'+cat.color+'">'+it.app+'</div>';
+      html += '</div></div>';
+    });
+  });
+  document.getElementById('pflegeList').innerHTML = html;
+}
+
+function renderAll() { renderFood(); renderPflege(); }
+
+// Init
+renderAll();
+</script>
+</body>
+</html>

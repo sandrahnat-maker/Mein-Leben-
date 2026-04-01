@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meine Pflanzen</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#f0f7f0;color:#1a3020;padding:.7rem;padding-bottom:3rem}
+h1{font-size:1.05rem;font-weight:700;color:#2E7D32;margin-bottom:.3rem}
+.sub{font-size:.72rem;color:#5a8a5a;margin-bottom:.7rem}
+.tip{background:#E8F5E9;border-left:3px solid #4CAF50;border-radius:8px;padding:.45rem .7rem;margin-bottom:.7rem;font-size:.72rem;color:#2E7D32;line-height:1.5}
+.counter{font-size:.68rem;color:#5a8a5a;text-align:right;margin-bottom:.5rem}
+.plant{background:#fff;border-radius:12px;margin-bottom:.45rem;border:1px solid #c8e6c9;overflow:hidden}
+.plant.done{opacity:.45}
+.plant-top{display:flex;align-items:center;gap:.5rem;padding:.55rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.plant-icon{font-size:1.4rem;flex-shrink:0}
+.plant-info{flex:1;min-width:0}
+.plant-name{font-size:.85rem;font-weight:700;color:#1a3020;line-height:1.2}
+.plant.done .plant-name{text-decoration:line-through;color:#888}
+.plant-latin{font-size:.68rem;color:#5a8a5a;font-style:italic;margin-top:.08rem}
+.plant-giessen{font-size:.7rem;color:#2E7D32;margin-top:.1rem;font-weight:600}
+.plant-check{width:26px;height:26px;border-radius:50%;border:2px solid #66BB6A;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;transition:all .15s;background:transparent}
+.plant.done .plant-check{background:#2E7D32;border-color:#2E7D32;color:#fff}
+.plant-note{font-size:.7rem;color:#5a8a5a;padding:0 .7rem .5rem 2.9rem;line-height:1.45}
+.reset{position:fixed;bottom:1rem;right:1rem;background:#2E7D32;color:#fff;border:none;border-radius:20px;padding:.4rem 1rem;font-size:.75rem;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(46,125,50,.3)}
+</style>
+</head>
+<body>
+<h1>&#x1F33F; Meine Pflanzen giessen</h1>
+<p class="sub">Antippen = gegossen &#x2713;</p>
+<div class="tip">&#x1F4A7; Faustregel: Finger in die Erde &ndash; trocken? Dann giessen! Staunaesse vermeiden.</div>
+<div class="counter" id="counter"></div>
+<div id="list"></div>
+<button class="reset" onclick="resetAll()">&#x21BA; Alle zuruecksetzen</button>
+<script>
+var PLANTS = [
+  {icon:'&#x1F332;',name:'Gummibaum',latin:'Ficus elastica',giessen:'alle 7-10 Tage',note:'Helles indirektes Licht \u00B7 Blaetter abwischen \u00B7 im Winter weniger giessen'},
+  {icon:'&#x1F333;',name:'Birkenfeige',latin:'Ficus benjamina',giessen:'wenn Erde oben trocken',note:'Standort nie wechseln! \u00B7 Apr-Sept duengen \u00B7 zieht bei Zugluft Blaetter ein'},
+  {icon:'&#x1F331;',name:'Einblatt',latin:'Spathiphyllum',giessen:'alle 5-7 Tage',note:'Haengende Blaetter = zu trocken \u00B7 Halbschatten geeignet \u00B7 entgiftet Luft'},
+  {icon:'&#x1FAB4;',name:'Efeutute',latin:'Epipremnum aureum',giessen:'alle 7 Tage',note:'Sehr pflegeleicht \u00B7 auch im Halbschatten \u00B7 haengende Ranken schneiden wenn noetig'},
+  {icon:'&#x1F335;',name:'Kaktus',latin:'Cactaceae',giessen:'alle 2-3 Wochen',note:'Im Winter kaum giessen \u00B7 volle Sonne \u00B7 sehr trockenresistent'},
+  {icon:'&#x1F940;',name:'Orchidee',latin:'Phalaenopsis',giessen:'alle 7-10 Tage (tauchen)',note:'Wurzeln gruenlich = gut bewaessert \u00B7 nach Bluete kurzschneiden \u00B7 keine Staundaesse'},
+  {icon:'&#x1F33C;',name:'Margerite / Bluetenstaude',latin:'Leucanthemum',giessen:'alle 3-4 Tage',note:'Regelmaessig duengen im Fruehling \u00B7 verwelkte Bluetenkoepfe abschneiden'},
+  {icon:'&#x1F343;',name:'Drachenbaumchen',latin:'Dracaena marginata',giessen:'alle 10-14 Tage',note:'Vertraegt Trockenheit gut \u00B7 kein Kalkwasser \u00B7 Blattspitzen braun = zu trockene Luft'},
+  {icon:'&#x1F490;',name:'Zamioculcas',latin:'Zamioculcas zamiifolia',giessen:'alle 14 Tage',note:'Extrem trockenresistent \u00B7 kein direktes Sonnenlicht \u00B7 sehr pflegeleicht'},
+  {icon:'&#x1F33A;',name:'Hibiskus',latin:'Hibiscus rosa-sinensis',giessen:'alle 3-4 Tage',note:'Viel Licht \u00B7 regelmaessig duengen Mai-Sept \u00B7 Blueteknospen nicht versetzen'},
+];
+var done = {};
+try { done = JSON.parse(localStorage.getItem('pflanzen_v2') || '{}'); } catch(e){}
+function save(){ try { localStorage.setItem('pflanzen_v2', JSON.stringify(done)); } catch(e){} }
+function render(){
+  var h = '';
+  var cnt = Object.values(done).filter(Boolean).length;
+  document.getElementById('counter').textContent = cnt + ' / ' + PLANTS.length + ' gegossen';
+  PLANTS.forEach(function(p, i){
+    var d = !!done[i];
+    h += '<div class="plant' + (d?' done':'') + '" id="p'+i+'">' +
+      '<div class="plant-top" onclick="toggle('+i+')">' +
+        '<span class="plant-icon">'+p.icon+'</span>' +
+        '<div class="plant-info">' +
+          '<div class="plant-name">'+p.name+'</div>' +
+          '<div class="plant-latin">'+p.latin+'</div>' +
+          '<div class="plant-giessen">&#x1F4A7; '+p.giessen+'</div>' +
+        '</div>' +
+        '<div class="plant-check">'+(d?'&#x2713;':'')+'</div>' +
+      '</div>' +
+      '<div class="plant-note">'+p.note+'</div>' +
+    '</div>';
+  });
+  document.getElementById('list').innerHTML = h;
+}
+function toggle(i){ done[i] = !done[i]; save(); render(); }
+function resetAll(){ done = {}; save(); render(); }
+render();
+</script>
+</body>
+</html>

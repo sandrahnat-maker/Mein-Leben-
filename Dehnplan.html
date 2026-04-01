@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mein Dehnplan</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F3EE;
+  --surface: #FFFFFF;
+  --surface2: #EDE8E0;
+  --ink: #1C1611;
+  --muted: rgba(28,22,17,.45);
+  --border: rgba(28,22,17,.1);
+
+  --kraft:  #2E6B3A; /* Muskeltraining – grün */
+  --surf:   #2058A0; /* Balanceboard – blau */
+  --yoga:   #7B3C98; /* Yoga – lila */
+  --walk:   #A05820; /* Spaziergang – ocker */
+  --kalk:   #B03030; /* Kalkschulter – rot */
+  --ruhe:   #888888; /* Ruhetag */
+
+  --kraft-pale: #EAF5EC;
+  --surf-pale:  #E8F1FB;
+  --yoga-pale:  #F4EAF9;
+  --walk-pale:  #FBF0E8;
+  --kalk-pale:  #FBE8E8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  font-family: 'Jost', sans-serif;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  color: #fff;
+  padding: .7rem 1rem .65rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+}
+
+.header-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.header-title em { font-style: italic; color: #d4a96a; }
+
+.day-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.dp {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .62rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .02em;
+  border: 1.5px solid transparent;
+}
+
+.dp-kraft { background: var(--kraft); color:#fff; }
+.dp-surf  { background: var(--surf);  color:#fff; }
+.dp-yoga  { background: var(--yoga);  color:#fff; }
+.dp-walk  { background: rgba(160,88,32,.2); color: #d4a96a; border-color: rgba(212,169,106,.3); }
+.dp-ruhe  { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); border-color: rgba(255,255,255,.15); }
+.dp.active { box-shadow: 0 0 0 2px #fff; transform: scale(1.1); }
+
+/* ── SCROLL AREA ── */
+.scroll { flex:1; overflow-y:auto; padding: .75rem .75rem 2rem; -webkit-overflow-scrolling: touch; }
+
+/* ── TODAY BANNER ── */
+.today-banner {
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.today-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: inherit;
+  filter: brightness(.96);
+  z-index: 0;
+}
+
+.today-banner > * { position: relative; z-index: 1; }
+
+.tb-emoji { font-size: 2.2rem; flex-shrink: 0; }
+
+.tb-text { flex: 1; }
+.tb-label {
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: .65;
+  margin-bottom: 2px;
+}
+.tb-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.tb-sub { font-size: .78rem; opacity: .7; margin-top: 3px; }
+
+.tb-btn {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .55rem 1rem;
+  font-family: 'Jost', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity .2s;
+}
+.tb-btn:active { opacity: .7; }
+
+/* ── SECTION HEADER ── */
+.sec-head {
+  font-size: .6rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 14px 0 8px;
+  padding: 0 2px;
+}
+
+/* ── STRETCH CARD ── */
+.stretch-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow .2s;
+}
+
+.stretch-card:active { box-shadow: 0 0 0 2px var(--border) inset; }
+
+.sc-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+}
+
+.sc-stripe {
+  width: 4px;
+  border-radius: 2px;
+  align-self: stretch;
+  flex-shrink: 0;
+  min-height: 36px;
+}
+
+.sc-emoji { font-size: 1.5rem; flex-shrink: 0; width: 28px; text-align: center; }
+
+.sc-info { flex: 1; }
+.sc-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: .92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.sc-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+.sc-badge {
+  font-size: .62rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.sc-chevron { color: var(--muted); font-size: .8rem; transition: transform .3s; flex-shrink: 0; }
+.stretch-card.open .sc-chevron { transform: rotate(180deg); }
+
+.sc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .4s ease;
+}
+
+.stretch-card.open .sc-body { max-height: 1200px; }
+
+.sc-inner { padding: 0 14px 16px 14px; }
+
+/* Exercise list inside card */
+.ex-list { display: flex; flex-direction: column; gap: 7px; }
+
+.ex-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border-radius: 10px;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.ex-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .62rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #fff;
+}
+
+.ex-text { flex: 1; }
+.ex-title { font-weight: 600; color: var(--ink); }
+.ex-desc { color: var(--muted); font-size: .75rem; margin-top: 1px; }
+
+.ex-dur {
+  font-size: .68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 1px solid var(--border);
+}
+
+/* Caution note */
+.caution-note {
+  font-size: .73rem;
+  line-height: 1.55;
+  color: #7a3a20;
+  background: #FBF0E8;
+  border-left: 3px solid #c06820;
+  border-radius: 0 8px 8px 0;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+}
+
+.breath-note {
+  font-size: .72rem;
+  color: #2a5a80;
+  background: var(--surf-pale);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+/* START BUTTON inside card */
+.sc-start-btn {
+  width: 100%;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .65rem;
+  font-family: 'Jost', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: opacity .2s;
+  letter-spacing: .04em;
+}
+.sc-start-btn:active { opacity: .75; }
+
+/* ── WEEK OVERVIEW ── */
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.ws-day {
+  border-radius: 10px;
+  padding: 8px 4px 7px;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.ws-day.today { box-shadow: 0 0 0 2px var(--ink); }
+
+.ws-name {
+  font-size: .6rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.ws-icon { font-size: 1.1rem; display: block; }
+
+.ws-sport {
+  font-size: .55rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+/* ── MODAL / ACTIVE SESSION ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(28,22,17,.95);
+  z-index: 200;
+  flex-direction: column;
+  backdrop-filter: blur(4px);
+}
+
+.overlay.show { display: flex; }
+
+.ov-header {
+  background: rgba(255,255,255,.06);
+  padding: .7rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.ov-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: .95rem;
+  color: #fff;
+  font-style: italic;
+}
+
+.ov-close {
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: .35rem .7rem;
+  font-family: 'Jost', sans-serif;
+  font-size: .75rem;
+  cursor: pointer;
+}
+
+.ov-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1.2rem;
+  gap: .8rem;
+}
+
+.ov-ex-num {
+  font-size: .6rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+
+.ov-ex-emoji { font-size: 4rem; }
+
+.ov-ex-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.5rem;
+  color: #fff;
+  text-align: center;
+  font-weight: 700;
+}
+
+.ov-ex-desc {
+  font-size: .82rem;
+  color: rgba(255,255,255,.65);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+/* RING TIMER */
+.ring-wrap {
+  position: relative;
+  width: 130px; height: 130px;
+}
+
+.ring-wrap svg { transform: rotate(-90deg); width: 130px; height: 130px; }
+.ring-bg  { fill: none; stroke: rgba(255,255,255,.1); stroke-width: 6; }
+.ring-fill {
+  fill: none;
+  stroke: #d4a96a;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 345;
+  stroke-dashoffset: 345;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+
+.ring-secs {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 2.4rem;
+  color: #d4a96a;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ring-unit {
+  font-size: .6rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  margin-top: 2px;
+}
+
+.ov-breath {
+  font-size: .78rem;
+  font-style: italic;
+  color: rgba(255,255,255,.45);
+  text-align: center;
+}
+
+/* controls */
+.ov-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  flex-shrink: 0;
+  padding: 0 1.2rem 1.5rem;
+}
+
+.ov-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: .75rem;
+  font-family: 'Jost', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.ov-btn:active { opacity: .75; }
+.ov-btn-main { background: #d4a96a; color: #1C1611; }
+.ov-btn-skip { background: rgba(255,255,255,.1); color: rgba(255,255,255,.75); }
+
+/* ov progress dots */
+.ov-dots {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.od { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); transition: all .3s; }
+.od.done { background: #d4a96a; }
+.od.cur  { background: #fff; transform: scale(1.3); }
+
+/* ov speaking */
+.ov-voice {
+  font-size: .7rem;
+  color: rgba(255,255,255,.3);
+  display: flex; align-items: center; gap: 6px;
+}
+.vdot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.vdot.on { background: #d4a96a; animation: vblink .8s infinite; }
+@keyframes vblink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* DONE screen */
+.ov-done {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.ov-done.show { display: flex; }
+.ov-done-emoji { font-size: 4.5rem; }
+.ov-done-title { font-family: 'Libre Baskerville', serif; font-size: 1.6rem; color: #fff; }
+.ov-done-sub { font-size: .85rem; color: rgba(255,255,255,.55); line-height: 1.65; max-width: 280px; }
+.ov-done-btn { background: #d4a96a; color: #1C1611; border:none; border-radius:12px; padding:.75rem 2rem; font-family:'Jost',sans-serif; font-size:.9rem; font-weight:700; cursor:pointer; margin-top:8px; }
+
+/* transition overlay */
+.trans-flash {
+  display: none;
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(28,22,17,.97);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+}
+.trans-flash.show { display: flex; }
+.tf-emoji { font-size: 4rem; }
+.tf-title { font-family:'Libre Baskerville',serif; font-size:1.4rem; color:#d4a96a; font-style:italic; }
+.tf-countdown { font-family:'Libre Baskerville',serif; font-size:3.5rem; color:#fff; font-weight:700; }
+
+/* voice toggle */
+.voice-row {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 8px;
+  font-size: .7rem; color: var(--muted);
+  padding: 4px 2px 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.vtog { width:30px;height:17px;border-radius:9px;background:var(--border);position:relative;transition:background .3s;flex-shrink:0; }
+.vtog.on { background: var(--ink); }
+.vtog-thumb { position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.vtog.on .vtog-thumb { transform:translateX(13px); }
+
+@media (max-width: 360px) {
+  .dp { width:24px;height:24px;font-size:.55rem; }
+  .header-title { font-size:.88rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title">Mein <em>Dehnplan</em></div>
+  </div>
+  <div class="day-pills" id="dayPills"></div>
+</div>
+
+<!-- SCROLL -->
+<div class="scroll" id="scrollArea">
+
+  <div class="voice-row" onclick="toggleVoice()">
+    <div class="vtog on" id="voiceTog"><div class="vtog-thumb"></div></div>
+    <span>Sprachansage</span>
+  </div>
+
+  <!-- Week strip -->
+  <div class="week-strip" id="weekStrip"></div>
+
+  <!-- Dynamic content -->
+  <div id="mainContent"></div>
+
+</div>
+
+<!-- SESSION MODAL -->
+<div class="overlay" id="overlay">
+  <div class="ov-header">
+    <div class="ov-title" id="ovTitle">Dehnen</div>
+    <button class="ov-close" onclick="confirmClose()">✕ Beenden</button>
+  </div>
+
+  <!-- Active -->
+  <div class="ov-body" id="ovBody">
+    <div class="ov-ex-num" id="ovExNum">Übung 1 von 6</div>
+    <div class="ov-ex-emoji" id="ovExEmoji">🧘</div>
+    <div class="ov-ex-name" id="ovExName">—</div>
+    <div class="ov-ex-desc" id="ovExDesc">—</div>
+
+    <div class="ring-wrap">
+      <svg viewBox="0 0 130 130">
+        <circle class="ring-bg"  cx="65" cy="65" r="55"/>
+        <circle class="ring-fill" id="ringFill" cx="65" cy="65" r="55"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-secs" id="ringSecs">—</div>
+        <div class="ring-unit">Sek.</div>
+      </div>
+    </div>
+
+    <div class="ov-breath" id="ovBreath">🫁 Ruhig weiteratmen</div>
+    <div class="ov-dots" id="ovDots"></div>
+    <div class="ov-voice"><div class="vdot" id="vdot"></div><span id="vtext">Stimme bereit</span></div>
+  </div>
+
+  <!-- Done -->
+  <div class="ov-done" id="ovDone">
+    <div class="ov-done-emoji">🌟</div>
+    <div class="ov-done-title">Sehr gut!</div>
+    <div class="ov-done-sub" id="ovDoneSub">Dehnung abgeschlossen.</div>
+    <button class="ov-done-btn" onclick="closeSession()">Fertig</button>
+  </div>
+
+  <div class="ov-controls" id="ovControls">
+    <button class="ov-btn ov-btn-skip" onclick="skipEx()">Überspringen</button>
+    <button class="ov-btn ov-btn-main" id="ovBtnMain" onclick="togglePause()">⏸ Pause</button>
+  </div>
+</div>
+
+<!-- TRANSITION FLASH -->
+<div class="trans-flash" id="transFlash">
+  <div class="tf-emoji" id="tfEmoji">✅</div>
+  <div class="tf-title" id="tfTitle">Weiter!</div>
+  <div class="tf-countdown" id="tfCountdown">3</div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// Colors per sport type
+const C = {
+  kraft: { hex:'#2E6B3A', pale:'#EAF5EC' },
+  surf:  { hex:'#2058A0', pale:'#E8F1FB' },
+  yoga:  { hex:'#7B3C98', pale:'#F4EAF9' },
+  walk:  { hex:'#A05820', pale:'#FBF0E8' },
+  kalk:  { hex:'#B03030', pale:'#FBE8E8' },
+};
+
+// Week schedule (0=So, 1=Mo, 2=Di, 3=Mi, 4=Do, 5=Fr, 6=Sa)
+const WEEK = [
+  { day:'So', emoji:'🧘',  sport:'Yoga',       type:'yoga',  label:'Yoga',        stretch:'yoga' },
+  { day:'Mo', emoji:'💪',  sport:'Kraft',      type:'kraft', label:'Muskeltraining', stretch:'kraft' },
+  { day:'Di', emoji:'😴',  sport:'Ruhe',       type:'ruhe',  label:'Ruhetag',     stretch:'ruhe' },
+  { day:'Mi', emoji:'🏄',  sport:'Balance',    type:'surf',  label:'Balanceboard', stretch:'surf' },
+  { day:'Do', emoji:'😴',  sport:'Ruhe',       type:'ruhe',  label:'Ruhetag',     stretch:'ruhe' },
+  { day:'Fr', emoji:'💪',  sport:'Kraft',      type:'kraft', label:'Muskeltraining', stretch:'kraft' },
+  { day:'Sa', emoji:'📚',  sport:'Uni',        type:'ruhe',  label:'Uni / Ruhe',  stretch:'walk' },
+];
+
+// Stretch routines
+const STRETCHES = {
+
+  kraft: {
+    label: 'Muskeltraining · Cool-Down',
+    emoji: '💪',
+    color: 'kraft',
+    duration: '10 Min',
+    note: 'Nach Squats, Liegestützen, Ausfallschritten & Plank.',
+    breathNote: '🫁 Ausatmen in die Dehnung – nie die Luft anhalten',
+    caution: null,
+    exercises: [
+      { emoji:'🏋️', name:'Quadrizeps Stehend', desc:'Fuß zur Gesäßbacke ziehen, Gleichgewicht halten. Je Seite 30 Sek.', dur:60, breath:'Ruhig atmen, Bauch leicht anspannen' },
+      { emoji:'🦵', name:'Ausfallschritt Hüftbeuger', desc:'Großer Ausfallschritt, Hüfte absenken. Hinteres Knie kann Boden berühren.', dur:50, breath:'Einatmen – aufrichten, Ausatmen – absenken' },
+      { emoji:'🧎', name:'Beinrückseite Liegend', desc:'Rücken am Boden, Bein gestreckt nach oben führen. Towel hilft. Je Seite 30 Sek.', dur:60, breath:'Beim Ausatmen Bein sanft näher ziehen' },
+      { emoji:'🤲', name:'Beckenbodenbrücke + Rücken', desc:'Rücken am Boden, Becken heben und halten für 5 Sek, dann rollen. Dehnt Wirbelsäule.', dur:40, breath:'Einatmen beim Heben, Ausatmen beim Absenken' },
+      { emoji:'🧘', name:'Schulterquerdehnung', desc:'Arm waagerecht über die Brust ziehen. Je Seite 20 Sek. Schont die Kalkschulter.', dur:45, breath:'Gleichmäßig weiteratmen' },
+      { emoji:'🤸', name:'Kindshaltung (Yoga)', desc:'Knie breit, Po zu den Fersen, Arme vorgestreckt. Entspannt Rücken & Schultern.', dur:50, breath:'Tief einatmen – mit jedem Ausatmen sinken' },
+    ]
+  },
+
+  surf: {
+    label: 'Balanceboard · Cool-Down',
+    emoji: '🏄',
+    color: 'surf',
+    duration: '8 Min',
+    note: 'Nach Balancieren, Squats auf dem Board & Rotationsübungen.',
+    breathNote: '🫁 Langsam und tief – Gleichgewichtssinn erholen',
+    caution: null,
+    exercises: [
+      { emoji:'🦵', name:'Waden & Fußgelenk', desc:'Fuß auf erhöhter Kante (z.B. Buch), Ferse absenken. Knöchel kreisen. Je Seite 30 Sek.', dur:60, breath:'Ruhig und gleichmäßig atmen' },
+      { emoji:'🧎', name:'Hüftbeuger Ausfallschritt', desc:'Tief in den Ausfallschritt – Gleichgewicht nach dem Boardtraining wiederfinden.', dur:50, breath:'Beim Ausatmen tiefer in die Hüfte sinken' },
+      { emoji:'⬛', name:'Einbeinstand + Schulterdehnung', desc:'Auf einem Bein stehen, Arm hinter den Kopf. 20 Sek je Seite. Kombiniert Balance & Schulter.', dur:45, breath:'Atemfokus hilft beim Gleichgewicht' },
+      { emoji:'🔄', name:'Oberkörperdrehung Sitzend', desc:'Auf dem Boden sitzen, Beine gestreckt. Oberkörper langsam drehen – Wirbelsäule derotieren.', dur:45, breath:'Einatmen – gerade, Ausatmen – weiter drehen' },
+      { emoji:'🧘', name:'Liegende Taubenstellung', desc:'Hüftöffner nach dem Balancieren. Je Seite 40 Sek. Hüfte und IT-Band dehnen.', dur:80, breath:'Tief in die Hüfte atmen – loslassen' },
+    ]
+  },
+
+  yoga: {
+    label: 'Yoga · Abrunden',
+    emoji: '🧘',
+    color: 'yoga',
+    duration: '8 Min',
+    note: 'Ergänzt die Mady Morrison Einheit mit tiefen Haltedehnungen.',
+    breathNote: '🫁 Yin-Stil: bei jedem Ausatmen tiefer sinken lassen',
+    caution: null,
+    exercises: [
+      { emoji:'🦋', name:'Schmetterling (Baddha Konasana)', desc:'Fußsohlen zusammen, Knie fallen lassen, Oberkörper vorneigen. 60 Sek halten.', dur:60, breath:'Beim Ausatmen Rumpf sinkend vorbeugen' },
+      { emoji:'🐦', name:'Taube (Eka Pada Rajakapotasana)', desc:'Tiefer Hüftöffner. Je Seite 60 Sek. Auf Unterarme oder Hände stützen.', dur:120, breath:'Tief in die Hüfte – mit jedem Atemzug loslassen' },
+      { emoji:'🧍', name:'Sitzende Vorwärtsbeuge (Paschimottanasana)', desc:'Beine gestreckt, langsam vorneigen. Rücken lang halten, nicht runden.', dur:60, breath:'Einatmen – aufrichten, Ausatmen – vorbeugen' },
+      { emoji:'🌀', name:'Liegende Drehung (Supta Matsyendrasana)', desc:'Auf Rücken, Knie zur Seite fallen lassen. Beide Seiten je 30 Sek.', dur:60, breath:'Schultern am Boden lassen, tief weiteratmen' },
+    ]
+  },
+
+  walk: {
+    label: 'Nach dem Spaziergang',
+    emoji: '🚶',
+    color: 'walk',
+    duration: '6 Min',
+    note: 'Kurze Routine nach dem Spaziergang mit Lotte.',
+    breathNote: '🫁 Sanft und entspannt – du bist schon warm',
+    caution: null,
+    exercises: [
+      { emoji:'🦵', name:'Waden dehnen', desc:'Fuß gegen eine Wand, Ferse bleibt am Boden. Je Seite 30 Sek.', dur:60, breath:'Ruhig und gleichmäßig atmen' },
+      { emoji:'🏃', name:'Hüftbeuger', desc:'Ausfallschritt, Hüfte absenken. Sanfter Hüftöffner nach dem Gehen. Je Seite 25 Sek.', dur:55, breath:'Beim Ausatmen tiefer sinken' },
+      { emoji:'🧎', name:'Oberschenkel-Rückseite', desc:'Ein Bein ausstrecken, sanft nach vorne neigen. Hamstrings nach dem Gehen entspannen.', dur:50, breath:'Nicht ruckartig – beim Ausatmen weiter' },
+    ]
+  },
+
+  kalk: {
+    label: 'Kalkschulter · Täglich',
+    emoji: '🩺',
+    color: 'kalk',
+    duration: '12 Min',
+    note: 'Sanfte Mobilisierung der Schulter. Nur im schmerzfreien Bereich!',
+    breathNote: '🫁 Nie die Luft anhalten – gleichmäßig weiteratmen',
+    caution: '⚠️ Bei Schmerz über 4/10 sofort stoppen. Nie in die schmerzhafte Zone (60–120°) zwingen.',
+    exercises: [
+      { emoji:'🫳', name:'Pendelübung (Codman)', desc:'Oberkörper vorbeugen, Arm hängen lassen, sanft in kleinen Kreisen schwingen. 60 Sek.', dur:60, breath:'Schwingung durch Rumpf erzeugen – Arm locker lassen' },
+      { emoji:'🧍', name:'Schulterblätter zusammenziehen', desc:'Arme hängen, Schulterblätter langsam zur Wirbelsäule ziehen. 10× halten.', dur:45, breath:'Einatmen beim Zusammenziehen, Ausatmen beim Lösen' },
+      { emoji:'🤲', name:'Außenrotation mit Tuch', desc:'Tuch/Stab mit beiden Händen, betroffene Schulter sanft in Außenrotation. Nur schmerzfrei!', dur:50, breath:'Nie die Luft anhalten – kontinuierlich atmen' },
+      { emoji:'🧘', name:'Nackenentlastung', desc:'Kopf langsam zur Seite neigen. Je Seite 20 Sek. Löst die kompensatorische Nackenverspannung.', dur:50, breath:'Beim Ausatmen tiefer in die Dehnung sinken' },
+      { emoji:'🧱', name:'Brustkorbdehnung an Wand', desc:'Unterarm an der Wand abstützen, Körper langsam wegdrehen. Nur schmerzfrei!', dur:50, breath:'Tief ausatmen und Körper sanft wegdrehen' },
+    ]
+  },
+
+  ruhe: {
+    label: 'Ruhetag · Sanfte Mobilisierung',
+    emoji: '🌿',
+    color: 'walk',
+    duration: '5 Min',
+    note: 'Leichte Beweglichkeit am Ruhetag – keine Belastung.',
+    breathNote: '🫁 Alles sehr sanft – du erholt dich heute',
+    caution: null,
+    exercises: [
+      { emoji:'🔄', name:'Schulterkreisen', desc:'Beide Schultern langsam vorwärts und rückwärts kreisen. 10× je Richtung.', dur:40, breath:'Gleichmäßig und tief atmen' },
+      { emoji:'🧘', name:'Katzenbuckel / Kuhstrecke', desc:'Im Vierfüßerstand: beim Einatmen Rücken hohlmachen, beim Ausatmen wölben. 8×.', dur:45, breath:'Bewegung mit dem Atem synchronisieren' },
+      { emoji:'🦋', name:'Hüftkreisen Stehend', desc:'Hände auf Hüfte, große Kreisbewegungen. Je Richtung 5× – Hüfte lockern.', dur:35, breath:'Locker und entspannt atmen' },
+    ]
+  }
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let voiceOn = true;
+let sessionExercises = [];
+let sessionIdx = 0;
+let sessionTimer = null;
+let sessionSecs = 0;
+let sessionTotal = 0;
+let sessionRunning = false;
+let sessionPaused = false;
+const CIRC = 2 * Math.PI * 55; // r=55
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function today() { return new Date().getDay(); } // 0=Sun
+
+function speak(text, cb) {
+  if (!voiceOn || !window.speechSynthesis) { if (cb) cb(); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'de-DE'; u.rate = 0.9; u.pitch = 1.0; u.volume = 1;
+  const voices = speechSynthesis.getVoices();
+  const pref = ['Anna','Helena','Katrin','Marlene','Google Deutsch'];
+  for (const p of pref) {
+    const v = voices.find(v => v.name.includes(p) || v.lang.startsWith('de'));
+    if (v) { u.voice = v; break; }
+  }
+  document.getElementById('vdot').classList.add('on');
+  document.getElementById('vtext').textContent = 'Spricht…';
+  u.onend = u.onerror = () => {
+    document.getElementById('vdot').classList.remove('on');
+    document.getElementById('vtext').textContent = 'Bereit';
+    if (cb) cb();
+  };
+  setTimeout(() => speechSynthesis.speak(u), 80);
+}
+
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  document.getElementById('voiceTog').classList.toggle('on', voiceOn);
+  if (!voiceOn) { speechSynthesis.cancel(); document.getElementById('vdot').classList.remove('on'); }
+  else speak('Sprachansage aktiv.');
+}
+
+// ─── BUILD UI ─────────────────────────────────────────────────────────────────
+function buildDayPills() {
+  const t = today();
+  const html = WEEK.map((w, i) => {
+    const cls = 'dp dp-' + (w.type === 'ruhe' ? 'ruhe' : w.type) + (i === t ? ' active' : '');
+    return `<div class="${cls}" onclick="selectDay(${i})" title="${w.label}">${w.day}</div>`;
+  }).join('');
+  document.getElementById('dayPills').innerHTML = html;
+}
+
+function buildWeekStrip() {
+  const t = today();
+  const html = WEEK.map((w, i) => {
+    const isToday = i === t;
+    const c = w.type !== 'ruhe' ? C[w.type] : null;
+    const border = c ? `border-top: 3px solid ${c.hex};` : '';
+    return `<div class="ws-day${isToday ? ' today' : ''}" style="${border}" onclick="selectDay(${i})">
+      <div class="ws-name">${w.day}</div>
+      <span class="ws-icon">${w.emoji}</span>
+      <div class="ws-sport">${w.sport}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('weekStrip').innerHTML = html;
+}
+
+let currentDay = today();
+
+function selectDay(d) {
+  currentDay = d;
+  // update pill highlight
+  document.querySelectorAll('.dp').forEach((el, i) => el.classList.toggle('active', i === d));
+  document.querySelectorAll('.ws-day').forEach((el, i) => el.classList.toggle('today', i === d));
+  buildMainContent(d);
+}
+
+function buildMainContent(d) {
+  const w = WEEK[d];
+  const isToday = d === today();
+  const mc = document.getElementById('mainContent');
+
+  let html = '';
+
+  // Today banner
+  if (isToday) {
+    const c = w.type !== 'ruhe' ? C[w.type] : { hex:'#888', pale:'#eee' };
+    html += `<div class="today-banner" style="background:${c.pale}">
+      <div class="tb-emoji">${w.emoji}</div>
+      <div class="tb-text">
+        <div class="tb-label" style="color:${c.hex}">Heute · ${w.label}</div>
+        <div class="tb-title" style="color:${c.hex}">${w.sport === 'Ruhe' ? 'Ruhetag' : w.label}</div>
+        <div class="tb-sub" style="color:${c.hex}">${STRETCHES[w.stretch].duration} · ${STRETCHES[w.stretch].exercises.length} Übungen</div>
+      </div>
+      ${w.stretch !== 'ruhe' || w.type !== 'ruhe' ?
+        `<button class="tb-btn" onclick="startSession('${w.stretch}')">▶ Starten</button>` : ''}
+    </div>`;
+  }
+
+  // Kalkschulter daily card (always show)
+  html += `<div class="sec-head">Täglich</div>`;
+  html += buildCard('kalk', 'täglich nach Kalkschulter-Übungen');
+
+  // Main sport stretch
+  if (w.stretch !== 'kalk') {
+    html += `<div class="sec-head">${isToday ? 'Heute nach dem ' + w.sport : w.sport} · ${w.label}</div>`;
+    html += buildCard(w.stretch, w.label);
+  }
+
+  // Walk (daily too)
+  if (w.stretch !== 'walk') {
+    html += `<div class="sec-head">Nach dem Spaziergang mit Lotte</div>`;
+    html += buildCard('walk', 'täglich nach Spaziergang');
+  }
+
+  mc.innerHTML = html;
+
+  // Add toggle events
+  mc.querySelectorAll('.stretch-card').forEach(card => {
+    card.querySelector('.sc-head').addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+  });
+}
+
+function buildCard(key, sublabel) {
+  const s = STRETCHES[key];
+  const c = C[s.color] || C.walk;
+  const exHtml = s.exercises.map((ex, i) => `
+    <div class="ex-item">
+      <div class="ex-num" style="background:${c.hex}">${i+1}</div>
+      <div class="ex-text">
+        <div class="ex-title">${ex.emoji} ${ex.name}</div>
+        <div class="ex-desc">${ex.desc}</div>
+      </div>
+      <div class="ex-dur">${ex.dur}s</div>
+    </div>`).join('');
+
+  return `<div class="stretch-card">
+    <div class="sc-head">
+      <div class="sc-stripe" style="background:${c.hex}"></div>
+      <div class="sc-emoji">${s.emoji}</div>
+      <div class="sc-info">
+        <div class="sc-name">${s.label}</div>
+        <div class="sc-meta">${sublabel} · ${s.duration}</div>
+      </div>
+      <div class="sc-badge" style="background:${c.pale};color:${c.hex}">${s.exercises.length} Übg.</div>
+      <div class="sc-chevron">▼</div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-inner">
+        ${s.caution ? `<div class="caution-note">${s.caution}</div>` : ''}
+        <div class="breath-note">${s.breathNote}</div>
+        <div class="ex-list">${exHtml}</div>
+        <button class="sc-start-btn" onclick="event.stopPropagation();startSession('${key}')">▶ Jetzt starten</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── SESSION ──────────────────────────────────────────────────────────────────
+function startSession(key) {
+  const s = STRETCHES[key];
+  sessionExercises = s.exercises;
+  sessionIdx = 0;
+  sessionRunning = true;
+  sessionPaused = false;
+  document.getElementById('ovTitle').textContent = s.label;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('ovBody').style.display = 'flex';
+  document.getElementById('ovDone').classList.remove('show');
+  document.getElementById('ovControls').style.display = 'flex';
+  buildDots();
+  loadExercise(0);
+  speak(`Bereit? ${s.label}. ${sessionExercises.length} Übungen. Wir beginnen mit: ${sessionExercises[0].name}.`, () => {
+    startTimer();
+  });
+}
+
+function loadExercise(idx) {
+  const ex = sessionExercises[idx];
+  sessionSecs = ex.dur;
+  sessionTotal = ex.dur;
+  document.getElementById('ovExNum').textContent = `Übung ${idx+1} von ${sessionExercises.length}`;
+  document.getElementById('ovExEmoji').textContent = ex.emoji;
+  document.getElementById('ovExName').textContent = ex.name;
+  document.getElementById('ovExDesc').textContent = ex.desc;
+  document.getElementById('ringSecs').textContent = sessionSecs;
+  document.getElementById('ovBreath').textContent = '🫁 ' + ex.breath;
+  document.getElementById('ringFill').style.strokeDashoffset = CIRC;
+  updateDots();
+}
+
+function buildDots() {
+  document.getElementById('ovDots').innerHTML = sessionExercises.map((_, i) =>
+    `<div class="od" id="od-${i}"></div>`).join('');
+}
+
+function updateDots() {
+  sessionExercises.forEach((_, i) => {
+    const d = document.getElementById(`od-${i}`);
+    if (!d) return;
+    d.className = 'od' + (i < sessionIdx ? ' done' : i === sessionIdx ? ' cur' : '');
+  });
+}
+
+function startTimer() {
+  if (sessionTimer) clearInterval(sessionTimer);
+  sessionRunning = true;
+  sessionPaused = false;
+  document.getElementById('ovBtnMain').textContent = '⏸ Pause';
+
+  sessionTimer = setInterval(() => {
+    if (sessionPaused) return;
+    sessionSecs--;
+    document.getElementById('ringSecs').textContent = sessionSecs;
+    const prog = 1 - (sessionSecs / sessionTotal);
+    document.getElementById('ringFill').style.strokeDashoffset = CIRC * (1 - prog);
+
+    if (sessionSecs === Math.floor(sessionTotal / 2)) {
+      speak('Gut! Halbe Zeit. Weiter so.');
+    }
+    if (sessionSecs === 5) speak('Fünf Sekunden.');
+    if (sessionSecs <= 0) {
+      clearInterval(sessionTimer);
+      exDone();
+    }
+  }, 1000);
+}
+
+function exDone() {
+  if (sessionIdx + 1 >= sessionExercises.length) {
+    // All done!
+    clearInterval(sessionTimer);
+    sessionRunning = false;
+    document.getElementById('ovBody').style.display = 'none';
+    document.getElementById('ovControls').style.display = 'none';
+    document.getElementById('ovDone').classList.add('show');
+    document.getElementById('ovDoneSub').textContent =
+      `${sessionExercises.length} Übungen abgeschlossen. Dein Körper dankt es dir!`;
+    speak('Ausgezeichnet! Alle Übungen abgeschlossen. Dein Körper dankt es dir!');
+    return;
+  }
+
+  // Transition
+  const next = sessionExercises[sessionIdx + 1];
+  const tf = document.getElementById('transFlash');
+  document.getElementById('tfEmoji').textContent = next.emoji;
+  document.getElementById('tfTitle').textContent = next.name;
+  tf.classList.add('show');
+  speak(`Gut! Weiter: ${next.name}.`);
+
+  let cd = 3;
+  document.getElementById('tfCountdown').textContent = cd;
+  const cdTimer = setInterval(() => {
+    cd--;
+    document.getElementById('tfCountdown').textContent = cd || '';
+    if (cd <= 0) {
+      clearInterval(cdTimer);
+      tf.classList.remove('show');
+      sessionIdx++;
+      loadExercise(sessionIdx);
+      startTimer();
+    }
+  }, 1000);
+}
+
+function skipEx() {
+  clearInterval(sessionTimer);
+  speechSynthesis.cancel();
+  exDone();
+}
+
+function togglePause() {
+  sessionPaused = !sessionPaused;
+  document.getElementById('ovBtnMain').textContent = sessionPaused ? '▶ Weiter' : '⏸ Pause';
+  if (sessionPaused) speechSynthesis.cancel();
+  else speak('Weiter!');
+}
+
+function closeSession() {
+  clearInterval(sessionTimer);
+  speechSynthesis.cancel();
+  sessionRunning = false;
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('transFlash').classList.remove('show');
+  document.getElementById('ovDot')?.classList.remove('on');
+}
+
+// ─── CONFIRM CLOSE ────────────────────────────────────────────────────────────
+function confirmClose() {
+  if (!sessionRunning) { closeSession(); return; }
+  const existing = document.getElementById('confirmDialog');
+  if (existing) { existing.remove(); return; }
+  const dlg = document.createElement('div');
+  dlg.id = 'confirmDialog';
+  dlg.style.cssText = 'position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:rgba(28,22,17,.7);backdrop-filter:blur(6px);';
+  dlg.innerHTML = `<div style="background:#1C1611;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:28px 24px;max-width:300px;width:90%;text-align:center;color:#fff;">
+    <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
+    <div style="font-family:'Libre Baskerville',serif;font-size:1.05rem;font-weight:700;margin-bottom:8px">Übung abbrechen?</div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:22px">Du bist mittendrin – wirklich aufhören?</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('confirmDialog').remove()"
+        style="flex:1;padding:.65rem;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.75);font-family:'Jost',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer">Weitermachen</button>
+      <button onclick="document.getElementById('confirmDialog').remove();closeSession()"
+        style="flex:1;padding:.65rem;border-radius:10px;border:none;background:#d4a96a;color:#1C1611;font-family:'Jost',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">Ja, beenden</button>
+    </div>
+  </div>`;
+  document.body.appendChild(dlg);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => {};
+}
+
+buildDayPills();
+buildWeekStrip();
+buildMainContent(today());
+
+speak('Willkommen! Tippe auf einen Wochentag oder starte direkt deine Dehnung.');
+</script>
+</body>
+</html>

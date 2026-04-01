@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkschulter Training</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+  :root {
+    --bg:#0f0d0e; --surface:#1a1518; --surface2:#231d20;
+    --rose:#d4847a; --rose-bright:#e8a89e; --amber:#e8c87a;
+    --red:#e07070; --text:#f0ece4; --text2:#a09090;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:1.2rem 1rem 3rem;overflow-x:hidden}
+  .container{max-width:420px;width:100%}
+  .header{text-align:center;margin-bottom:1.2rem}
+  .header-label{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:.3rem}
+  .header-title{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.1}
+  .header-title em{font-style:italic;color:var(--rose-bright)}
+  .header-sub{margin-top:.3rem;font-size:.65rem;color:var(--text2);letter-spacing:.04em;line-height:1.5}
+  .warn{background:#2a1818;border:1px solid #8b3030;border-radius:10px;padding:.5rem .8rem;
+    font-size:.65rem;color:#e09090;margin-bottom:1rem;line-height:1.5}
+  .timer-card{background:var(--surface);border:1px solid #2a2020;border-radius:20px;
+    padding:1.4rem 1.2rem;margin-bottom:1rem;text-align:center;position:relative;overflow:hidden}
+  .timer-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(ellipse at 50% 0%,rgba(212,132,122,.05) 0%,transparent 60%);pointer-events:none}
+  .phase-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.35rem;transition:color .3s}
+  .phase-label.work{color:var(--rose)} .phase-label.rest{color:var(--amber)}
+  .phase-label.prep{color:var(--text2)} .phase-label.done{color:var(--rose-bright)}
+  .exercise-name{font-family:'Playfair Display',serif;font-size:1.4rem;line-height:1.2;
+    margin-bottom:.2rem;min-height:1.8em;display:flex;align-items:center;justify-content:center;text-align:center}
+  .exercise-note{font-size:.65rem;color:var(--text2);margin-bottom:1rem;min-height:1.1em;line-height:1.4}
+  .big-timer{font-size:4.2rem;font-weight:500;line-height:1;letter-spacing:-.02em;
+    margin-bottom:.4rem;transition:color .3s;font-variant-numeric:tabular-nums}
+  .big-timer.work{color:var(--rose-bright)} .big-timer.rest{color:var(--amber)}
+  .big-timer.prep{color:var(--text2)}
+  .big-timer.danger{color:var(--red);animation:pulse .5s ease-in-out infinite alternate}
+  @keyframes pulse{from{opacity:1}to{opacity:.4}}
+  .progress-wrap{height:3px;background:#2a2020;border-radius:2px;margin-bottom:.8rem;overflow:hidden}
+  .progress-bar{height:100%;border-radius:2px;transition:width 1s linear,background .3s}
+  .counters{display:flex;justify-content:center;gap:1.2rem;font-size:.65rem;color:var(--text2);letter-spacing:.04em}
+  .counters span{color:var(--text);font-weight:500}
+  .btn-row{display:flex;gap:.6rem;margin-bottom:1rem}
+  .btn{flex:1;padding:.8rem;border:none;border-radius:12px;font-family:'DM Mono',monospace;
+    font-size:.75rem;font-weight:500;letter-spacing:.05em;cursor:pointer;transition:all .15s}
+  .btn-primary{background:var(--rose);color:#0f0d0e}
+  .btn-primary:hover{background:var(--rose-bright)}
+  .btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid #2a2020}
+  .btn-secondary:hover{color:var(--text)}
+  .btn:disabled{opacity:.3;cursor:not-allowed}
+  .exercises-card{background:var(--surface);border:1px solid #2a2020;border-radius:16px;margin-bottom:1rem;overflow:hidden}
+  .exercises-title{padding:.6rem 1rem;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--text2);border-bottom:1px solid #2a2020}
+  .exercise-row{display:flex;align-items:center;gap:.7rem;padding:.55rem 1rem;
+    border-bottom:1px solid #1e1a1b;font-size:.72rem;transition:background .2s}
+  .exercise-row:last-child{border-bottom:none}
+  .exercise-row.active{background:rgba(212,132,122,.08)}
+  .exercise-row.done{opacity:.3}
+  .ex-num{width:1.3rem;height:1.3rem;border-radius:50%;background:#2a2020;display:flex;
+    align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0;color:var(--text2);transition:all .3s}
+  .exercise-row.active .ex-num{background:var(--rose);color:#0f0d0e}
+  .ex-info{flex:1}
+  .ex-name{color:var(--text);margin-bottom:.08rem}
+  .ex-detail{font-size:.6rem;color:var(--text2)}
+  .ex-time{font-size:.6rem;color:var(--text2);white-space:nowrap}
+  .settings-card{background:var(--surface);border:1px solid #2a2020;border-radius:16px;
+    padding:.9rem 1rem;margin-bottom:1rem}
+  .settings-title{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text2);margin-bottom:.7rem}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;font-size:.7rem}
+  .setting-row:last-child{margin-bottom:0}
+  .setting-label{color:var(--text2)} .setting-val{color:var(--text);font-weight:500;min-width:3rem;text-align:right}
+  input[type=range]{width:100px;accent-color:var(--rose)}
+  .voice-status{font-size:.6rem;color:var(--text2);text-align:center;margin-top:.3rem;min-height:1em}
+
+.side-select{display:flex;gap:.5rem;justify-content:center;padding:.5rem 1rem;}
+.side-btn{flex:1;padding:.4rem .3rem;border:2px solid #7B5EA7;background:transparent;color:#7B5EA7;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.side-btn.active{background:#7B5EA7;color:#fff;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-label">Schulter &#183; Physiotherapie</div>
+    <div class="header-title">&#x1F9B4; Kalk<em>schulter</em></div>
+    <div class="header-sub">6 Uebungen &middot; ca. 8 Minuten &middot; mit Ansage</div>
+  </div>
+  <div class="side-select">
+    <button class="side-btn active" id="btn-links" onclick="setSide('links')">&#x1F4AA; Links</button>
+    <button class="side-btn" id="btn-rechts" onclick="setSide('rechts')">&#x1F4AA; Rechts</button>
+    <button class="side-btn" id="btn-beide" onclick="setSide('beide')">&#x1F4AA; Beide</button>
+  </div>
+  <div class="warn">&#x26A0;&#xFE0F; Nur im schmerzfreien Bereich &middot; Bei Schmerz &gt; 4/10 sofort stoppen &middot; kein Ersatz fuer aerztliche Behandlung</div>
+  <div class="timer-card">
+    <div class="phase-label prep" id="phaseLabel">BEREIT</div>
+    <div class="exercise-name" id="exerciseName">Kalkschulter-Training</div>
+    <div class="exercise-note" id="exerciseNote">Starte das Training mit dem Button unten</div>
+    <div class="big-timer prep" id="bigTimer">&#x2014;</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%;background:var(--rose)"></div></div>
+    <div class="counters">Uebung&nbsp;<span id="exCounter">&#x2014;</span>&nbsp;/&nbsp;<span id="exTotal">6</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;Zeit&nbsp;<span id="totalTime">&#x2014;</span></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnStart" onclick="startTraining()">&#x25B6; START</button>
+    <button class="btn btn-secondary" id="btnPause" onclick="togglePause()" disabled>&#x23F8; PAUSE</button>
+    <button class="btn btn-secondary" id="btnStop" onclick="stopTraining()" disabled>&#x23F9; STOP</button>
+  </div>
+  <div class="voice-status" id="voiceStatus"></div>
+  <div class="exercises-card">
+    <div class="exercises-title">Uebungsplan</div>
+    <div id="exerciseList"></div>
+  </div>
+  <div class="settings-card">
+    <div class="settings-title">Einstellungen</div>
+    <div class="setting-row">
+      <span class="setting-label">Uebungszeit</span>
+      <span class="setting-val" id="workLabel">60s</span>
+      <input type="range" min="30" max="90" step="10" value="60" id="workSlider" oninput="updateSettings()">
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Pause</span>
+      <span class="setting-val" id="restLabel">15s</span>
+      <input type="range" min="10" max="30" step="5" value="15" id="restSlider" oninput="updateSettings()">
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Ansage</span>
+      <span class="setting-val" id="voiceLabel">An</span>
+      <input type="range" min="0" max="1" step="1" value="1" id="voiceSlider" oninput="updateSettings()">
+    </div>
+  </div>
+</div>
+<script>
+var currentSide = 'links';
+var sideRound = 1;
+
+function setSide(side) {
+  if (phase !== 'idle' && phase !== 'done') return;
+  currentSide = side;
+  ['links','rechts','beide'].forEach(function(s){
+    var el = document.getElementById('btn-'+s);
+    if (el) el.className = 'side-btn' + (s===side?' active':'');
+  });
+}
+
+function getSideLabel() {
+  if (currentSide === 'beide') return sideRound === 1 ? 'linke' : 'rechte';
+  return currentSide + 'e';
+}
+
+var EXERCISES = [
+  { name:"Pendeluebung (Codman)", note:"Gesunde Hand abstuetzen - Arm locker kreisen",
+    voice:"Pendeluebung! Gesunde Hand an den Tisch, leicht vorbeugen, Arm locker haengen lassen und sanft in kleinen Kreisen schwingen." },
+  { name:"Schulterbl\u00E4tter zusammenziehen", note:"Aufrecht stehen - kurz halten - loesen",
+    voice:"Schulterbl\u00E4tter zusammenziehen! Aufrecht stehen, Schulterbl\u00E4tter langsam zur Wirbels\u00E4ule ziehen, kurz halten, dann loesen." },
+  { name:"Nackenentlastung seitlich", note:"Ohr Richtung Schulter - 10 Sek halten",
+    voice:"Nackenentlastung! Kopf langsam zur Seite neigen, Ohr Richtung Schulter, zehn Sekunden halten, dann Seite wechseln." },
+  { name:"Aussenrotation mit Tuch", note:"Nur bis zur Schmerzgrenze - langsam zurueck",
+    voice:"Aussenrotation! Handtuch waagerecht halten. Schulter sanft in Aussenrotation fuehren, nur bis zur Schmerzgrenze, langsam zurueck." },
+  { name:"Schulter vorwaerts kreisen", note:"Grosse, weiche Kreise - beide Schultern",
+    voice:"Schulter kreisen! Beide Schultern langsam vorwaerts kreisen, grosse weiche Kreisbewegungen." },
+  { name:"Brustkorb-Dehnung an der Wand", note:"Unterarm an Wand - Koerper wegdrehen",
+    voice:"Brustkorb-Dehnung! Seitlich an die Wand, Unterarm abstuetzen, Koerper langsam wegdrehen. Dehnt die Schulterkapsel von vorne." }
+];
+
+var PREP_TIME = 5;
+var WORK_TIME = 60;
+var REST_TIME = 15;
+var voiceOn = true;
+
+var phase = 'idle';
+var isPaused = false;
+var currentEx = 0;
+var timerInterval = null;
+var elapsed = 0;
+var phaseDuration = 0;
+
+// Speech - try multiple sources (iframe may have restricted access)
+var synthObj = null;
+function getSynth() {
+  if (synthObj) return synthObj;
+  try { if (window.speechSynthesis) { synthObj = window.speechSynthesis; return synthObj; } } catch(e){}
+  try { if (window.top && window.top.speechSynthesis) { synthObj = window.top.speechSynthesis; return synthObj; } } catch(e){}
+  try { if (window.parent && window.parent.speechSynthesis) { synthObj = window.parent.speechSynthesis; return synthObj; } } catch(e){}
+  return null;
+}
+
+var voicesLoaded = false;
+var germanVoice = null;
+
+function loadVoices() {
+  var s = getSynth();
+  if (!s) return;
+  var voices = s.getVoices();
+  if (voices.length > 0) {
+    voicesLoaded = true;
+    germanVoice = null;
+    for (var i = 0; i < voices.length; i++) {
+      if (voices[i].lang && voices[i].lang.indexOf('de') === 0) {
+        germanVoice = voices[i];
+        break;
+      }
+    }
+    updateVoiceStatus();
+  }
+}
+
+function updateVoiceStatus() {
+  var s = getSynth();
+  var el = document.getElementById('voiceStatus');
+  if (!s) {
+    el.textContent = '&#x1F507; Ansage nicht verfuegbar in diesem Browser';
+    el.style.color = '#e07070';
+  } else if (germanVoice) {
+    el.textContent = '&#x1F50A; Deutsche Stimme: ' + germanVoice.name.substring(0,30);
+    el.style.color = 'var(--text2)';
+  } else if (voicesLoaded) {
+    el.textContent = '&#x1F508; Keine deutsche Stimme - Standardstimme wird verwendet';
+    el.style.color = 'var(--amber)';
+  }
+}
+
+function speak(text) {
+  if (!voiceOn) return;
+  var s = getSynth();
+  if (!s) return;
+  try {
+    s.cancel();
+    var utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'de-DE';
+    utt.rate = 0.9;
+    utt.pitch = 1.0;
+    utt.volume = 1.0;
+    if (germanVoice) utt.voice = germanVoice;
+    s.speak(utt);
+  } catch(e) {
+    console.log('speak error:', e);
+  }
+}
+
+function initVoice() {
+  var s = getSynth();
+  if (!s) { updateVoiceStatus(); return; }
+  if (s.onvoiceschanged !== undefined) s.onvoiceschanged = loadVoices;
+  loadVoices();
+  // Retry after short delay (Chrome needs this)
+  setTimeout(loadVoices, 500);
+  setTimeout(loadVoices, 1500);
+}
+
+function updateSettings() {
+  WORK_TIME = parseInt(document.getElementById('workSlider').value);
+  REST_TIME = parseInt(document.getElementById('restSlider').value);
+  voiceOn = parseInt(document.getElementById('voiceSlider').value) === 1;
+  document.getElementById('workLabel').textContent = WORK_TIME + 's';
+  document.getElementById('restLabel').textContent = REST_TIME + 's';
+  document.getElementById('voiceLabel').textContent = voiceOn ? 'An' : 'Aus';
+  renderList();
+}
+
+function renderList() {
+  var html = '';
+  for (var i = 0; i < EXERCISES.length; i++) {
+    var ex = EXERCISES[i];
+    var cls = '';
+    if (phase !== 'idle' && phase !== 'done') {
+      if (i === currentEx) cls = 'active';
+      else if (i < currentEx) cls = 'done';
+    }
+    var num = cls === 'done' ? '&#x2713;' : (i+1);
+    html += '<div class="exercise-row ' + cls + '">' +
+      '<div class="ex-num">' + num + '</div>' +
+      '<div class="ex-info"><div class="ex-name">' + ex.name + '</div>' +
+      '<div class="ex-detail">' + ex.note + '</div></div>' +
+      '<div class="ex-time">' + WORK_TIME + 's</div></div>';
+  }
+  document.getElementById('exerciseList').innerHTML = html;
+}
+
+function setUI(exIdx, ph, timeLeft, phaseDur) {
+  var ex = EXERCISES[exIdx] || null;
+  var phaseEl = document.getElementById('phaseLabel');
+  var labels = {prep:'VORBEREITUNG', work:'UEBUNG', rest:'PAUSE', done:'FERTIG'};
+  phaseEl.textContent = labels[ph] || '';
+  phaseEl.className = 'phase-label ' + ph;
+
+  if (ph === 'done') {
+    document.getElementById('exerciseName').textContent = '&#x1F389; Training abgeschlossen!';
+    document.getElementById('exerciseNote').textContent = 'Gut gemacht - Schulter gepflegt!';
+  } else if (ph === 'rest') {
+    var nextEx = EXERCISES[exIdx + 1];
+    document.getElementById('exerciseName').textContent = '&#x1F4A4; Pause';
+    document.getElementById('exerciseNote').textContent = nextEx ? 'Naechste: ' + nextEx.name : 'Letzte Pause';
+  } else if (ex) {
+    document.getElementById('exerciseName').textContent = ex.name;
+    document.getElementById('exerciseNote').textContent = ex.note;
+  }
+
+  var timerEl = document.getElementById('bigTimer');
+  if (ph === 'done') {
+    timerEl.textContent = '&#x2713;';
+    timerEl.className = 'big-timer work';
+  } else {
+    timerEl.textContent = timeLeft;
+    var cls = ph;
+    if ((ph === 'work' || ph === 'prep') && timeLeft <= 3) cls = 'danger';
+    timerEl.className = 'big-timer ' + cls;
+  }
+
+  var pct = phaseDur > 0 ? Math.min(100, ((phaseDur - timeLeft) / phaseDur) * 100) : 100;
+  var bar = document.getElementById('progressBar');
+  bar.style.width = pct + '%';
+  bar.style.background = ph === 'rest' ? 'var(--amber)' : 'var(--rose)';
+
+  document.getElementById('exCounter').textContent = ph === 'done' ? EXERCISES.length : (exIdx + 1);
+
+  var totalSec = EXERCISES.length * WORK_TIME + (EXERCISES.length - 1) * REST_TIME;
+  var mm = Math.floor(totalSec / 60);
+  var ss = totalSec % 60;
+  document.getElementById('totalTime').textContent = mm + ':' + (ss < 10 ? '0' : '') + ss;
+  renderList();
+}
+
+function startTraining() {
+  if (phase !== 'idle') return;
+  // Trigger voice init on user gesture (required by browsers)
+  initVoice();
+  currentEx = 0;
+  elapsed = 0;
+  isPaused = false;
+  sideRound = 1;
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnPause').disabled = false;
+  document.getElementById('btnStop').disabled = false;
+  startPhase('prep');
+}
+
+function startPhase(ph) {
+  phase = ph;
+  elapsed = 0;
+
+  if (ph === 'prep') {
+    phaseDuration = PREP_TIME;
+    speak('Bereit machen fuer die ' + getSideLabel() + ' Schulter! In ' + PREP_TIME + ' Sekunden geht es los.');
+    setUI(currentEx, 'prep', PREP_TIME, PREP_TIME);
+  } else if (ph === 'work') {
+    phaseDuration = WORK_TIME;
+    speak(EXERCISES[currentEx].voice);
+    setUI(currentEx, 'work', WORK_TIME, WORK_TIME);
+  } else if (ph === 'rest') {
+    phaseDuration = REST_TIME;
+    var next = EXERCISES[currentEx + 1];
+    speak('Pause! Erholen. Als naechstes: ' + (next ? next.name : 'letzte Uebung'));
+    setUI(currentEx, 'rest', REST_TIME, REST_TIME);
+  } else if (ph === 'done') {
+    if (currentSide === 'beide' && sideRound === 1) {
+      // Erste Seite fertig → automatisch rechte Schulter starten
+      sideRound = 2;
+      speak('Linke Schulter fertig! Kurze Pause, dann die rechte Schulter.');
+      setTimeout(function() {
+        currentEx = 0; elapsed = 0;
+        startPhase('prep');
+      }, 4000);
+      return;
+    }
+    var msg = currentSide === 'beide'
+      ? 'Training abgeschlossen! Beide Schultern gut gepflegt. Ausgezeichnet.'
+      : 'Training abgeschlossen! ' + getSideLabel().charAt(0).toUpperCase() + getSideLabel().slice(1) + ' Schulter gut gepflegt.';
+    speak(msg);
+    setUI(EXERCISES.length - 1, 'done', 0, 1);
+    document.getElementById('btnPause').disabled = true;
+    document.getElementById('btnStop').disabled = true;
+    document.getElementById('btnStart').disabled = false;
+    document.getElementById('btnStart').textContent = '&#x25B6; NOCHMAL';
+    phase = 'done';
+    return;
+  }
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(tick, 1000);
+}
+
+function tick() {
+  if (isPaused) return;
+  elapsed++;
+  var remaining = phaseDuration - elapsed;
+  setUI(currentEx, phase, remaining, phaseDuration);
+  if (remaining === 3) speak('Drei');
+  else if (remaining === 2) speak('Zwei');
+  else if (remaining === 1) speak('Eins');
+
+  if (remaining <= 0) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    if (phase === 'prep') {
+      startPhase('work');
+    } else if (phase === 'work') {
+      if (currentEx < EXERCISES.length - 1) { startPhase('rest'); }
+      else { startPhase('done'); }
+    } else if (phase === 'rest') {
+      currentEx++;
+      startPhase('work');
+    }
+  }
+}
+
+function togglePause() {
+  if (phase === 'idle' || phase === 'done') return;
+  isPaused = !isPaused;
+  document.getElementById('btnPause').textContent = isPaused ? '&#x25B6; WEITER' : '&#x23F8; PAUSE';
+  speak(isPaused ? 'Pause' : 'Weiter!');
+}
+
+function stopTraining() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  var s = getSynth(); if (s) { try { s.cancel(); } catch(e){} }
+  phase = 'idle'; isPaused = false; currentEx = 0; elapsed = 0;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStart').textContent = '&#x25B6; START';
+  document.getElementById('btnPause').disabled = true;
+  document.getElementById('btnPause').textContent = '&#x23F8; PAUSE';
+  document.getElementById('btnStop').disabled = true;
+  document.getElementById('phaseLabel').textContent = 'BEREIT';
+  document.getElementById('phaseLabel').className = 'phase-label prep';
+  document.getElementById('exerciseName').textContent = 'Kalkschulter-Training';
+  document.getElementById('exerciseNote').textContent = 'Starte das Training mit dem Button unten';
+  document.getElementById('bigTimer').textContent = '&#x2014;';
+  document.getElementById('bigTimer').className = 'big-timer prep';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('exCounter').textContent = '&#x2014;';
+  renderList();
+}
+
+// Init
+updateSettings();
+renderList();
+initVoice();
+</script>
+</body>
+</html>

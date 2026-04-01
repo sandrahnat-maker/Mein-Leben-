@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiefer & Kaumuskel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#FFF8E1;color:#2a1800;min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:linear-gradient(135deg,#E65100,#FF8A65);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr h1{color:#fff;font-size:.95rem;font-weight:700}
+.hdr p{color:rgba(255,255,255,.8);font-size:.6rem;margin-top:.05rem}
+.reset-btn{background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:.3rem .6rem;font-size:.65rem;cursor:pointer;font-family:inherit}
+.prog-bar{height:3px;background:rgba(230,81,0,.1);flex-shrink:0}
+.prog-fill{height:100%;background:linear-gradient(90deg,#E65100,#FF8A65);transition:width .4s}
+
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;gap:.7rem;text-align:center}
+.intro-ico{font-size:3.2rem}
+.intro-title{font-size:1.05rem;font-weight:700;color:#5a2000}
+.intro-info{font-size:.73rem;color:#8a4a20;line-height:1.6;max-width:280px}
+.ex-list{width:100%;max-width:300px;text-align:left}
+.ex-list-item{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:1px solid #FFE0B2;font-size:.73rem;color:#5a2000}
+.ex-list-item:last-child{border:none}
+.ex-dur{font-size:.62rem;color:#E65100;margin-left:auto;font-weight:700}
+.start-btn{background:linear-gradient(135deg,#E65100,#FF8A65);color:#fff;border:none;border-radius:12px;padding:.7rem 2rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;width:100%;max-width:280px;margin-top:.3rem}
+
+.ex-card{flex:1;display:flex;flex-direction:column;padding:.9rem;gap:.65rem;overflow-y:auto}
+.illus{background:#fff;border-radius:14px;border:1px solid #FFE0B2;padding:.9rem;text-align:center;flex-shrink:0}
+.ex-ico{font-size:3.8rem;display:block;margin-bottom:.3rem}
+.ex-zone{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FF8A65;margin-bottom:.2rem}
+.ex-name{font-size:1.05rem;font-weight:700;color:#5a2000}
+.ex-reps{font-size:.72rem;font-weight:700;color:#E65100;background:#FFF3E0;padding:.18rem .5rem;border-radius:6px;display:inline-block;margin-top:.25rem}
+
+.timer-wrap{display:flex;justify-content:center;flex-shrink:0}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(230,81,0,.1);stroke-width:8}
+.ring-fill{fill:none;stroke:#E65100;stroke-width:8;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset .5s linear}
+.ring-num{font-size:1.55rem;font-weight:700;fill:#5a2000;dominant-baseline:middle;text-anchor:middle}
+.ring-lbl{font-size:.52rem;fill:#E65100;dominant-baseline:middle;text-anchor:middle;letter-spacing:.06em;text-transform:uppercase}
+
+/* Massage-Spot Visualisierung */
+.massage-vis{background:#fff;border-radius:12px;border:1px solid #FFE0B2;padding:.75rem;text-align:center;flex-shrink:0}
+.face-vis{font-size:2.8rem;position:relative;display:inline-block}
+.spot-label{font-size:.68rem;color:#E65100;font-weight:600;margin-top:.3rem}
+
+.instruction{background:#fff;border-radius:12px;border:1px solid #FFE0B2;padding:.75rem .9rem;flex-shrink:0}
+.inst-title{font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FF8A65;margin-bottom:.4rem}
+.inst-steps{list-style:none}
+.inst-steps li{font-size:.78rem;color:#2a1800;line-height:1.5;padding:.1rem 0;display:flex;gap:.45rem}
+.inst-steps li::before{content:"→";color:#FF8A65;flex-shrink:0}
+.inst-tip{font-size:.65rem;color:#8a4a20;margin-top:.35rem;font-style:italic;line-height:1.4}
+.inst-warn{font-size:.65rem;color:#E65100;margin-top:.3rem;font-style:italic;line-height:1.4}
+
+.btns{display:flex;gap:.5rem;padding:.7rem .9rem;flex-shrink:0;background:#FFF8E1}
+.btn-prev{background:#fff;color:#E65100;border:1.5px solid #FF8A65;border-radius:10px;padding:.55rem;font-size:.82rem;cursor:pointer;font-family:inherit;flex:0 0 2.6rem}
+.btn-main{flex:1;background:linear-gradient(135deg,#E65100,#FF8A65);color:#fff;border:none;border-radius:10px;padding:.55rem;font-size:.85rem;cursor:pointer;font-family:inherit;font-weight:700}
+.btn-main.paused{background:linear-gradient(135deg,#FF8A65,#FFAB91)}
+.btn-skip{background:#fff;color:#E65100;border:1.5px solid #FF8A65;border-radius:10px;padding:.55rem;font-size:.82rem;cursor:pointer;font-family:inherit;flex:0 0 2.6rem}
+.dots{display:flex;gap:.28rem;justify-content:center;padding:.3rem .9rem;flex-shrink:0;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(230,81,0,.15);cursor:pointer;transition:all .2s}
+.dot.done{background:#FF8A65}.dot.active{background:#E65100;transform:scale(1.35)}
+
+.done-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;gap:.8rem}
+.done-ico{font-size:3.5rem}
+.done-title{font-size:1.15rem;font-weight:700;color:#5a2000}
+.done-sub{font-size:.75rem;color:#8a4a20;line-height:1.6;max-width:260px}
+.done-again{background:linear-gradient(135deg,#E65100,#FF8A65);color:#fff;border:none;border-radius:12px;padding:.6rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>😮 Kiefer & Kaumuskel</h1><p id="hdrSub">6 Übungen · ca. 8 Minuten</p></div>
+  <button class="reset-btn" onclick="goIntro()">↺ Neu</button>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+<div id="mainContent"></div>
+<script>
+var EXERCISES = [
+  {
+    name: "Kiefer lockern",
+    zone: "\uD83D\uDD00 Aufw\u00E4rmen",
+    ico: "\uD83D\uDE2E",
+    reps: "10 Kreise je Seite",
+    dur: 50,
+    cues: [
+      {at:0,  txt:"Mund leicht \u00F6ffnen. Kiefer locker h\u00E4ngen lassen."},
+      {at:5,  txt:"Jetzt Kiefer langsam im Kreis bewegen. Rechts herum. Gro\u00DFe, weiche Kreise."},
+      {at:15, txt:"Gut. Weiter kreisen. Tief durch die Nase atmen."},
+      {at:25, txt:"Richtung wechseln. Links herum. Zehn Runden."},
+      {at:40, txt:"Fast fertig. Noch f\u00FCnf Kreise."},
+      {at:47, txt:"Mund schlie\u00DFen. Kurz nachsp\u00FCren."}
+    ],
+    steps: [
+      "Mund leicht \u00F6ffnen \u2014 Kiefer locker h\u00E4ngen lassen",
+      "Kiefer langsam im Kreis bewegen \u2014 erst rechts herum",
+      "Gro\u00DFe, weiche Kreisbewegungen wie Kauen in Zeitlupe",
+      "10 Runden rechts, dann 10 Runden links",
+      "Dabei tief durch die Nase ein- und ausatmen"
+    ],
+    tip: "Der Kiefer speichert enorm viel Stress \u2014 besonders bei Bruxismus. Diese Lockerung verhindert, dass sich Verspannungen aufbauen."
+  },
+  {
+    name: "Kaumuskel Triggerpunkt Au\u00DFen",
+    zone: "\uD83D\uDC46 Massagepunkt Wange au\u00DFen",
+    ico: "\uD83E\uDD1C",
+    reps: "60 Sek je Seite",
+    dur: 75,
+    cues: [
+      {at:0,  txt:"Zeige- und Mittelfinger auf den Wangenknochen legen. Rechte Seite zuerst."},
+      {at:6,  txt:"Etwa zwei Zentimeter unterhalb des Wangenknochens. Dort sitzt der Kaumuskel."},
+      {at:12, txt:"Sanft aber bestimmt. Kleine kreisende Bewegungen."},
+      {at:20, txt:"Bei einem Druckpunkt: zehn Sekunden Druck halten, dann loslassen."},
+      {at:35, txt:"Seite wechseln. Linke Wange."},
+      {at:41, txt:"Wieder unterhalb des Wangenknochens. Kreisende Bewegungen."},
+      {at:62, txt:"Noch ein paar Sekunden."},
+      {at:71, txt:"H\u00E4nde loslassen. Kurz absch\u00FCtteln."}
+    ],
+    steps: [
+      "Zeige- und Mittelfinger auf den Wangenknochen legen",
+      "Ca. 1\u20132 cm unterhalb des Wangenknochens \u2014 dort sitzt der Masseter",
+      "Sanft aber bestimmt kreisenden Druck aus\u00FCben",
+      "Bei einem Schmerzpunkt: 10 Sek Druck halten, dann loslassen",
+      "60 Sekunden rechte Seite, dann links"
+    ],
+    tip: "Der Masseter ist einer der st\u00E4rksten Muskeln im K\u00F6rper. Bei Bruxismus verh\u00E4rtet er sich enorm \u2014 diese Massage l\u00F6st das direkt."
+  },
+  {
+    name: "Kaumuskel Triggerpunkt Innen",
+    zone: "\uD83D\uDC46 Massagepunkt innen",
+    ico: "\uD83E\uDEB6",
+    reps: "60 Sek je Seite",
+    dur: 75,
+    cues: [
+      {at:0,  txt:"Daumen in den Mund nehmen. Rechte Seite zuerst."},
+      {at:5,  txt:"Daumenspitze an die Innenseite der Wangenschleimhaut dr\u00FCcken. Zeigefinger au\u00DFen gegendr\u00FCcken."},
+      {at:13, txt:"Sanft von vorne nach hinten tasten. Du sp\u00FCrst den harten Muskel."},
+      {at:23, txt:"Bei Druckpunkten kurz verweilen. Ganz sanft. Das ist intensiv."},
+      {at:36, txt:"Jetzt die linke Seite. Daumen rein. Zeigefinger au\u00DFen."},
+      {at:43, txt:"Wieder von vorne nach hinten tasten. Ruhig atmen."},
+      {at:62, txt:"Fast fertig. Noch etwas Druck."},
+      {at:72, txt:"Daumen heraus. Mund kurz \u00F6ffnen und loslassen."}
+    ],
+    steps: [
+      "Daumen in den Mund nehmen",
+      "Daumenspitze an die Innenseite der Wangenschleimhaut dr\u00FCcken",
+      "Au\u00DFen gleichzeitig mit Zeigefinger gegendr\u00FCcken \u2014 sanfte Zange",
+      "Langsam von vorne nach hinten den ganzen Muskel ertasten",
+      "Bei Druckpunkten kurz halten \u2014 60 Sek je Seite"
+    ],
+    tip: "Die Innenmassage erreicht Muskelanteile, die von au\u00DFen nicht zug\u00E4nglich sind. Wirkt sofort und tief.",
+    warn: "\u26A0\uFE0F Sanft beginnen! Bei starkem Schmerz erst mit weniger Druck arbeiten."
+  },
+  {
+    name: "Schl\u00E4fenmuskel-Massage",
+    zone: "\uD83E\uDDE0 Schl\u00E4fenregion",
+    ico: "\uD83E\uDD14",
+    reps: "60 Sek",
+    dur: 65,
+    cues: [
+      {at:0,  txt:"Beide Handinnenflächen seitlich an die Schl\u00E4fen legen."},
+      {at:6,  txt:"Leichten Druck nach innen. Kleine, langsame Kreisbewegungen."},
+      {at:15, txt:"Z\u00E4hne dabei leicht auseinander. Nicht aufeinanderbeißen."},
+      {at:28, txt:"Sp\u00FCrst du die Spannung? Etwas mehr Druck."},
+      {at:45, txt:"Kreise etwas gr\u00F6\u00DFer werden lassen."},
+      {at:58, txt:"H\u00E4nde loslassen. Kurz nachsp\u00FCren."}
+    ],
+    steps: [
+      "Beide Handinnenflächen seitlich an die Schl\u00E4fen legen",
+      "Leichten Druck nach innen aus\u00FCben",
+      "Kleine, langsame Kreisbewegungen \u2014 so gro\u00DF wie eine M\u00FCnze",
+      "Gleichzeitig beide Seiten massieren",
+      "Z\u00E4hne dabei leicht auseinander \u2014 nicht aufeinanderbeißen!"
+    ],
+    tip: "Der Schl\u00E4fenmuskel ist der zweite gro\u00DFe Kaumuskel \u2014 oft die Ursache von Kopfschmerzen bei Bruxismus."
+  },
+  {
+    name: "Unterkiefer-Dehnung",
+    zone: "\uD83D\uDD13 Kiefergelenk",
+    ico: "\uD83D\uDE2C",
+    reps: "10 Wiederholungen",
+    dur: 55,
+    cues: [
+      {at:0,  txt:"Mund langsam so weit wie m\u00F6glich \u00F6ffnen. Ohne Schmerz."},
+      {at:6,  txt:"Kurz halten. Die Dehnung im Kiefergelenk sp\u00FCren."},
+      {at:11, txt:"Langsam schlie\u00DFen. Z\u00E4hne nicht aufeinanderbeißen."},
+      {at:16, txt:"Nochmal \u00F6ffnen. Jetzt Unterkiefer leicht nach vorne schieben."},
+      {at:23, txt:"Drei Sekunden halten. Dann zur\u00FCck."},
+      {at:30, txt:"Kiefer leicht nach rechts schieben. Halten. Zur\u00FCck."},
+      {at:38, txt:"Und nach links. Halten. Zur\u00FCck."},
+      {at:49, txt:"Gut. Kiefer locker lassen."}
+    ],
+    steps: [
+      "Mund langsam so weit wie m\u00F6glich \u00F6ffnen \u2014 ohne Schmerz",
+      "Kurz halten \u2014 die Dehnung im Kiefergelenk sp\u00FCren",
+      "Langsam schlie\u00DFen \u2014 Z\u00E4hne NICHT aufeinanderbeißen",
+      "Dann Unterkiefer leicht nach vorne schieben und halten",
+      "Und leicht zur Seite schieben \u2014 je 3 Sekunden"
+    ],
+    tip: "Verbessert die Beweglichkeit des Kiefergelenks. Ideal als Vorbereitung f\u00FCr den Tag und zum Einschlafen."
+  },
+  {
+    name: "W\u00E4rme & Entspannung",
+    zone: "\uD83C\uDF21\uFE0F Abschluss",
+    ico: "\uD83D\uDE4F",
+    reps: "1 Minute",
+    dur: 60,
+    cues: [
+      {at:0,  txt:"Beide H\u00E4nde aneinanderreiben bis sie warm werden."},
+      {at:7,  txt:"Warme H\u00E4nde sanft auf Wangen und Kiefer legen."},
+      {at:13, txt:"Mund leicht \u00F6ffnen. Kiefer komplett loslassen."},
+      {at:21, txt:"Tief einatmen durch die Nase."},
+      {at:26, txt:"Ausatmen. Bei jedem Ausatmen mehr loslassen."},
+      {at:36, txt:"Sp\u00FCr die W\u00E4rme. Kiefer ist schwer und entspannt."},
+      {at:46, txt:"Lippen zu. Z\u00E4hne auseinander. Das ist die richtige Ruheposition."},
+      {at:56, txt:"Gut gemacht. Diese Position immer anstreben."}
+    ],
+    steps: [
+      "Beide Handinnenflächen aneinanderreiben bis sie warm werden",
+      "Warme H\u00E4nde sanft auf Wangen und Kiefer legen",
+      "Mund leicht \u00F6ffnen \u2014 Kiefer komplett loslassen",
+      "Tief ein- und ausatmen \u2014 bei jedem Ausatmen mehr loslassen",
+      "Bewusst sp\u00FCren: Lippen zu, Z\u00E4hne auseinander \u2014 immer!"
+    ],
+    tip: "W\u00E4rme entspannt Muskeln sofort. Diese Abschluss\u00FCbung programmiert den Kiefer auf Entspannung."
+  }
+];
+
+var synth = window.speechSynthesis;
+var voice = null;
+var curIdx=0,sec=0,interval=null,isRunning=false,isPaused=false,state='intro';
+
+function loadVoice(){
+  var voices=synth.getVoices();
+  var pref=['Anna','Helena','Katrin','Marlene','Google Deutsch'];
+  for(var i=0;i<pref.length;i++){var v=voices.find(function(v){return v.name.indexOf(pref[i])>=0;});if(v){voice=v;break;}}
+  if(!voice)voice=voices.find(function(v){return v.lang&&v.lang.startsWith('de');});
+}
+if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=loadVoice;
+setTimeout(loadVoice,500);
+
+function speak(txt){try{synth.cancel();var u=new SpeechSynthesisUtterance(txt);u.lang='de-DE';u.rate=.88;u.volume=1;if(voice)u.voice=voice;synth.speak(u);}catch(e){}}
+
+function goIntro(){
+  clearInterval(interval);isRunning=false;isPaused=false;curIdx=0;sec=0;state='intro';
+  try{synth.cancel();}catch(e){}render();
+}
+
+function startTraining(){
+  state='running';curIdx=0;sec=0;isRunning=true;isPaused=false;render();
+  speak('Übung 1: '+EXERCISES[0].name+'. '+EXERCISES[0].steps[0]);
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(interval);
+  interval=setInterval(function(){
+    if(isPaused)return;
+    sec++;
+    var ex=EXERCISES[curIdx];
+    var rem=Math.max(0,ex.dur-sec);
+    // Live-Cues ausüben
+    if(ex.cues){
+      for(var c=0;c<ex.cues.length;c++){
+        if(sec===ex.cues[c].at+1) speak(ex.cues[c].txt);
+      }
+    }
+    if(rem===0){
+      clearInterval(interval);
+      if(curIdx<EXERCISES.length-1){
+        setTimeout(function(){curIdx++;sec=0;render();speak('Übung '+(curIdx+1)+' von '+EXERCISES.length+': '+EXERCISES[curIdx].name+'.');startTimer();},2500);
+      } else {state='done';speak('Fertig! Kiefer und Kaumuskel entspannt. Ausgezeichnet!');render();}
+    }
+    renderTimer();
+  },1000);
+}
+
+function togglePause(){
+  if(!isRunning)return;
+  isPaused=!isPaused;
+  if(isPaused){try{synth.cancel();}catch(e){}speak('Pause.')}else speak('Weiter.');
+  var btn=document.getElementById('btnMain');
+  if(btn){btn.textContent=isPaused?'▶ Weiter':'⏸ Pause';btn.className='btn-main'+(isPaused?' paused':'');}
+}
+
+function skipEx(){
+  if(!isRunning)return;
+  clearInterval(interval);try{synth.cancel();}catch(e){}
+  if(curIdx<EXERCISES.length-1){curIdx++;sec=0;render();speak('Übung '+(curIdx+1)+': '+EXERCISES[curIdx].name+'.');startTimer();}
+  else{state='done';render();}
+}
+
+function goToEx(i){
+  if(state!=='running')return;
+  clearInterval(interval);try{synth.cancel();}catch(e){}
+  curIdx=i;sec=0;isPaused=false;render();
+  speak('Übung '+(i+1)+': '+EXERCISES[i].name+'. '+EXERCISES[i].steps[0]);
+  startTimer();
+}
+
+function renderTimer(){
+  var ex=EXERCISES[curIdx];
+  var rem=Math.max(0,ex.dur-sec);
+  var pct=sec/ex.dur;
+  var circ=2*Math.PI*45;
+  var el=document.getElementById('ringFill');
+  var numEl=document.getElementById('ringNum');
+  if(el)el.style.strokeDashoffset=circ*(1-pct);
+  if(numEl)numEl.textContent=rem+'s';
+  var btn=document.getElementById('btnMain');
+  if(btn){btn.textContent=isPaused?'▶ Weiter':'⏸ Pause';btn.className='btn-main'+(isPaused?' paused':'');}
+}
+
+function render(){
+  var html='';
+  if(state==='intro'){
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('hdrSub').textContent=EXERCISES.length+' Übungen · ca. 8 Minuten';
+    html='<div class="intro"><div class="intro-ico">😮</div>'
+      +'<div class="intro-title">Kiefer & Kaumuskel</div>'
+      +'<div class="intro-info">Entspannung & Massage für Bruxismus · geführt mit Timer & Ansage</div>'
+      +'<div class="ex-list">';
+    EXERCISES.forEach(function(ex,i){
+      html+='<div class="ex-list-item"><span style="font-size:1.1rem">'+ex.ico+'</span><span>'+ex.name+'</span><span class="ex-dur">'+ex.dur+'s</span></div>';
+    });
+    html+='</div><button class="start-btn" onclick="startTraining()">▶ Starten</button></div>';
+  } else if(state==='done'){
+    document.getElementById('progFill').style.width='100%';
+    html='<div class="done-screen"><div class="done-ico">😌</div>'
+      +'<div class="done-title">Entspannt!</div>'
+      +'<div class="done-sub">Alle Übungen abgeschlossen.<br>Lippen zu · Zähne auseinander · immer! 😮</div>'
+      +'<button class="done-again" onclick="goIntro()">↺ Nochmal</button></div>';
+  } else {
+    var ex=EXERCISES[curIdx];
+    document.getElementById('progFill').style.width=Math.round(curIdx/EXERCISES.length*100)+'%';
+    document.getElementById('hdrSub').textContent='Übung '+(curIdx+1)+' von '+EXERCISES.length;
+    var stepsHtml=ex.steps.map(function(s){return'<li>'+s+'</li>';}).join('');
+    var dotsHtml=EXERCISES.map(function(e,i){
+      var c=i<curIdx?'done':i===curIdx?'active':'';
+      return'<div class="dot '+c+'" onclick="goToEx('+i+')"></div>';
+    }).join('');
+
+    html='<div class="ex-card">'
+      +'<div class="illus"><span class="ex-ico">'+ex.ico+'</span>'
+      +'<div class="ex-zone">'+ex.zone+'</div>'
+      +'<div class="ex-name">'+ex.name+'</div>'
+      +'<div style="margin-top:.25rem"><span class="ex-reps">'+ex.reps+'</span></div></div>'
+      +'<div class="timer-wrap">'
+      +'<svg class="ring-svg" width="108" height="108" viewBox="0 0 110 110">'
+      +'<circle class="ring-bg" cx="55" cy="55" r="45"/>'
+      +'<circle class="ring-fill" id="ringFill" cx="55" cy="55" r="45" style="stroke-dasharray:'+(2*Math.PI*45)+';stroke-dashoffset:'+(2*Math.PI*45)+'"/>'
+      +'<text class="ring-num" id="ringNum" x="55" y="50">'+ex.dur+'s</text>'
+      +'<text class="ring-lbl" x="55" y="67">verbleibend</text>'
+      +'</svg></div>'
+      +'<div class="instruction"><div class="inst-title">So geht\'s</div>'
+      +'<ul class="inst-steps">'+stepsHtml+'</ul>'
+      +(ex.warn?'<div class="inst-warn">'+ex.warn+'</div>':'')
+      +(ex.tip?'<div class="inst-tip">💡 '+ex.tip+'</div>':'')
+      +'</div></div>'
+      +'<div class="dots">'+dotsHtml+'</div>'
+      +'<div class="btns">'
+      +'<button class="btn-prev" onclick="goToEx(Math.max(0,curIdx-1))">◀</button>'
+      +'<button class="btn-main" id="btnMain" onclick="togglePause()">⏸ Pause</button>'
+      +'<button class="btn-skip" onclick="skipEx()">▶▶</button>'
+      +'</div>';
+  }
+  document.getElementById('mainContent').innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>

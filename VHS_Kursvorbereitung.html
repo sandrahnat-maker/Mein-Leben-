@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VHS Kursvorbereitung</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f5f0e8;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    header {
+      background: #2c2416;
+      color: #f5f0e8;
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 4px solid #c4a265;
+    }
+
+    .header-inner { max-width: 860px; margin: 0 auto; }
+
+    .vhs-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c4a265;
+      margin-bottom: 0.4rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: normal;
+      letter-spacing: 0.02em;
+    }
+
+    .day-tabs {
+      margin-top: 1.2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tab-btn {
+      padding: 0.4rem 1rem;
+      border: 2px solid #5a4a30;
+      border-radius: 2px;
+      background: transparent;
+      color: #c4a265;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      border-color: #c4a265;
+      background: #c4a265;
+      color: #2c2416;
+    }
+
+    .reset-btn {
+      margin-left: auto;
+      padding: 0.4rem 1rem;
+      border: 2px solid #5a4a30;
+      border-radius: 2px;
+      background: transparent;
+      color: #8a7a60;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      font-family: Georgia, serif;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .cards { display: grid; gap: 1.5rem; }
+
+    .card {
+      background: #fff;
+      border: 2px solid #ddd5c5;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card.done { box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+
+    .card-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.3s;
+    }
+
+    .card-icon {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      font-weight: bold;
+    }
+
+    .card-title { font-weight: bold; font-size: 1.05rem; color: #2c2416; transition: color 0.3s; }
+    .card-subtitle { font-size: 0.82rem; color: #6b5a3e; transition: color 0.3s; }
+    .card-count { text-align: right; }
+    .count-num { font-size: 1.4rem; font-weight: bold; line-height: 1; transition: color 0.3s; }
+    .count-label { font-size: 0.7rem; color: #999; letter-spacing: 0.05em; }
+
+    .progress-bar { height: 3px; background: #eee; }
+    .progress-fill { height: 100%; transition: width 0.4s ease; }
+
+    .task-list { padding: 0.5rem 0; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.6rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f0ebe0;
+      transition: background 0.2s;
+      list-style: none;
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #c5b99a;
+      border-radius: 2px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .checkbox.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox svg { display: none; }
+    .checkbox.checked svg { display: block; }
+
+    .task-label {
+      font-size: 0.9rem;
+      color: #2c2416;
+      font-family: Georgia, serif;
+      transition: all 0.2s;
+    }
+
+    .task-label.done-text {
+      text-decoration: line-through;
+      color: #8a7a60;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #a09070;
+      letter-spacing: 0.05em;
+      padding-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="vhs-label">Volkshochschule</div>
+    <h1>Kursvorbereitung</h1>
+    <div class="day-tabs">
+      <button class="tab-btn active" onclick="setDay('mo')">Montag &#8212; Vorbereitung</button>
+      <button class="tab-btn" onclick="setDay('di')">Dienstag &#8212; Kopieren</button>
+      <button class="reset-btn" onclick="resetAll()">Zur&#252;cksetzen</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="cards" id="cards"></div>
+  <footer>Montag &#8212; Vorbereitung &#183; Dienstag &#8212; Kopieren &amp; Verteilen</footer>
+</main>
+
+<script>
+  const courses = [
+    { id: 1, name: "Singrienergasse", subtitle: "Gruppe 1 / 2", color: "#e8d5b7", accent: "#c4a265", icon: "\u2460 \u2461" },
+    { id: 2, name: "Singrienergasse", subtitle: "Gruppe 3",    color: "#d4e8d0", accent: "#5a9e52", icon: "\u2462" },
+    { id: 3, name: "Rosasgasse",      subtitle: "Gruppe 1 \u2013 4",color: "#d0dde8", accent: "#4a7aa8", icon: "\u2460 \u2461 \u2462 \u2463" },
+    { id: 4, name: "Johann Hoffmann Platz", subtitle: "Gruppe 1 / 2", color: "#e8d0d8", accent: "#a8476a", icon: "\u2460 \u2461" },
+  ];
+
+  const tasks = [
+    { id: "korrektur",   label: "Arbeiten vom letzten Mal korrigieren", day: "mo" },
+    { id: "feedback",    label: "Feedback schreiben",                   day: "mo" },
+    { id: "ordner",      label: "Kurs-Ordner in Ordnung bringen",       day: "mo" },
+    { id: "anwesenheit", label: "Anwesenheit dokumentieren",            day: "mo" },
+    { id: "sammelpass",  label: "Sammelp\u00E4sse nachkleben (falls n\u00F6tig)", day: "mo" },
+    { id: "drehbuch",    label: "Neues Drehbuch vorbereiten",           day: "mo" },
+    { id: "material",    label: "Alle Lernmaterialien vorbereiten",     day: "mo" },
+    { id: "fuellen",     label: "Ordner f\u00FCr alle Kurse fertig f\u00FCllen",  day: "di" },
+    { id: "kopieren",    label: "Kopieren f\u00FCr kommende Kurse",          day: "di" },
+  ];
+
+  let activeDay = "mo";
+  let checked = JSON.parse(localStorage.getItem("vhs_checked") || "{}");
+
+  function save() {
+    localStorage.setItem("vhs_checked", JSON.stringify(checked));
+  }
+
+  function setDay(day) {
+    activeDay = day;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-btn")[day === "mo" ? 0 : 1].classList.add("active");
+    render();
+  }
+
+  function toggle(courseId, taskId) {
+    const key = `${courseId}-${taskId}`;
+    checked[key] = !checked[key];
+    save();
+    render();
+  }
+
+  function resetAll() {
+    if (confirm("Alle H\u00E4kchen zur\u00FCcksetzen?")) {
+      checked = {};
+      save();
+      render();
+    }
+  }
+
+  function isChecked(courseId, taskId) {
+    return !!checked[`${courseId}-${taskId}`];
+  }
+
+  function render() {
+    const filtered = tasks.filter(t => t.day === activeDay);
+    const container = document.getElementById("cards");
+    container.innerHTML = "";
+
+    courses.forEach(course => {
+      const done = filtered.filter(t => isChecked(course.id, t.id)).length;
+      const total = filtered.length;
+      const pct = Math.round((done / total) * 100);
+      const allDone = done === total;
+
+      const card = document.createElement("div");
+      card.className = "card" + (allDone ? " done" : "");
+      card.style.borderColor = allDone ? course.accent : "#ddd5c5";
+      if (allDone) card.style.boxShadow = `0 2px 12px ${course.accent}55`;
+
+      const headerBg = allDone ? course.accent : course.color;
+      const titleColor = allDone ? "#fff" : "#2c2416";
+      const subtitleColor = allDone ? "#ffffffbb" : "#6b5a3e";
+      const iconColor = allDone ? "#fff8" : course.accent;
+      const countColor = allDone ? "#fff" : course.accent;
+
+      card.innerHTML = `
+        <div class="card-header" style="background:${headerBg}">
+          <div class="card-icon" style="color:${iconColor}">${course.icon}</div>
+          <div style="flex:1">
+            <div class="card-title" style="color:${titleColor}">${course.name}</div>
+            <div class="card-subtitle" style="color:${subtitleColor}">${course.subtitle}</div>
+          </div>
+          <div class="card-count">
+            <div class="count-num" style="color:${countColor}">${done}/${total}</div>
+            <div class="count-label" style="color:${allDone ? '#ffffffaa' : '#999'}">erledigt</div>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%;background:${course.accent}"></div>
+        </div>
+        <ul class="task-list" id="tasks-${course.id}"></ul>
+      `;
+
+      container.appendChild(card);
+
+      const taskList = card.querySelector(`#tasks-${course.id}`);
+      filtered.forEach(task => {
+        const chk = isChecked(course.id, task.id);
+        const li = document.createElement("li");
+        li.className = "task-item";
+        if (chk) li.style.background = `${course.color}88`;
+        li.style.setProperty("--accent", course.accent);
+        li.innerHTML = `
+          <div class="checkbox ${chk ? 'checked' : ''}" style="${chk ? '' : ''}">
+            <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+              <path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="task-label ${chk ? 'done-text' : ''}">${task.label}</span>
+        `;
+        li.addEventListener("click", () => toggle(course.id, task.id));
+        taskList.appendChild(li);
+      });
+    });
+  }
+
+  render();
+</script>
+</body>
+</html>

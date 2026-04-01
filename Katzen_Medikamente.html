@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rudi & Timmy &#8211; Medikamente</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --rudi: #E8A020;
+    --rudi-light: #FDF3E0;
+    --rudi-dark: #B87A10;
+    --timmy: #5B8DB8;
+    --timmy-light: #EAF2FA;
+    --timmy-dark: #3A6A94;
+    --bg: #FAFAF8;
+    --text: #2C2A25;
+    --muted: #8A8680;
+    --border: #E8E4DC;
+    --card: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--text);
+    margin-bottom: .3rem;
+  }
+
+  header p {
+    font-size: .8rem;
+    color: var(--muted);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .alert {
+    background: #FFF3CD;
+    border: 1.5px solid #E8C84A;
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    font-size: .82rem;
+    font-weight: 500;
+    color: #7A5C00;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+  }
+
+  .session {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .session-header {
+    padding: .9rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .session-header .icon { font-size: 1.3rem; }
+
+  .session-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .session-header .time {
+    margin-left: auto;
+    font-size: .75rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--bg);
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .cats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cat-col {
+    padding: 1rem;
+  }
+
+  .cat-col:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .cat-name {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: .8rem;
+    padding-bottom: .5rem;
+    border-bottom: 2px solid;
+  }
+
+  .cat-col.rudi .cat-name { color: var(--rudi-dark); border-color: var(--rudi); }
+  .cat-col.timmy .cat-name { color: var(--timmy-dark); border-color: var(--timmy); }
+
+  .med-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: .45rem .5rem;
+    border-radius: 8px;
+    margin-bottom: .25rem;
+    font-size: .82rem;
+    transition: background .15s;
+  }
+
+  .cat-col.rudi .med-item:hover { background: var(--rudi-light); }
+  .cat-col.timmy .med-item:hover { background: var(--timmy-light); }
+
+  .med-name {
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .med-dose {
+    font-size: .78rem;
+    font-weight: 400;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    margin-left: .5rem;
+  }
+
+  .cat-col.rudi .med-dose { color: var(--rudi-dark); }
+  .cat-col.timmy .med-dose { color: var(--timmy-dark); }
+
+  .med-note {
+    font-size: .68rem;
+    color: var(--muted);
+    font-style: italic;
+    display: block;
+  }
+
+  .special-note {
+    background: #F0F7FF;
+    border-left: 3px solid var(--timmy);
+    border-radius: 0 8px 8px 0;
+    padding: .5rem .8rem;
+    margin: .5rem;
+    font-size: .75rem;
+    color: var(--timmy-dark);
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: .72rem;
+    color: var(--muted);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* Mittwochs-Note */
+  .mittwoch-note {
+    background: #F5F0FF;
+    border: 1px solid #C9B8F0;
+    border-radius: 10px;
+    padding: .65rem 1rem;
+    font-size: .78rem;
+    color: #5A3F9A;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .med-item {
+    cursor: pointer;
+    user-select: none;
+  }
+  .med-item.done {
+    opacity: .4;
+    text-decoration: line-through;
+  }
+  .med-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    flex-shrink: 0;
+    margin-right: .4rem;
+    transition: all .15s;
+    background: white;
+  }
+  .cat-col.rudi .med-item.done .med-check { background: var(--rudi); border-color: var(--rudi); }
+  .cat-col.timmy .med-item.done .med-check { background: var(--timmy); border-color: var(--timmy); }
+  .med-item:not(.done) .med-check { color: transparent; }
+
+  .reset-btn {
+    display: block;
+    margin: 1.2rem auto 0;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: .4rem 1.2rem;
+    font-size: .75rem;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .reset-btn:active { background: var(--bg); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#128049; Rudi & Timmy</h1>
+  <p>Medikamentenplan</p>
+</header>
+
+<div class="alert">
+  &#128167; Wassersch&#252;sserl neu f&#252;llen!!!
+</div>
+
+<div class="mittwoch-note">
+  &#128197; <strong>Mittags t&#228;glich:</strong> Gabapentin (Rudi) &#8211; nach dem Mittagessen, 2 Min
+</div>
+
+<!-- MORGEN -->
+<div class="session">
+  <div class="session-header">
+    <span class="icon">&#127749;</span>
+    <h2>F&#252;ttern &amp; Medikamente &#8211; Morgen</h2>
+    <span class="time">08:30</span>
+  </div>
+  <div class="cats-grid">
+    <div class="cat-col rudi">
+      <div class="cat-name">&#128992; Rudi</div>
+
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Magenschutz</span>
+        <span class="med-dose">&#189; Packerl</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Atopica</span>
+        <span class="med-dose">0,1 ml</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">B-Decaplex</span>
+        <span class="med-dose">&#189; Tabl.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Gabapentin</span>
+        <span class="med-dose">&#189; Kapsel</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Tee + Kalium</span>
+        <span class="med-dose">1 ml</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Augentropfen</span>
+        <span class="med-dose">1 Tr./Auge</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Prednicortone</span>
+        <span class="med-dose">&#188; Tabl.</span>
+      </div>
+    </div>
+
+    <div class="cat-col timmy">
+      <div class="cat-name">&#128309; Timmy</div>
+
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Felimazole</span>
+        <span class="med-dose">1 Tabl.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Semintra</span>
+        <span class="med-dose">0,6 ml</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Amodip</span>
+        <span class="med-dose">&#188; Tabl.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Kalium</span>
+        <span class="med-dose">1 ml</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABEND -->
+<div class="session">
+  <div class="session-header">
+    <span class="icon">&#127769;</span>
+    <h2>F&#252;ttern &amp; Medikamente &#8211; Abend</h2>
+    <span class="time">22:00</span>
+  </div>
+
+  <div class="alert" style="margin: .8rem .8rem 0; font-size: .78rem;">
+    &#128167; Wassersch&#252;sserl neu f&#252;llen!!!
+  </div>
+
+  <div class="cats-grid">
+    <div class="cat-col rudi">
+      <div class="cat-name">&#128992; Rudi</div>
+
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Redonyl</span>
+        <span class="med-dose">1 Kapsel</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Cosequin</span>
+        <span class="med-dose">&#189; Kapsel</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Malzpaste</span>
+        <span class="med-dose"></span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Tee + Kalium</span>
+        <span class="med-dose">1 ml</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Augentropfen</span>
+        <span class="med-dose">je 1 Tr.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Atopica <span class="med-note">2-3 Std. nach Futter!</span></span>
+        <span class="med-dose">0,1 ml</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Gabapentin</span>
+        <span class="med-dose">&#189; Kapsel</span>
+      </div>
+    </div>
+
+    <div class="cat-col timmy">
+      <div class="cat-name">&#128309; Timmy</div>
+
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Cosequin</span>
+        <span class="med-dose">&#189; Kapsel</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Malzpaste</span>
+        <span class="med-dose"></span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Felimazole</span>
+        <span class="med-dose">1 Tabl.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Mariendistel</span>
+        <span class="med-dose">2 Tropfen</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Amodip</span>
+        <span class="med-dose">&#189; Tabl.</span>
+      </div>
+      <div class="med-item" onclick="tog(this)"><span class="med-check">&#10003;</span>
+        <span class="med-name">Kalium</span>
+        <span class="med-dose">1 ml</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="footer-note">* Atopica immer 2&#8211;3 Std. nach dem Futter geben!</p>
+
+
+<button class="reset-btn" onclick="resetAll()">&#8634; Alle zur&#252;cksetzen</button>
+
+<script>
+function tog(el) {
+  el.classList.toggle('done');
+  save();
+}
+function save() {
+  var states = [];
+  document.querySelectorAll('.med-item').forEach(function(el) {
+    states.push(el.classList.contains('done') ? '1' : '0');
+  });
+  try { localStorage.setItem('katzen_checks', states.join('')); } catch(e) {}
+}
+function load() {
+  var saved;
+  try { saved = localStorage.getItem('katzen_checks'); } catch(e) {}
+  if (!saved) return;
+  var items = document.querySelectorAll('.med-item');
+  saved.split('').forEach(function(s, i) {
+    if (s === '1' && items[i]) items[i].classList.add('done');
+  });
+}
+function resetAll() {
+  document.querySelectorAll('.med-item').forEach(function(el) {
+    el.classList.remove('done');
+  });
+  try { localStorage.removeItem('katzen_checks'); } catch(e) {}
+}
+window.addEventListener('load', load);
+</script>
+</body>
+</html>

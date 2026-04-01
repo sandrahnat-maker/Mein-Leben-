@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#faf3e8">
+<title>Mein Leben</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf3e8;
+  --bg2:#f5ede0;
+  --white:#fffdf8;
+  --border:rgba(180,130,70,0.13);
+  --text:#2e2010;
+  --muted:rgba(80,50,20,0.42);
+  --gold:#c8943a;
+  --gold2:#e8b86a;
+  --terra:#c4704a;
+  --sage:#7a9a5a;
+  --rose:#c4807a;
+  --warm:#f0e0c8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);font-family:'Cormorant Garamond',Georgia,serif;color:var(--text);display:flex;flex-direction:column;height:100dvh;}
+
+/* NAV */
+#nav{display:flex;background:var(--white);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;padding:0 .4rem;scrollbar-width:none;box-shadow:0 1px 8px rgba(180,120,40,0.07);}
+#nav::-webkit-scrollbar{display:none;}
+.nb{display:flex;flex-direction:column;align-items:center;padding:.55rem .65rem;border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;color:var(--muted);font-size:.58rem;font-family:'Cormorant Garamond',serif;white-space:nowrap;flex-shrink:0;transition:all .25s;letter-spacing:.03em;}
+.nb.on{color:var(--gold);border-bottom-color:var(--gold);}
+.nb span{font-size:1.25rem;margin-bottom:.15rem;}
+
+/* PAGES */
+#pages{flex:1;overflow:hidden;}
+.pg{display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:3rem;}
+
+/* VISION */
+#pg-vision{background:linear-gradient(160deg,#fdf6ea 0%,#f5ede0 40%,#f0f2e8 80%,#f8eeee 100%);flex-direction:column;align-items:center;padding:1.2rem 1rem 2rem;}
+.v-sein{font-size:.76rem;font-style:italic;color:var(--terra);text-align:center;line-height:1.9;margin-bottom:.6rem;opacity:.9;}
+.v-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;color:var(--text);text-align:center;margin-bottom:.1rem;}
+.v-sub{font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:.9rem;}
+.v-wheel{width:100%;max-width:380px;}
+.seeds{display:flex;gap:.8rem;justify-content:center;margin-top:.9rem;width:100%;max-width:380px;}
+.seed{flex:1;background:rgba(255,253,248,.8);border-radius:14px;padding:.9rem .7rem;text-align:center;border:1px solid var(--border);box-shadow:0 2px 10px rgba(180,120,40,0.06);}
+.seed-icon{font-size:1.5rem;margin-bottom:.3rem;}
+.seed-t{font-size:.76rem;font-weight:600;margin-bottom:.25rem;color:var(--text);}
+.seed-s{font-size:.64rem;font-style:italic;color:var(--muted);}
+.v-bottom{text-align:center;margin-top:1rem;padding:.8rem;background:rgba(255,253,248,.6);border-radius:12px;border:1px solid var(--border);}
+.v-schluck{font-size:.66rem;font-style:italic;color:var(--muted);margin-bottom:.3rem;}
+.v-rhythm{font-size:.82rem;font-style:italic;color:var(--gold);letter-spacing:.1em;}
+
+/* SECTION HEADER */
+.sh{padding:1.1rem 1rem .25rem;font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:var(--text);}
+.ss{padding:0 1rem .9rem;font-size:.73rem;font-style:italic;color:var(--muted);}
+
+/* FENG SHUI BANNER */
+.fs-banner{margin:0 1rem .8rem;background:linear-gradient(135deg,#f8f0e0,#f0ece4,#e8f0e8);border-radius:14px;padding:.9rem 1rem;border:1px solid rgba(180,130,60,0.15);display:flex;gap:.7rem;align-items:flex-start;}
+.fs-bagua{font-size:1.6rem;flex-shrink:0;margin-top:.1rem;}
+.fs-text{flex:1;}
+.fs-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.2rem;}
+.fs-tip{font-size:.82rem;font-style:italic;color:var(--text);line-height:1.55;}
+
+/* CARD */
+.card{background:var(--white);border-radius:16px;margin:0 1rem .8rem;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 8px rgba(180,120,40,0.05);}
+.ch{padding:.85rem 1rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;user-select:none;}
+.ch-icon{font-size:1.25rem;}
+.ch-title{flex:1;font-size:.92rem;font-weight:600;color:var(--text);}
+.ch-arr{font-size:.85rem;color:var(--gold2);transition:transform .25s;}
+.card.open .ch-arr{transform:rotate(90deg);}
+.cb-body{display:none;padding:0 1rem 1rem;}
+.card.open .cb-body{display:block;}
+
+/* CHECKLIST */
+.cl{list-style:none;}
+.cl li{display:flex;align-items:center;gap:.65rem;padding:.5rem 0;border-bottom:1px solid var(--border);cursor:pointer;font-size:.87rem;}
+.cl li:last-child{border-bottom:none;}
+.ck{width:21px;height:21px;border-radius:7px;border:1.5px solid rgba(180,130,70,0.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#fff;transition:all .2s;}
+.cl li.done .ck{background:var(--sage);border-color:var(--sage);}
+.cl li.done span{text-decoration:line-through;color:var(--muted);}
+
+/* TEXTAREA */
+.ta{width:100%;border:1px solid var(--border);border-radius:12px;padding:.8rem;font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--text);background:var(--bg);resize:none;min-height:75px;margin-top:.6rem;line-height:1.6;}
+.ta::placeholder{color:var(--muted);font-style:italic;}
+
+/* REFLEXION BOX */
+.reflex{background:linear-gradient(135deg,#fdf6e8,#f8f0f0);border-radius:12px;padding:.9rem 1rem;margin-top:.5rem;border-left:3px solid var(--gold2);}
+.reflex-q{font-size:.8rem;font-style:italic;color:var(--terra);margin-bottom:.5rem;line-height:1.5;}
+
+/* INSPO */
+.inspo{background:linear-gradient(135deg,#fdf0e0,#f0ede8);border-radius:13px;padding:1rem;margin-top:.5rem;font-style:italic;font-size:.9rem;line-height:1.7;text-align:center;border:1px solid rgba(200,148,58,0.12);}
+.inspo-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:.5rem;}
+
+/* APP LINK */
+.al{display:flex;align-items:center;gap:.75rem;padding:.65rem .9rem;background:var(--bg);border-radius:11px;margin-top:.5rem;text-decoration:none;color:var(--text);border:1px solid var(--border);transition:background .15s;}
+.al:active{background:var(--warm);}
+.al-icon{font-size:1.35rem;}
+.al-text{font-size:.87rem;font-weight:600;}
+.al-sub{font-size:.69rem;color:var(--muted);font-style:italic;}
+.al-arr{margin-left:auto;color:var(--gold2);font-size:.95rem;}
+
+/* WEATHER */
+.wt-times{display:flex;gap:.4rem;margin-bottom:.8rem;}
+.wt-btn{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:.45rem;font-size:.77rem;font-family:'Cormorant Garamond',serif;cursor:pointer;color:var(--muted);transition:all .2s;}
+.wt-btn.on{background:var(--gold);color:#fff;border-color:var(--gold);}
+.wt-opts{display:flex;flex-wrap:wrap;gap:.45rem;}
+.wo{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:.38rem .85rem;font-size:.8rem;font-family:'Cormorant Garamond',serif;cursor:pointer;color:var(--text);transition:all .2s;}
+.wo.on{background:var(--terra);color:#fff;border-color:var(--terra);}
+
+/* TEA */
+.tea-card{background:linear-gradient(135deg,#e8f0e0,#f5ece4);border-radius:13px;padding:1.1rem;text-align:center;border:1px solid rgba(122,154,90,0.2);}
+.tea-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;margin-bottom:.35rem;color:var(--text);}
+.tea-ben{font-size:.77rem;color:var(--muted);font-style:italic;}
+.tea-ritual{font-size:.72rem;color:var(--sage);margin-top:.5rem;letter-spacing:.05em;}
+
+/* BODY GRID */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem;}
+.bi{background:var(--bg);border-radius:11px;padding:.65rem;text-align:center;cursor:pointer;border:1px solid var(--border);transition:all .2s;}
+.bi.on{background:#eaf5e0;border-color:var(--sage);}
+.bi-ico{font-size:1.45rem;}
+.bi-lbl{font-size:.66rem;color:var(--muted);margin-top:.2rem;}
+
+/* DIVIDER */
+.dvd{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:.6rem 0;}
+
+/* TAG */
+.tag{display:inline-block;background:var(--warm);border-radius:20px;padding:.2rem .6rem;font-size:.65rem;color:var(--gold);margin-top:.3rem;border:1px solid rgba(200,148,58,0.2);}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <button class="nb on" data-pg="vision"><span>🌿</span>Mein Leben</button>
+  <button class="nb" data-pg="tiere"><span>🐾</span>Tiere</button>
+  <button class="nb" data-pg="lehren"><span>✨</span>Lehren</button>
+  <button class="nb" data-pg="zuhause"><span>🏡</span>Zuhause</button>
+  <button class="nb" data-pg="koerper"><span>💫</span>Körper</button>
+  <button class="nb" data-pg="seele"><span>🌊</span>Seele</button>
+</nav>
+
+<div id="pages">
+
+<!-- VISION -->
+<div class="pg" id="pg-vision">
+  <div class="v-sein">
+    Ich bin eine wertschätzende, fröhliche,<br>
+    bisschen schrullige Künstlerin und Lehrerin<br>
+    — achtsam, langsam und ganz bei mir.
+  </div>
+  <div class="v-title">Ich lebe mein Leben</div>
+  <div class="v-sub">im Einklang mit der Natur & mit mir selbst</div>
+  <div class="v-wheel">
+    <svg id="wheel" viewBox="0 0 700 620" width="100%"></svg>
+  </div>
+  <div class="seeds">
+    <div class="seed"><div class="seed-icon">👥</div><div class="seed-t">Freunde & Familie</div><div class="seed-s">🌱 dürfen wieder wachsen</div></div>
+    <div class="seed"><div class="seed-icon">🏡</div><div class="seed-t">Weidlingbach</div><div class="seed-s">🌱 mein Samen für die Zukunft</div></div>
+  </div>
+  <div class="v-bottom">
+    <div class="v-schluck">Ein Schluck Leben, bitte — ganz bewusst.</div>
+    <div class="v-rhythm">Aufwachen · Tee · Stille · Abend</div>
+  </div>
+</div>
+
+<!-- TIERE -->
+<div class="pg" id="pg-tiere">
+  <div class="sh">🐾 Meine Tiere</div>
+  <div class="ss">Sie sind meine Herzensbegleiter — jeden Tag.</div>
+
+  <div class="fs-banner">
+    <div class="fs-bagua">☯️</div>
+    <div class="fs-text">
+      <div class="fs-title">Feng Shui · Tiere & Energie</div>
+      <div class="fs-tip">Tiere spüren die Energie eines Raumes. Wo Lotte, Rudi & Timmy sich gerne aufhalten, fließt das Chi besonders harmonisch.</div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">🐕</span><span class="ch-title">Lotte – heute</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Für Lotte mit Liebe</div>Jeder Spaziergang mit ihr ist ein Geschenk.<br>Sie zeigt mir, wie man wirklich im Moment lebt.</div>
+      <ul class="cl">
+        <li><div class="ck">✓</div><span>Morgenrunde 🌲</span></li>
+        <li><div class="ck">✓</div><span>Abendrunde 🌙</span></li>
+        <li><div class="ck">✓</div><span>Wasser frisch</span></li>
+        <li><div class="ck">✓</div><span>Futter mit Liebe</span></li>
+        <li><div class="ck">✓</div><span>Kuschelzeit 🤍</span></li>
+      </ul>
+      <a class="al" href="Lotte_Runden.html"><span class="al-icon">🗺️</span><div><div class="al-text">Lotte Runden</div><div class="al-sub">Unsere Spaziergänge & Routen</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🐈</span><span class="ch-title">Rudi & Timmy – heute</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Für Rudi & Timmy</div>Katzen bringen Ruhe und Wärme ins Haus.<br>Ihre Gegenwart ist stille Geborgenheit.</div>
+      <ul class="cl">
+        <li><div class="ck">✓</div><span>Futter Rudi 🐱</span></li>
+        <li><div class="ck">✓</div><span>Futter Timmy 🐱</span></li>
+        <li><div class="ck">✓</div><span>Wasser frisch</span></li>
+        <li><div class="ck">✓</div><span>Kistchen sauber</span></li>
+        <li><div class="ck">✓</div><span>Spielzeit & Liebe</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">💊</span><span class="ch-title">Medikamente & Gesundheit</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <a class="al" href="Medikamente_Tiere.html"><span class="al-icon">💊</span><div><div class="al-text">Medikamentenplan</div><div class="al-sub">Rudi, Timmy & Lotte</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Katzen_Medikamente.html"><span class="al-icon">🐱</span><div><div class="al-text">Katzen Medikamente</div><div class="al-sub">Rudi & Timmy</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🍖</span><span class="ch-title">Futter & Bestellung</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <a class="al" href="Futter_Bestellplaner.html"><span class="al-icon">🛒</span><div><div class="al-text">Futter-Bestellplaner</div><div class="al-sub">Rudi, Timmy & Lotte</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🗒️</span><span class="ch-title">Meine Gedanken zu ihnen</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="reflex-q" style="font-size:.8rem;font-style:italic;color:var(--terra);margin-bottom:.4rem;">Was hat mir heute einer meiner Tiere gegeben?</div>
+      <textarea class="ta" placeholder="Ein Moment, ein Blick, eine Wärme..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- LEHREN -->
+<div class="pg" id="pg-lehren">
+  <div class="sh">✨ Mein Lehren & Lernen</div>
+  <div class="ss">Hier bin ich ganz ich — lebendig und verbunden.</div>
+
+  <div class="fs-banner">
+    <div class="fs-bagua">🔥</div>
+    <div class="fs-text">
+      <div class="fs-title">Feng Shui · Bereich Ruhm & Beruf</div>
+      <div class="fs-tip">Südlicher Bereich: Feuer-Element. Rot, Orange, Kerzen stärken Sichtbarkeit und Anerkennung. Deine Stimme als Lehrerin verdient Raum.</div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">📋</span><span class="ch-title">VHS Kursvorbereitung</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Meine Erinnerung</div>Im Unterricht bin ich ganz ich.<br>Präsent, verbunden, lebendig.<br>Meine Schüler*innen spüren das.</div>
+      <a class="al" href="VHS_Kursvorbereitung.html"><span class="al-icon">📋</span><div><div class="al-text">VHS Kursvorbereitung</div><div class="al-sub">Checklisten & Materialien</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="VHS_Kursabschluss.html"><span class="al-icon">🎓</span><div><div class="al-text">Kursabschluss</div><div class="al-sub">Abschluss mit Würde & Wärme</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">📚</span><span class="ch-title">Lernplan Uni</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Sanfte Erinnerung</div>Ich lerne in meinem Rhythmus.<br>Jeder kleine Schritt zählt — auch der heutige.</div>
+      <ul class="cl" id="lernliste">
+        <li><div class="ck">✓</div><span>Migration, Flucht, Trauma</span></li>
+        <li><div class="ck">✓</div><span>Grammatik & Grammatikunterricht</span></li>
+        <li><div class="ck">✓</div><span>Ästhetisches Lernen</span></li>
+        <li><div class="ck">✓</div><span>Lehrskizzen & Unterricht</span></li>
+      </ul>
+      <a class="al" href="Lernplan.html"><span class="al-icon">📚</span><div><div class="al-text">Lernplan öffnen</div><div class="al-sub">Sandra Hnat-Gerersdorfer</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Wochenplan.html"><span class="al-icon">📅</span><div><div class="al-text">Wochenplan</div><div class="al-sub">Meine Wochenübersicht</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">💛</span><span class="ch-title">Reflexion – Was war heute schön?</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="reflex">
+        <div class="reflex-q">Was hat heute im Unterricht gut funktioniert? Was hat mich erfüllt?</div>
+        <textarea class="ta" placeholder="Ein Moment, ein Lächeln, eine Verbindung..."></textarea>
+      </div>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Was möchte ich morgen anders oder bewusster machen?</div>
+        <textarea class="ta" placeholder="Sanft & ohne Druck..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🛒</span><span class="ch-title">Einkauf & Ernährung</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <a class="al" href="Einkaufsliste.html"><span class="al-icon">🛒</span><div><div class="al-text">Einkaufsliste</div><div class="al-sub">LP(a)-freundlich & vegetarisch</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ZUHAUSE -->
+<div class="pg" id="pg-zuhause">
+  <div class="sh">🏡 Mein Zuhause</div>
+  <div class="ss">Ein Ort der mich nährt — warm, kreativ, lebendig.</div>
+
+  <div class="fs-banner">
+    <div class="fs-bagua">🌬️</div>
+    <div class="fs-text">
+      <div class="fs-title">Feng Shui · Chi-Fluss im Heim</div>
+      <div class="fs-tip">Freie Wege für freies Chi. Pinch Points (enge Ecken, volle Türbereiche) blockieren Energie. Ein aufgeräumter Eingang lädt Gutes ein.</div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">✨</span><span class="ch-title">Mein Raum – meine Welt</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Meine Vision</div>Boho-luxe. Warm. Kreativ. Lebendig.<br>Ein Ort wo ich ganz ich sein darf —<br>umgeben von Schönheit und Stille.</div>
+      <ul class="cl">
+        <li><div class="ck">✓</div><span>Boden & Eingänge freiräumen 🌬️</span></li>
+        <li><div class="ck">✓</div><span>Ein schönes Detail bewusst arrangieren</span></li>
+        <li><div class="ck">✓</div><span>Licht bewusst gestalten 🕯️</span></li>
+        <li><div class="ck">✓</div><span>Pflanzen gießen & grüßen 🌿</span></li>
+        <li><div class="ck">✓</div><span>Einen Bereich energetisch reinigen</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">☯️</span><span class="ch-title">Feng Shui – Bagua heute</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Bagua-Bereiche</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;text-align:left;">
+          <div style="font-size:.75rem;"><b>SE – Wohlstand</b><br><span style="color:var(--muted);font-style:italic;">Holz · Lila · Pflanzen</span></div>
+          <div style="font-size:.75rem;"><b>S – Ruhm</b><br><span style="color:var(--muted);font-style:italic;">Feuer · Rot · Kerzen</span></div>
+          <div style="font-size:.75rem;"><b>SW – Liebe</b><br><span style="color:var(--muted);font-style:italic;">Erde · Rosa · Paare</span></div>
+          <div style="font-size:.75rem;"><b>E – Familie</b><br><span style="color:var(--muted);font-style:italic;">Holz · Grün · Fotos</span></div>
+          <div style="font-size:.75rem;"><b>W – Kreativität</b><br><span style="color:var(--muted);font-style:italic;">Metall · Weiß · Kunst</span></div>
+          <div style="font-size:.75rem;"><b>N – Karriere</b><br><span style="color:var(--muted);font-style:italic;">Wasser · Schwarz · Spiegel</span></div>
+        </div>
+      </div>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Welchen Bereich möchte ich heute bewusst stärken?</div>
+        <textarea class="ta" placeholder="Ein kleines Ritual, ein Objekt, ein Gedanke..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌿</span><span class="ch-title">Pflanzen & Haushalt</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <a class="al" href="Pflanzen_Galerie.html"><span class="al-icon">🌿</span><div><div class="al-text">Meine Pflanzen</div><div class="al-sub">Galerie & Pflege</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Haushaltsplan.html"><span class="al-icon">🏠</span><div><div class="al-text">Haushaltsplan</div><div class="al-sub">Schritt für Schritt, sanft & ohne Druck</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌱</span><span class="ch-title">Weidlingbach – mein Traum</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Meine Vision</div>Ein Zuhause das wirklich meins ist.<br>Grün. Ruhig. Mit Platz für Lotte, Rudi & Timmy.<br>Und für mich — ganz ich.</div>
+      <a class="al" href="hausverkauf-guide.html"><span class="al-icon">📋</span><div><div class="al-text">Hausverkauf Guide</div><div class="al-sub">Schritte & Informationen</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Hausverkauf_Checkliste.html"><span class="al-icon">✅</span><div><div class="al-text">Hausverkauf Checkliste</div><div class="al-sub">Weidlingbach – alle Schritte</div></div><span class="al-arr">›</span></a>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Was bringt mich heute meinem Traum einen kleinen Schritt näher?</div>
+        <textarea class="ta" placeholder="Gedanken, Ideen, nächste Schritte..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KÖRPER -->
+<div class="pg" id="pg-koerper">
+  <div class="sh">💫 Mein Körper</div>
+  <div class="ss">Ich pflege ihn mit Geduld, Liebe und Achtsamkeit.</div>
+
+  <div class="fs-banner">
+    <div class="fs-bagua">💧</div>
+    <div class="fs-text">
+      <div class="fs-title">Feng Shui · Gesundheitsbereich</div>
+      <div class="fs-tip">Mitte des Bagua: Erdenergie. Gelb, Beige, runde Formen stärken Balance und Gesundheit. Dein Körper ist dein wertvollstes Zuhause.</div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">🌅</span><span class="ch-title">Morgenroutine</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Mein Morgen gehört mir</div>Ich starte sanft. Kein Stress, kein Druck.<br>Der Tee, das Licht, ein tiefer Atemzug — das bin ich.</div>
+      <ul class="cl">
+        <li><div class="ck">✓</div><span>Innehalten — wie ist mein Wetter? ☀️</span></li>
+        <li><div class="ck">✓</div><span>Ein Glas warmes Wasser 💧</span></li>
+        <li><div class="ck">✓</div><span>Tee des Tages zubereiten 🍵</span></li>
+        <li><div class="ck">✓</div><span>Sanftes Stretching 🤸</span></li>
+        <li><div class="ck">✓</div><span>Weleda Morgenpflege mit Liebe 🌿</span></li>
+      </ul>
+      <a class="al" href="Bad_Frueh.html"><span class="al-icon">🌅</span><div><div class="al-text">Bad Früh</div><div class="al-sub">Meine Morgenroutine im Bad</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Duschen.html"><span class="al-icon">🚿</span><div><div class="al-text">Duschen & Fertig</div><div class="al-sub">Schnell & bewusst</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🏃</span><span class="ch-title">Bewegung heute</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Sanfte Einladung</div>Jede Bewegung ist ein Geschenk an meinen Körper.<br>Auch ein kurzer Spaziergang zählt. Auch fünf Minuten.</div>
+      <div class="bgrid">
+        <div class="bi"><div class="bi-ico">🌲</div><div class="bi-lbl">Wald & Lotte</div></div>
+        <div class="bi"><div class="bi-ico">🧘</div><div class="bi-lbl">Yoga</div></div>
+        <div class="bi"><div class="bi-ico">💪</div><div class="bi-lbl">Kraft</div></div>
+        <div class="bi"><div class="bi-ico">⚖️</div><div class="bi-lbl">Balance Board</div></div>
+        <div class="bi"><div class="bi-ico">🚶</div><div class="bi-lbl">Spaziergang</div></div>
+        <div class="bi"><div class="bi-ico">🤸</div><div class="bi-lbl">Dehnen</div></div>
+      </div>
+      <a class="al" href="Koerpergewicht_Training_Audio.html"><span class="al-icon">💪</span><div><div class="al-text">Körpergewicht Training</div><div class="al-sub">Audio-geführt</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Balanceboard_Training_Audio.html"><span class="al-icon">🏄</span><div><div class="al-text">Balance Board Training</div><div class="al-sub">Audio-geführt</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Sonntags_Yoga_Audio.html"><span class="al-icon">🧘</span><div><div class="al-text">Sonntags-Yoga</div><div class="al-sub">Audio-geführt</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Dehnplan.html"><span class="al-icon">🤸</span><div><div class="al-text">Dehnplan</div><div class="al-sub">Mein persönlicher Dehnplan</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Kalkschulter.html"><span class="al-icon">💪</span><div><div class="al-text">Kalkschulter Training</div><div class="al-sub">Sanfte Schulterübungen</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Beckenboden.html"><span class="al-icon">🌸</span><div><div class="al-text">Beckenboden</div><div class="al-sub">Mit Liebe & Geduld</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🍽️</span><span class="ch-title">Ernährung mit Liebe</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Meine Küche, meine Kunst</div>Vegetarisch. LP(a)-bewusst. Mit Freude gekocht.<br>Kochen ist Selbstfürsorge. Anrichten ist Liebe an mich selbst.</div>
+      <a class="al" href="Ernaehrungsplan_4Wochen.html"><span class="al-icon">🥗</span><div><div class="al-text">Ernährungsplan</div><div class="al-sub">4-Wochen-Plan, LP(a)-freundlich</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Einkaufsliste.html"><span class="al-icon">🛒</span><div><div class="al-text">Einkaufsliste</div><div class="al-sub">LP(a)-freundliche Lebensmittel</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌿</span><span class="ch-title">Pflege & Schönheit</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Selbstfürsorge mit Liebe</div>Ich pflege mich mit Achtsamkeit und Freude.<br>Weleda nährt mich — von außen, sanft und natürlich.<br>Ich bin es wert.</div>
+      <a class="al" href="Naturkosmetik_Tagesplan.html"><span class="al-icon">🌿</span><div><div class="al-text">Naturkosmetik Tagesplan</div><div class="al-sub">Weleda & mehr</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Koerperpflege_Tagesplan.html"><span class="al-icon">✨</span><div><div class="al-text">Körperpflege Tagesplan</div><div class="al-sub">Vollständige Routine</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Gesichtsyoga.html"><span class="al-icon">😊</span><div><div class="al-text">Gesichtsyoga</div><div class="al-sub">Entspannung & Leuchten</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Kiefer_Bruxismus.html"><span class="al-icon">🫀</span><div><div class="al-text">Kiefer & Kaumuskel</div><div class="al-sub">Sanfte Bruxismus-Übungen</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Haarpflege.html"><span class="al-icon">💆</span><div><div class="al-text">Haarpflege</div><div class="al-sub">Meine Haarpflegeroutine</div></div><span class="al-arr">›</span></a>
+      <a class="al" href="Nagelpflege.html"><span class="al-icon">💅</span><div><div class="al-text">Nagelpflege</div><div class="al-sub">Mit Sorgfalt & Freude</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌙</span><span class="ch-title">Abendritual</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Mein Abend</div>Der Abend gehört mir — ganz allein.<br>Warm. Still. Duftend. Für mich.<br>Ich lasse den Tag los.</div>
+      <a class="al" href="Bad_Abend.html"><span class="al-icon">🛁</span><div><div class="al-text">Bad Abend Routine</div><div class="al-sub">Mein Abendritual mit Liebe</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- SEELE -->
+<div class="pg" id="pg-seele">
+  <div class="sh">🌊 Meine Seele</div>
+  <div class="ss">Sie weiß den Weg — ich darf ihr vertrauen.</div>
+
+  <div class="fs-banner">
+    <div class="fs-bagua">🌊</div>
+    <div class="fs-text">
+      <div class="fs-title">Feng Shui · Innere Mitte</div>
+      <div class="fs-tip">Wasser-Element stärkt die Seele. Ein kleiner Brunnen, eine Schale mit Wasser oder Blaues im Norden des Raumes fördert Tiefe & innere Klarheit.</div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">☀️</span><span class="ch-title">Wie ist mein inneres Wetter?</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div style="font-size:.78rem;font-style:italic;color:var(--muted);margin-bottom:.7rem;line-height:1.6;">Wie fühle ich mich gerade — ohne Bewertung, einfach ehrlich?</div>
+      <div class="wt-times" id="wt-times">
+        <button class="wt-btn on">Aufwachen</button>
+        <button class="wt-btn">Nach dem Tee</button>
+        <button class="wt-btn">Abend</button>
+      </div>
+      <div class="wt-opts" id="wt-opts">
+        <button class="wo">☀️ Sonnig & leicht</button>
+        <button class="wo">🌤️ Meist heiter</button>
+        <button class="wo">🌧️ Eher schwer</button>
+        <button class="wo">⛈️ Aufgewühlt</button>
+        <button class="wo">🌫️ Irgendwie nebelig</button>
+        <button class="wo">🌈 Nach dem Regen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card open">
+    <div class="ch"><span class="ch-icon">🍵</span><span class="ch-title">Tee des Tages</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="tea-card">
+        <div class="tea-name" id="tea-name"></div>
+        <div class="tea-ben" id="tea-ben"></div>
+        <div class="tea-ritual">Ein Schluck Fürsorge für mein Herz 🫖</div>
+      </div>
+      <a class="al" href="tee-des-tages.html"><span class="al-icon">🍵</span><div><div class="al-text">Tee des Tages öffnen</div><div class="al-sub">Mein 7-Tage-Teeplan</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">❤️</span><span class="ch-title">Meine Gesundheit</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Mit Sanftheit</div>Ich beobachte meinen Körper mit Neugier,<br>nicht mit Angst. Er tut sein Bestes für mich.</div>
+      <a class="al" href="Blutdruck.html"><span class="al-icon">❤️</span><div><div class="al-text">Blutdruck Protokoll</div><div class="al-sub">Messung & Verlauf</div></div><span class="al-arr">›</span></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">✍️</span><span class="ch-title">Tagesreflexion</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="reflex">
+        <div class="reflex-q">Was war heute mein Schluck Leben? 🌿</div>
+        <textarea class="ta" placeholder="Ein Moment, eine Begegnung, ein Gefühl..."></textarea>
+      </div>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Wofür bin ich heute dankbar?</div>
+        <textarea class="ta" placeholder="Drei kleine Dinge genügen..."></textarea>
+      </div>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Was darf ich heute loslassen?</div>
+        <textarea class="ta" placeholder="Sanft und ohne Groll..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">💚</span><span class="ch-title">Verbindung & Liebe</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Mein Herz öffnen</div>Verbindung nährt mich.<br>Wen könnte ich heute mit einer Geste beglücken?<br>Eine Freundin, eine Kollegin, mich selbst.</div>
+      <textarea class="ta" placeholder="Ein kleiner Schritt zur Verbindung..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌿</span><span class="ch-title">Weiser Gedanke des Tages</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl" id="stoic-lbl"></div><span id="stoic-q" style="font-size:.92rem;line-height:1.7;"></span></div>
+      <div class="reflex" style="margin-top:.6rem;">
+        <div class="reflex-q">Was bedeutet dieser Gedanke für mich heute?</div>
+        <textarea class="ta" placeholder="Meine persönliche Resonanz..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ch-icon">🌙</span><span class="ch-title">Abend-Intention</span><span class="ch-arr">›</span></div>
+    <div class="cb-body">
+      <div class="inspo"><div class="inspo-lbl">Für morgen früh</div>Was möchte ich morgen als erstes fühlen?<br>Was setze ich jetzt als sanfte Intention?</div>
+      <textarea class="ta" placeholder="Meine Intention für morgen..."></textarea>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+
+<script>
+window.addEventListener("load", function() {
+
+(function() {
+  // NAV
+  var allPages = document.querySelectorAll('.pg');
+  var allBtns = document.querySelectorAll('.nb');
+
+  function showPage(id) {
+    allBtns.forEach(function(b){ b.classList.remove('on'); });
+    allPages.forEach(function(p){ p.style.display = 'none'; });
+    var target = document.getElementById('pg-' + id);
+    if (target) {
+      target.style.display = (id === 'vision') ? 'flex' : 'block';
+    }
+  }
+
+  allBtns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var id = this.getAttribute('data-pg');
+      this.classList.add('on');
+      showPage(id);
+    });
+  });
+
+  // Init
+  allPages.forEach(function(p){ p.style.display = 'none'; });
+  var vision = document.getElementById('pg-vision');
+  if (vision) vision.style.display = 'flex';
+
+  // CARD TOGGLE
+  document.querySelectorAll('.ch').forEach(function(h) {
+    h.addEventListener('click', function() {
+      h.parentElement.classList.toggle('open');
+    });
+  });
+
+  // CHECKLIST
+  document.querySelectorAll('.cl li').forEach(function(li) {
+    li.addEventListener('click', function() {
+      li.classList.toggle('done');
+    });
+  });
+
+  // BODY GRID
+  document.querySelectorAll('.bi').forEach(function(bi) {
+    bi.addEventListener('click', function() {
+      bi.classList.toggle('on');
+    });
+  });
+
+  // WEATHER TIME
+  document.querySelectorAll('.wt-btn').forEach(function(b) {
+    b.addEventListener('click', function() {
+      document.querySelectorAll('.wt-btn').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+
+  // WEATHER OPT
+  document.querySelectorAll('.wo').forEach(function(b) {
+    b.addEventListener('click', function() {
+      document.querySelectorAll('.wo').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+
+})();
+
+// TEA
+var teas = [
+  ['Hibiskus & Hagebutte','für Blutdruck und Herz 🌺'],
+  ['Grüner Tee & Ingwer','für Energie und Cholesterin 🍃'],
+  ['Weißdorn','für das Herz und die Seele 🌸'],
+  ['Rooibos & Zimt','für Wärme und Ausgeglichenheit ☕'],
+  ['Brennnessel & Löwenzahn','für Entgiftung und Kraft 🌿'],
+  ['Lavendel & Kamille','für Entspannung und tiefen Schlaf 💜'],
+  ['Artischocke & Mariendistel','für Leber und Cholesterin 🌻'],
+];
+var tea = teas[new Date().getDay()];
+var tn = document.getElementById('tea-name');
+var tb = document.getElementById('tea-ben');
+if (tn) tn.textContent = tea[0];
+if (tb) tb.textContent = tea[1];
+
+// QUOTES
+var quotes = [
+  ['Marc Aurel','Das Glück hängt von der Qualität deiner Gedanken ab.'],
+  ['Marc Aurel','Handle nie gegen die Natur der Dinge — und gegen dich selbst.'],
+  ['Epiktet','Verlange nicht, dass die Dinge so geschehen wie du willst — wünsche, dass sie so sind, wie sie sind.'],
+  ['Seneca','Lebe jetzt. Alles andere ist Aufschub.'],
+  ['Marc Aurel','Du hast Macht über deinen Geist, nicht über äußere Ereignisse. Erkenne das — und du wirst Stärke finden.'],
+  ['Laozi','Ein Reise von tausend Meilen beginnt mit einem einzigen Schritt.'],
+  ['Rumi','Sei nicht zufrieden mit Geschichten, wie die Dinge anderen Menschen ergangen sind. Entfalte deine eigene Geschichte.'],
+];
+var q = quotes[new Date().getDate() % quotes.length];
+var sl = document.getElementById('stoic-lbl');
+var sq = document.getElementById('stoic-q');
+if (sl) sl.textContent = q[0];
+if (sq) sq.textContent = q[1];
+
+// WHEEL
+(function(){
+  var svg = document.getElementById('wheel');
+  if (!svg) return;
+  var ns = 'http://www.w3.org/2000/svg';
+  var cx=350, cy=310, r=172, ir=70, half=36;
+  function rad(d){return d*Math.PI/180;}
+  function px(a,rr){return cx+Math.cos(rad(a))*rr;}
+  function py(a,rr){return cy+Math.sin(rad(a))*rr;}
+  function el(t,a,p){var e=document.createElementNS(ns,t);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+
+  var els=[
+    {a:-90,g:'#d4eabc',c:'#a8c878',t:'#4a7a2a',e:'🐾',f:['Meine','Tiere'],s:['meine Herzens-','begleiter']},
+    {a:-18,g:'#fad4bc',c:'#f4a070',t:'#8a3a10',e:'✨',f:['Lehren','& Lernen'],s:['hier bin ich','ganz ich']},
+    {a:54, g:'#f4e4b0',c:'#e8c870',t:'#7a5a10',e:'🏡',f:['Mein','Zuhause'],s:['warm, kreativ','& lebendig']},
+    {a:126,g:'#e4eef6',c:'#c8d8e8',t:'#3a5a7a',e:'💫',f:['Mein','Körper'],s:['mit Geduld','& Liebe gepflegt']},
+    {a:198,g:'#c4dcee',c:'#90b8d8',t:'#2a4a6a',e:'🌊',f:['Meine','Seele'],s:['weiß den Weg —','ich vertraue ihr']},
+  ];
+
+  var defs=el('defs',{},svg);
+  els.forEach(function(e,i){
+    var g=el('radialGradient',{id:'g'+i,cx:'50%',cy:'50%',r:'50%'},defs);
+    el('stop',{offset:'0%','stop-color':e.g},g);
+    el('stop',{offset:'100%','stop-color':e.c,'stop-opacity':'0.75'},g);
+  });
+  var m=el('marker',{id:'arr',markerWidth:'7',markerHeight:'7',refX:'5',refY:'3.5',orient:'auto'},defs);
+  el('path',{d:'M0,0 L0,7 L7,3.5 z',fill:'#c8943a',opacity:'0.6'},m);
+
+  el('circle',{cx:cx,cy:cy,r:r+20,fill:'none',stroke:'#e8c890','stroke-width':'1',opacity:'0.5'},svg);
+
+  els.forEach(function(e,i){
+    var a1=e.a-half,a2=e.a+half;
+    el('path',{
+      d:'M '+px(a1,ir)+' '+py(a1,ir)+' A '+ir+' '+ir+' 0 0 1 '+px(a2,ir)+' '+py(a2,ir)+' L '+px(a2,r)+' '+py(a2,r)+' A '+r+' '+r+' 0 0 0 '+px(a1,r)+' '+py(a1,r)+' Z',
+      fill:'url(#g'+i+')',stroke:'white','stroke-width':'2.5',opacity:'0.92'
+    },svg);
+  });
+
+  els.forEach(function(e,i){
+    var next=els[(i+1)%els.length];
+    var a1=e.a+half+3,a2=next.a-half-3,ar=r+13,steps=24;
+    var pts=[];
+    for(var s=0;s<=steps;s++){
+      var a=a1+(a2-a1)*s/steps;
+      pts.push(px(a,ar)+','+py(a,ar));
+    }
+    el('polyline',{points:pts.join(' '),fill:'none',stroke:'#c8943a','stroke-width':'1.2','stroke-dasharray':'4 3',opacity:'0.5','marker-end':'url(#arr)'},svg);
+  });
+
+  el('circle',{cx:cx,cy:cy,r:ir,fill:'white',opacity:'0.94'},svg);
+  el('circle',{cx:cx,cy:cy,r:ir-2,fill:'none',stroke:'#e8c890','stroke-width':'1.5',opacity:'0.7'},svg);
+
+  // flakon
+  var fy=cy-32;
+  el('ellipse',{cx:cx,cy:fy+8,rx:8,ry:5,fill:'#c8943a',opacity:'0.65'},svg);
+  el('rect',{x:cx-4,y:fy+8,width:8,height:11,rx:2,fill:'#b89050',opacity:'0.6'},svg);
+  el('path',{d:'M'+(cx-12)+' '+(fy+19)+' Q'+(cx-14)+' '+(fy+27)+' '+(cx-17)+' '+(fy+36)+' L'+(cx-20)+' '+(fy+50)+' Q'+(cx-22)+' '+(fy+59)+' '+(cx-22)+' '+(fy+67)+' Q'+(cx-22)+' '+(fy+86)+' '+cx+' '+(fy+86)+' Q'+(cx+22)+' '+(fy+86)+' '+(cx+22)+' '+(fy+67)+' Q'+(cx+22)+' '+(fy+59)+' '+(cx+20)+' '+(fy+50)+' L'+(cx+17)+' '+(fy+36)+' Q'+(cx+14)+' '+(fy+27)+' '+(cx+12)+' '+(fy+19)+'Z',fill:'#f0e8d8',opacity:'0.5'},svg);
+  el('path',{d:'M'+(cx-12)+' '+(fy+19)+' Q'+(cx-14)+' '+(fy+27)+' '+(cx-17)+' '+(fy+36)+' L'+(cx-20)+' '+(fy+50)+' Q'+(cx-22)+' '+(fy+59)+' '+(cx-22)+' '+(fy+67)+' Q'+(cx-22)+' '+(fy+86)+' '+cx+' '+(fy+86)+' Q'+(cx+22)+' '+(fy+86)+' '+(cx+22)+' '+(fy+67)+' Q'+(cx+22)+' '+(fy+59)+' '+(cx+20)+' '+(fy+50)+' L'+(cx+17)+' '+(fy+36)+' Q'+(cx+14)+' '+(fy+27)+' '+(cx+12)+' '+(fy+19)+'Z',fill:'none',stroke:'#c8943a','stroke-width':'1',opacity:'0.5'},svg);
+  [0,60,120,180,240,300].forEach(function(a){
+    var ex=cx+Math.sin(rad(a))*5,ey=fy+14-Math.cos(rad(a))*5;
+    el('ellipse',{cx:ex,cy:ey,rx:2,ry:4,fill:'#e8b4a0',opacity:'0.7',transform:'rotate('+a+' '+ex+' '+ey+')'},svg);
+  });
+  el('circle',{cx:cx,cy:fy+14,r:2,fill:'#c8943a',opacity:'0.8'},svg);
+
+  els.forEach(function(e){
+    var lr=r+58,lx=px(e.a,lr),ly=py(e.a,lr);
+    var ex2=px(e.a,r-42),ey2=py(e.a,r-42);
+    var t=el('text',{x:ex2,y:ey2+7,'text-anchor':'middle','font-size':'17'},svg);
+    t.textContent=e.e;
+    e.f.forEach(function(l,j){
+      var tx=el('text',{x:lx,y:ly-14+j*13,'text-anchor':'middle','font-family':'Georgia,serif','font-size':'11','font-weight':'bold',fill:e.t,opacity:'0.95'},svg);
+      tx.textContent=l;
+    });
+    e.s.forEach(function(l,j){
+      var tx=el('text',{x:lx,y:ly+18+j*12,'text-anchor':'middle','font-family':'Georgia,serif','font-size':'8','font-style':'italic',fill:e.t,opacity:'0.7'},svg);
+      tx.textContent=l;
+    });
+  });
+})();
+
+});
+</script>
+</body>
+</html>

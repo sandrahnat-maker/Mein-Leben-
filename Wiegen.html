@@ -1,0 +1,538 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>&#9878;&#65039; Gewicht</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#F7F3EE;--ink:#1A1A2E;--cream:#FFFDF9;
+  --gold:#C4956A;--gold-light:#E8C89A;--gold-pale:#FDF5EC;
+  --green:#1A6B3C;--red:#C0392B;--grey:#717D7E;
+  --up-col:#C0392B;--down-col:#1A6B3C;--same-col:#6B7280;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--ink);padding:.8rem .8rem 4rem;max-width:480px;margin:0 auto}
+
+/* HEADER */
+.hdr{background:var(--ink);color:#fff;border-radius:16px;padding:1rem 1.2rem;margin-bottom:.9rem;position:relative;overflow:hidden}
+.hdr::before{content:'&#9878;&#65039;';position:absolute;right:.8rem;top:.5rem;font-size:3rem;opacity:.1}
+.hdr-title{font-family:'DM Serif Display',serif;font-size:1.4rem}
+.hdr-sub{font-size:.75rem;color:#A9CCE3;margin-top:.2rem;font-weight:300}
+
+/* DELTA BADGE */
+.delta-box{background:var(--cream);border-radius:14px;padding:.85rem 1.1rem;margin-bottom:.9rem;display:flex;align-items:center;gap:.9rem;border:1.5px solid var(--gold-light);box-shadow:0 2px 8px rgba(196,149,106,.12)}
+.delta-icon{font-size:1.8rem;flex-shrink:0}
+.delta-label{font-size:.7rem;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.delta-value{font-family:'DM Serif Display',serif;font-size:1.35rem;margin-top:.1rem}
+.delta-meta{font-size:.72rem;color:var(--grey);margin-top:.1rem}
+.delta-up{color:var(--up-col)}
+.delta-down{color:var(--down-col)}
+.delta-same{color:var(--same-col)}
+
+/* INPUT / STEPPER */
+.input-box{background:var(--cream);border-radius:14px;padding:.85rem 1.1rem;margin-bottom:.9rem;border:1.5px solid var(--gold-light)}
+
+/* DRUM PICKER */
+.drum-wrap{display:flex;align-items:center;justify-content:center;gap:.2rem;user-select:none;-webkit-user-select:none}
+.drum-sep{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink);padding:0 .1rem;line-height:1}
+.drum-unit-lbl{font-size:.85rem;color:var(--grey);padding-left:.3rem;align-self:center}
+.drum{position:relative;width:4.2rem;height:154px;overflow:hidden;cursor:ns-resize;border-radius:12px;background:var(--ink)}
+.drum::before,.drum::after{content:'';position:absolute;left:0;right:0;height:2.2rem;z-index:2;pointer-events:none}
+.drum::before{top:0;background:linear-gradient(to bottom,rgba(26,26,46,.92),rgba(26,26,46,.0))}
+.drum::after{bottom:0;background:linear-gradient(to top,rgba(26,26,46,.92),rgba(26,26,46,.0))}
+.drum-selector{position:absolute;top:50%;left:.3rem;right:.3rem;height:44px;transform:translateY(-50%);border:2px solid var(--gold);border-radius:8px;z-index:1;pointer-events:none}
+.drum-inner{position:absolute;left:0;right:0;transition:transform .12s cubic-bezier(.25,.8,.25,1)}
+.drum-item{height:44px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.5rem;color:rgba(255,255,255,.35);transition:color .1s,font-size .1s}
+.drum-item.selected{color:#fff;font-size:1.75rem}
+
+.input-btn{background:var(--gold);color:#fff;border:none;border-radius:10px;padding:.6rem 1.3rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:.8rem}
+.input-btn:active{opacity:.85}
+.input-date{font-size:.72rem;color:var(--grey);margin-top:.4rem;text-align:center}
+
+/* CHART TABS */
+.tabs{display:flex;gap:.4rem;margin-bottom:.7rem}
+.tab{flex:1;background:#fff;border:1.5px solid #E8E0D8;border-radius:10px;padding:.45rem .3rem;font-size:.72rem;font-weight:600;color:var(--grey);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* CHART */
+.chart-box{background:var(--cream);border-radius:14px;padding:.85rem 1rem;margin-bottom:.9rem;border:1.5px solid var(--gold-light);min-height:160px;position:relative}
+.chart-title{font-size:.7rem;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.5rem}
+.chart-svg-wrap{width:100%;overflow:visible}
+.chart-empty{text-align:center;color:var(--grey);font-size:.82rem;padding:2rem 0}
+
+/* STATS ROW */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.9rem}
+.stat{background:var(--cream);border-radius:12px;padding:.65rem .7rem;text-align:center;border:1.5px solid var(--gold-light)}
+.stat-val{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink)}
+.stat-lbl{font-size:.65rem;color:var(--grey);margin-top:.15rem;font-weight:500}
+
+/* HISTORY */
+.hist-title{font-size:.7rem;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:.4rem}
+.hist-item{display:flex;align-items:center;background:var(--cream);border-radius:10px;padding:.5rem .8rem;margin-bottom:.35rem;border:1px solid #EDE4D8;gap:.6rem}
+.hist-date{font-size:.75rem;color:var(--grey);min-width:3.8rem;flex-shrink:0}
+.hist-val{font-family:'DM Serif Display',serif;font-size:1rem;flex:1}
+.hist-delta{font-size:.72rem;font-weight:700;flex-shrink:0}
+.hist-del{background:none;border:none;color:#CCC;cursor:pointer;font-size:.85rem;padding:0 .2rem;flex-shrink:0}
+.hist-del:active{color:var(--red)}
+</style>
+</head><body>
+
+<div class="hdr">
+  <div class="hdr-title">&#9878;&#65039; Gewicht</div>
+  <div class="hdr-sub" id="hdrSub">Lade&#8230;</div>
+</div>
+
+<div class="delta-box" id="deltaBox">
+  <div class="delta-icon" id="deltaIcon">&#9203;</div>
+  <div>
+    <div class="delta-label">Vergleich Vorwoche</div>
+    <div class="delta-value delta-same" id="deltaVal">&#8211;</div>
+    <div class="delta-meta" id="deltaMeta">Noch kein Eintrag diese Woche</div>
+  </div>
+</div>
+
+<div class="input-box">
+  <div class="drum-wrap">
+    <div class="drum" id="drumKg"></div>
+    <div class="drum-sep">,</div>
+    <div class="drum" id="drumDez" style="width:3rem"></div>
+    <div class="drum-unit-lbl">kg</div>
+  </div>
+  <button class="input-btn" onclick="saveWeight()">Eintragen</button>
+  <div class="input-date" id="inputDate"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setView(7,this)">7 Tage</button>
+  <button class="tab" onclick="setView(30,this)">30 Tage</button>
+  <button class="tab" onclick="setView(180,this)">6 Mon.</button>
+  <button class="tab" onclick="setView(365,this)">12 Mon.</button>
+</div>
+
+<div class="chart-box">
+  <div class="chart-title" id="chartTitle">Letzte 7 Tage</div>
+  <div id="chartArea"><div class="chart-empty">Noch keine Eintr&#228;ge</div></div>
+</div>
+
+<div class="stats" id="statsRow"></div>
+
+<div class="hist-title">Alle Eintr&#228;ge</div>
+<div id="histList"></div>
+
+<script>
+var KEY = 'wg_entries_v1';
+var entries = [];
+var currentDays = 7;
+
+// \u2500\u2500 STORAGE (postMessage to parent for cross-iframe persistence) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function loadData() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    entries = raw ? JSON.parse(raw) : [];
+  } catch(e) { entries = []; }
+  // Also listen for data from parent
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'wg_data') {
+      entries = e.data.entries || [];
+      render();
+    }
+    if (e.data && e.data.type === 'wg_request') {
+      window.parent.postMessage({type:'wg_response', entries: entries}, '*');
+    }
+  });
+  // Request data from parent if available
+  try { window.parent.postMessage({type:'wg_load'}, '*'); } catch(e){}
+}
+
+function saveData() {
+  try { localStorage.setItem(KEY, JSON.stringify(entries)); } catch(e){}
+  try { window.parent.postMessage({type:'wg_save', entries: entries}, '*'); } catch(e){}
+}
+
+// \u2500\u2500 HELPERS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function today() {
+  var d = new Date();
+  return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+}
+function p2(n){ return n<10?'0'+n:''+n; }
+function fmtDate(d) {
+  var parts = d.split('-');
+  return parts[2]+'.'+parts[1]+'.'+parts[0].slice(2);
+}
+function fmtDateShort(d) {
+  var parts = d.split('-');
+  return parts[2]+'.'+parts[1]+'.';
+}
+function addDays(dateStr, n) {
+  var d = new Date(dateStr);
+  d.setDate(d.getDate() + n);
+  return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+}
+function daysBetween(a, b) {
+  return Math.round((new Date(b) - new Date(a)) / 86400000);
+}
+
+// ── DRUM PICKER (endlos, mit Übertrag) ─────────────────────────────────────
+var drumKgVal  = 70;
+var drumDezVal = 0;
+var _drumKgObj  = null;
+var _drumDezObj = null;
+var DRUM_IH = 44;
+var DRUM_REP = 40;
+
+function initStepper() {
+  if (entries.length > 0) {
+    var w = entries[0].w;
+    drumKgVal  = Math.max(30, Math.min(199, Math.floor(w)));
+    drumDezVal = Math.round((w - Math.floor(w)) * 10) % 10;
+  }
+  _drumKgObj  = makeDrum('drumKg',  30, 199, drumKgVal,  onKgChange);
+  _drumDezObj = makeDrum('drumDez',  0,   9, drumDezVal, onDezChange);
+}
+
+function onKgChange(v) { drumKgVal = v; }
+function onDezChange(v, steps) {
+  // steps = wie viele Schritte über die 0-9 Grenze gegangen wurde (positiv = aufwärts, negativ = abwärts)
+  drumDezVal = v;
+  if (steps !== 0 && _drumKgObj) {
+    var nk = drumKgVal + steps;
+    if (nk < 30) nk = 30;
+    if (nk > 199) nk = 199;
+    drumKgVal = nk;
+    _drumKgObj.scrollTo(nk, true);
+  }
+}
+
+function makeDrum(id, min, max, initVal, onChange) {
+  var el = document.getElementById(id);
+  var IH = DRUM_IH;
+  var count = max - min + 1;
+  var total = count * DRUM_REP;
+  var inner = document.createElement('div');
+  inner.className = 'drum-inner';
+  for (var i = 0; i < total; i++) {
+    var item = document.createElement('div');
+    item.className = 'drum-item';
+    item.textContent = min + (i % count);
+    inner.appendChild(item);
+  }
+  el.innerHTML = '';
+  var sel = document.createElement('div'); sel.className = 'drum-selector';
+  el.appendChild(sel); el.appendChild(inner);
+
+  var dH = el.offsetHeight || 154;
+  var cOff = dH / 2 - IH / 2;
+  // currentIdx zeigt auf die aktuell zentrierte Position in der langen Liste
+  var currentIdx = Math.floor(DRUM_REP / 2) * count + (initVal - min);
+  var curY = -(currentIdx * IH) + cOff;
+  inner.style.transition = 'none';
+  inner.style.transform = 'translateY(' + curY + 'px)';
+  hl();
+
+  function getY() {
+    var m = inner.style.transform.match(/-?[\d.]+/);
+    return m ? parseFloat(m[0]) : 0;
+  }
+  function idxFromY(y) { return Math.round((-y + cOff) / IH); }
+  function valFromIdx(idx) { return min + (((idx % count) + count) % count); }
+
+  function snap(y, anim) {
+    var newIdx = Math.max(0, Math.min(total - 1, idxFromY(y)));
+    var ny = -(newIdx * IH) + cOff;
+    inner.style.transition = anim ? 'transform .18s cubic-bezier(.25,.8,.25,1)' : 'none';
+    inner.style.transform = 'translateY(' + ny + 'px)';
+    curY = ny;
+
+    var newVal = valFromIdx(newIdx);
+    // Übertrag: wie oft wurde die 0-9 Grenze überquert?
+    // idxDiff Schritte durch eine count=10 Liste → floor(idxDiff/10) vollständige Durchläufe
+    // Plus: Teilübertrag wenn wir die Grenze 9→0 oder 0→9 überquert haben
+    var carry = 0;
+    if (id === 'drumDez') {
+      var idxDiff = newIdx - currentIdx;
+      // vollständige Durchläufe
+      var full = Math.floor(idxDiff / count);
+      // Rest: hat der Teilschritt die Grenze überquert?
+      var oldVal = valFromIdx(currentIdx);
+      var partial = 0;
+      if (idxDiff > 0 && newVal < oldVal) partial = +1;  // 9→0 aufwärts
+      if (idxDiff < 0 && newVal > oldVal) partial = -1;  // 0→9 abwärts
+      carry = full + partial;
+    }
+    currentIdx = newIdx;
+
+    setTimeout(hl, anim ? 20 : 0);
+    onChange(newVal, carry);
+  }
+
+  function hl() {
+    var y = getY();
+    var h = el.offsetHeight || 154;
+    var co = h / 2 - IH / 2;
+    var ci = Math.round((-y + co) / IH);
+    inner.querySelectorAll('.drum-item').forEach(function(it, i) {
+      it.classList.toggle('selected', i === ci);
+    });
+  }
+
+  var dSY, dSTY, drag = false;
+  el.addEventListener('touchstart', function(e) {
+    e.preventDefault(); drag = true;
+    dSY = e.touches[0].clientY; dSTY = getY();
+    inner.style.transition = 'none';
+  }, {passive: false});
+  el.addEventListener('touchmove', function(e) {
+    if (!drag) return; e.preventDefault();
+    curY = dSTY + (e.touches[0].clientY - dSY);
+    inner.style.transform = 'translateY(' + curY + 'px)'; hl();
+  }, {passive: false});
+  el.addEventListener('touchend', function() {
+    if (!drag) return; drag = false; snap(curY, true);
+  });
+  el.addEventListener('mousedown', function(e) {
+    e.preventDefault(); drag = true;
+    dSY = e.clientY; dSTY = getY();
+    inner.style.transition = 'none';
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!drag) return;
+    curY = dSTY + (e.clientY - dSY);
+    inner.style.transform = 'translateY(' + curY + 'px)'; hl();
+  });
+  window.addEventListener('mouseup', function() {
+    if (!drag) return; drag = false; snap(curY, true);
+  });
+  el.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    snap(getY() - (e.deltaY > 0 ? 1 : -1) * IH, true);
+  }, {passive: false});
+
+  function scrollTo(val, anim) {
+    var cv = valFromIdx(currentIdx);
+    var diff = val - cv;
+    // kürzester Weg im Kreis
+    if (diff >  count / 2) diff -= count;
+    if (diff < -count / 2) diff += count;
+    var ni = Math.max(0, Math.min(total - 1, currentIdx + diff));
+    var ny = -(ni * IH) + cOff;
+    inner.style.transition = anim ? 'transform .22s cubic-bezier(.25,.8,.25,1)' : 'none';
+    inner.style.transform = 'translateY(' + ny + 'px)';
+    curY = ny;
+    currentIdx = ni;
+    setTimeout(hl, anim ? 25 : 0);
+  }
+  return { scrollTo: scrollTo };
+}
+
+// ── INPUT ─────────────────────────────────────────────────────────────────────
+function saveWeight() {
+  var v = drumKgVal + drumDezVal / 10;
+  var t = today();
+  var idx = entries.findIndex(function(e){ return e.d === t; });
+  if (idx >= 0) entries[idx].w = v;
+  else entries.push({d: t, w: v});
+  entries.sort(function(a,b){ return a.d < b.d ? 1 : -1; });
+  saveData();
+  render();
+}
+
+// \u2500\u2500 RENDER ALL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function render() {
+  renderHeader();
+  renderDelta();
+  renderChart(currentDays);
+  renderStats();
+  renderHistory();
+}
+
+function renderHeader() {
+  var el = document.getElementById('hdrSub');
+  if (entries.length === 0) { el.textContent = 'Noch keine Eintr\u00E4ge'; return; }
+  var latest = entries[0];
+  el.textContent = 'Heute: ' + (latest.d === today() ? latest.w + ' kg' : '\u2013 kg') + '  \u00B7  ' + entries.length + ' Eintr\u00E4ge';
+}
+
+function renderDelta() {
+  if (entries.length < 2) return;
+  var todayStr = today();
+  // Find most recent entry
+  var recent = entries.find(function(e){ return e.d <= todayStr; });
+  if (!recent) return;
+  // Find entry from ~7 days ago (\u00B12 days tolerance)
+  var targetDate = addDays(recent.d, -7);
+  var prevEntry = null;
+  var bestDiff = 999;
+  entries.forEach(function(e) {
+    if (e.d >= recent.d) return;
+    var diff = Math.abs(daysBetween(e.d, targetDate));
+    if (diff < bestDiff && diff <= 3) { bestDiff = diff; prevEntry = e; }
+  });
+  if (!prevEntry) {
+    // Just compare last two entries
+    prevEntry = entries[1];
+  }
+  var delta = Math.round((recent.w - prevEntry.w) * 10) / 10;
+  var icon = delta > 0.05 ? '\uD83D\uDCC8' : delta < -0.05 ? '\uD83D\uDCC9' : '\u27A1\uFE0F';
+  var cls = delta > 0.05 ? 'delta-up' : delta < -0.05 ? 'delta-down' : 'delta-same';
+  var sign = delta > 0 ? '+' : '';
+  document.getElementById('deltaIcon').textContent = icon;
+  document.getElementById('deltaVal').textContent = sign + delta.toFixed(1) + ' kg';
+  document.getElementById('deltaVal').className = 'delta-value ' + cls;
+  document.getElementById('deltaMeta').textContent =
+    recent.w.toFixed(1) + ' kg heute vs. ' + prevEntry.w.toFixed(1) + ' kg am ' + fmtDate(prevEntry.d);
+}
+
+function setView(days, btn) {
+  currentDays.toFixed; // noop
+  currentDays = days;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  btn.classList.add('active');
+  var titles = {7:'Letzte 7 Tage', 30:'Letzte 30 Tage', 180:'Letzte 6 Monate', 365:'Letzte 12 Monate'};
+  document.getElementById('chartTitle').textContent = titles[days] || '';
+  renderChart(days);
+  renderStats();
+}
+
+function renderChart(days) {
+  var cutoff = addDays(today(), -days);
+  var filtered = entries.filter(function(e){ return e.d >= cutoff; }).reverse();
+  var area = document.getElementById('chartArea');
+  if (filtered.length < 2) {
+    area.innerHTML = '<div class="chart-empty">' + (filtered.length === 0 ? 'Noch keine Eintr\u00E4ge' : 'Mindestens 2 Eintr\u00E4ge n\u00F6tig') + '</div>';
+    return;
+  }
+
+  var W = 340, H = 120, PAD = {t:12, r:8, b:28, l:36};
+  var minW = Math.min.apply(null, filtered.map(function(e){return e.w;}));
+  var maxW = Math.max.apply(null, filtered.map(function(e){return e.w;}));
+  var range = maxW - minW || 1;
+  minW -= range * 0.1; maxW += range * 0.1; range = maxW - minW;
+
+  var cW = W - PAD.l - PAD.r;
+  var cH = H - PAD.t - PAD.b;
+  var n = filtered.length;
+
+  function xOf(i){ return PAD.l + (i/(n-1)) * cW; }
+  function yOf(w){ return PAD.t + cH - ((w-minW)/range)*cH; }
+
+  // Build path
+  var pts = filtered.map(function(e,i){ return [xOf(i), yOf(e.w)]; });
+  var pathD = 'M' + pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join('L');
+  var areaD = pathD + 'L'+pts[pts.length-1][0].toFixed(1)+','+(PAD.t+cH)+'L'+pts[0][0].toFixed(1)+','+(PAD.t+cH)+'Z';
+
+  // Y axis labels
+  var yLabels = '';
+  var steps = 3;
+  for(var s=0;s<=steps;s++){
+    var wv = minW + (range*s/steps);
+    var yl = yOf(wv);
+    yLabels += '<line x1="'+PAD.l+'" y1="'+yl.toFixed(1)+'" x2="'+(W-PAD.r)+'" y2="'+yl.toFixed(1)+'" stroke="#EDE4D8" stroke-width="1"/>';
+    yLabels += '<text x="'+(PAD.l-3)+'" y="'+(yl+4).toFixed(1)+'" text-anchor="end" font-size="9" fill="#999">'+wv.toFixed(1)+'</text>';
+  }
+
+  // X axis labels \u2014 show first, middle, last for 7d; sampled for longer
+  var xLabels = '';
+  var showIdxs = [];
+  if (n <= 7) { for(var i=0;i<n;i++) showIdxs.push(i); }
+  else if (n <= 14) { showIdxs = [0, Math.floor(n/2), n-1]; }
+  else { showIdxs = [0, Math.floor(n/4), Math.floor(n/2), Math.floor(3*n/4), n-1]; }
+  showIdxs.forEach(function(i){
+    var xi = xOf(i);
+    xLabels += '<text x="'+xi.toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="8" fill="#999">'+fmtDateShort(filtered[i].d)+'</text>';
+  });
+
+  // Dots with latest highlighted
+  var dots = pts.map(function(p,i){
+    var isLast = i === pts.length-1;
+    return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(isLast?4:2.5)+'" fill="'+(isLast?'#1A1A2E':'#C4956A')+'" stroke="#fff" stroke-width="1.5"/>';
+  }).join('');
+
+  // Trend line
+  var sumX=0,sumY=0,sumXY=0,sumXX=0,nn=pts.length;
+  pts.forEach(function(p,i){sumX+=i;sumY+=p[1];sumXY+=i*p[1];sumXX+=i*i;});
+  var slope=(nn*sumXY-sumX*sumY)/(nn*sumXX-sumX*sumX)||0;
+  var intercept=(sumY-slope*sumX)/nn;
+  var tx1=xOf(0), ty1=slope*0+intercept, tx2=xOf(n-1), ty2=slope*(n-1)+intercept;
+  var trendCol = slope < 0 ? '#1A6B3C' : slope > 0 ? '#C0392B' : '#999';
+  var trendLine = '<line x1="'+tx1.toFixed(1)+'" y1="'+ty1.toFixed(1)+'" x2="'+tx2.toFixed(1)+'" y2="'+ty2.toFixed(1)+'" stroke="'+trendCol+'" stroke-width="1.5" stroke-dasharray="4,3" opacity=".6"/>';
+
+  area.innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" class="chart-svg-wrap" style="width:100%;height:auto">'+
+    '<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C4956A" stop-opacity=".25"/><stop offset="100%" stop-color="#C4956A" stop-opacity=".02"/></linearGradient></defs>'+
+    yLabels + xLabels +
+    '<path d="'+areaD+'" fill="url(#ag)"/>'+
+    '<path d="'+pathD+'" fill="none" stroke="#C4956A" stroke-width="2" stroke-linejoin="round"/>'+
+    trendLine + dots +
+    '</svg>';
+}
+
+function renderStats() {
+  var cutoff = addDays(today(), -currentDays);
+  var filtered = entries.filter(function(e){ return e.d >= cutoff; });
+  var el = document.getElementById('statsRow');
+  if (filtered.length === 0) { el.innerHTML = ''; return; }
+  var vals = filtered.map(function(e){return e.w;});
+  var mn = Math.min.apply(null,vals), mx = Math.max.apply(null,vals);
+  var avg = vals.reduce(function(a,b){return a+b;},0)/vals.length;
+  var start = filtered[filtered.length-1].w, end = filtered[0].w;
+  var change = Math.round((end-start)*10)/10;
+  var sign = change>0?'+':'';
+  el.innerHTML =
+    '<div class="stat"><div class="stat-val">'+mn.toFixed(1)+'</div><div class="stat-lbl">Minimum</div></div>'+
+    '<div class="stat"><div class="stat-val">'+avg.toFixed(1)+'</div><div class="stat-lbl">Durchschnitt</div></div>'+
+    '<div class="stat"><div class="stat-val" style="color:'+(change<0?'var(--down-col)':change>0?'var(--up-col)':'var(--grey)')+'">'+sign+change.toFixed(1)+'</div><div class="stat-lbl">Ver\u00E4nderung</div></div>';
+}
+
+function renderHistory() {
+  var el = document.getElementById('histList');
+  if (entries.length === 0) { el.innerHTML = ''; return; }
+  var html = '';
+  var shown = entries.slice(0, 20);
+  for (var i = 0; i < shown.length; i++) {
+    var e = shown[i];
+    var prev = entries[i+1];
+    var dHtml = '';
+    if (prev) {
+      var d = Math.round((e.w - prev.w) * 10) / 10;
+      var arrow = d > 0.05 ? 'v' : d < -0.05 ? 'v' : '-';
+      var sign = d > 0 ? '+' : '';
+      var cls = d > 0.05 ? 'delta-up' : d < -0.05 ? 'delta-down' : 'delta-same';
+      arrow = d > 0.05 ? '&#9650;' : d < -0.05 ? '&#9660;' : '&#8594;';
+      dHtml = '<span class="hist-delta ' + cls + '">' + arrow + sign + Math.abs(d).toFixed(1) + '</span>';
+    }
+    var dateStr = e.d;
+    html += '<div class="hist-item">';
+    html += '<span class="hist-date">' + fmtDate(e.d) + '</span>';
+    html += '<span class="hist-val">' + e.w.toFixed(1) + ' kg</span>';
+    html += dHtml;
+    html += '<button class="hist-del" onclick="delEntry(this)" data-date="' + e.d + '">x</button>';
+    html += '</div>';
+  }
+  if (entries.length > 20) {
+    html += '<div style="font-size:.72rem;color:var(--grey);text-align:center;padding:.4rem">... ' + (entries.length - 20) + ' aeltere Eintraege</div>';
+  }
+  el.innerHTML = html;
+}
+
+function delEntry(btn) {
+  var d = btn.getAttribute('data-date');
+  if (!confirm('Eintrag loeschen?')) return;
+  entries = entries.filter(function(e){ return e.d !== d; });
+  saveData();
+  render();
+}
+
+// \u2500\u2500 INIT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+var now = new Date();
+document.getElementById('inputDate').textContent =
+  'F\u00FCr heute, ' + p2(now.getDate())+'.'+p2(now.getMonth()+1)+'.'+now.getFullYear();
+
+loadData();
+render();
+// initStepper nach erstem Paint, damit offsetHeight korrekt ist
+requestAnimationFrame(function() {
+  requestAnimationFrame(function() {
+    initStepper();
+  });
+});
+</script>
+</body></html>

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💊 Rudi, Timmy & Lotte – Medikamentenplan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rudi: #2563a8;
+    --rudi-light: #dbeafe;
+    --rudi-mid: #93c5fd;
+    --timmy: #c2410c;
+    --timmy-light: #ffedd5;
+    --timmy-mid: #fdba74;
+    --ok: #15803d;
+    --ok-light: #dcfce7;
+    --warn: #b45309;
+    --warn-light: #fef3c7;
+    --danger: #b91c1c;
+    --danger-light: #fee2e2;
+    --bg: #f8f7f4;
+    --card: #ffffff;
+    --text: #1c1917;
+    --muted: #78716c;
+    --border: #e7e5e4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--text);
+    color: white;
+    padding: 2rem 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  header p {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+  }
+
+  #today-display {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 0.5rem;
+  }
+
+  .summary-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+  }
+
+  .summary-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .summary-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 3rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin: 1.5rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-title .badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-rudi { background: var(--rudi-light); color: var(--rudi); }
+  .badge-timmy { background: var(--timmy-light); color: var(--timmy); }
+  .badge-lotte { background: #d1fae5; color: #065f46; }
+  .med-card.lotte::before { background: #059669; }
+  .btn-new-pack.lotte { background: #d1fae5; color: #065f46; }
+  .badge-beide { background: #ede9fe; color: #5b21b6; }
+  .med-card.beide::before { background: linear-gradient(180deg, var(--rudi), var(--timmy)); }
+  .btn-new-pack.beide { background: #ede9fe; color: #5b21b6; }
+  .med-card.beide::before { background: linear-gradient(180deg, #2563a8 50%, #c2410c 50%); }
+  .btn-new-pack.beide { background: #ede9fe; color: #5b21b6; }
+
+  .med-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .med-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1rem;
+    align-items: start;
+    transition: box-shadow 0.15s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .med-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    transform: translateY(-1px);
+  }
+
+  .med-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .med-card.rudi::before { background: var(--rudi); }
+  .med-card.timmy::before { background: var(--timmy); }
+
+  .med-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .med-info {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  .med-details {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .detail-chip {
+    font-size: 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    color: var(--muted);
+  }
+
+  .detail-chip strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .status-block {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    min-width: 130px;
+  }
+
+  .days-left {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .days-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .status-ok { background: var(--ok-light); color: var(--ok); }
+  .status-warn { background: var(--warn-light); color: var(--warn); }
+  .status-danger { background: var(--danger-light); color: var(--danger); }
+  .status-unknown { background: var(--border); color: var(--muted); }
+
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    grid-column: 1 / -1;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-new-pack {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .btn-new-pack.rudi {
+    background: var(--rudi-light);
+    color: var(--rudi);
+  }
+
+  .btn-new-pack.timmy {
+    background: var(--timmy-light);
+    color: var(--timmy);
+  }
+
+  .btn-new-pack:hover {
+    filter: brightness(0.93);
+    transform: scale(1.02);
+  }
+
+  .btn-edit {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.3rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-edit:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  .opened-date {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .nachkauf-date {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: slideUp 0.2s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .modal label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .modal input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 0.75rem;
+  }
+
+  .modal input:focus { border-color: var(--text); }
+
+  .modal-btns {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  .modal-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .modal-btn.cancel {
+    background: var(--bg);
+    color: var(--muted);
+  }
+
+  .modal-btn.confirm {
+    background: var(--text);
+    color: white;
+  }
+
+  .modal-btn:hover { filter: brightness(0.9); }
+
+  footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 1.25rem; }
+    main { padding: 1rem; }
+    .status-block { min-width: 100px; }
+    .days-left { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>🐱🐶 Rudi, Timmy & Lotte</h1>
+    <p>Medikamentenplan — immer aktuell</p>
+    <div id="today-display"></div>
+  </div>
+  <div style="margin-top:.8rem;display:flex;gap:.5rem;flex-wrap:wrap">
+    <button onclick="exportState()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:.3rem .7rem;font-size:.65rem;cursor:pointer;font-family:inherit">📎 Daten exportieren</button>
+    <button onclick="importState()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:.3rem .7rem;font-size:.65rem;cursor:pointer;font-family:inherit">📥 Daten importieren</button>
+    <button onclick="showBackupInfo()" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.3rem .7rem;font-size:.65rem;cursor:pointer;font-family:inherit">⚡️ Backup-Info</button>
+  </div>
+  <textarea id="importArea" style="display:none;width:100%;margin-top:.5rem;padding:.4rem;border-radius:6px;font-size:.65rem;height:80px;font-family:monospace" placeholder="JSON hier einfügen..."></textarea>
+  <button id="importConfirm" style="display:none;background:#2563a8;color:#fff;border:none;border-radius:6px;padding:.3rem .8rem;font-size:.65rem;cursor:pointer;margin-top:.3rem" onclick="confirmImport()">✓ Importieren</button>
+</header>
+
+<div class="summary-bar">
+  <div class="summary-inner">
+    <div class="summary-pill"><span class="dot" style="background:var(--danger)"></span> <span id="count-danger">0 dringend</span></div>
+    <div class="summary-pill"><span class="dot" style="background:var(--warn)"></span> <span id="count-warn">0 bald nachkaufen</span></div>
+    <div class="summary-pill"><span class="dot" style="background:var(--ok)"></span> <span id="count-ok">0 in Ordnung</span></div>
+  </div>
+</div>
+
+<main>
+  <div id="rudi-section">
+    <div class="section-title">Rudi <span class="badge badge-rudi">Katze</span></div>
+    <div class="med-grid" id="rudi-meds"></div>
+  </div>
+  <div id="timmy-section">
+    <div class="section-title">Timmy <span class="badge badge-timmy">Katze</span></div>
+    <div class="med-grid" id="timmy-meds"></div>
+  </div>
+  <div id="lotte-section">
+    <div class="section-title">Lotte <span class="badge badge-lotte">Hund</span></div>
+    <div class="med-grid" id="lotte-meds"></div>
+  </div>
+  <div id="beide-section">
+    <div class="section-title">Rudi &amp; Timmy <span class="badge badge-beide">Beide Katzen</span></div>
+    <div class="med-grid" id="beide-meds"></div>
+  </div>
+</main>
+
+<footer>Daten werden lokal im Browser gespeichert · Kein Internet nötig</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Neue Packung</h3>
+    <label>Geöffnet am</label>
+    <input type="date" id="modal-date">
+    <label>Packungsgröße (Einheiten)</label>
+    <input type="number" id="modal-size" min="1" step="0.5">
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Abbrechen</button>
+      <button class="modal-btn confirm" onclick="confirmModal()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- DATA ----
+const defaultMeds = [
+  // Rudi
+  { id: 'rudi-prednicortone', katze: 'rudi',  name: 'Prednicortone',   wirkstoff: 'Prednisolon · Entzündungshemmung',    packSize: 10,   einheit: 'Tabletten', dosePer: 0.25, hinweis: '¼ Tablette tägl. · 1 Blister = 40 Tage' },
+  { id: 'rudi-atopica',       katze: 'rudi',  name: 'Atopica',         wirkstoff: 'Ciclosporin · Immunmodulator',        packSize: 17,   einheit: 'ml',        dosePer: 0.5,  hinweis: 'Kühl lagern' },
+  { id: 'rudi-gabapentin',    katze: 'rudi',  name: 'Gabapentin',      wirkstoff: 'Schmerztherapie · Neuropathie',       packSize: 10,   einheit: 'Kapseln',   dosePer: 1.25, hinweis: 'Kapseln halbieren (50 mg)' },
+  { id: 'rudi-redonyl',       katze: 'rudi',  name: 'Redonyl',         wirkstoff: 'Haut & Fettsäuren',                   packSize: 30,   einheit: 'Kapseln',   dosePer: 1,    hinweis: 'Packungsgröße bitte prüfen' },
+  { id: 'rudi-remend',        katze: 'rudi',  name: 'Remend',          wirkstoff: 'Hornhaut-Augenpflege',                packSize: 360,  einheit: 'Tropfen',   dosePer: 2,    hinweis: '6× 3ml · ca. 360 Tropfen · 2× tägl.' },
+  { id: 'rudi-nexium',        katze: 'rudi',  name: 'Nexium',          wirkstoff: 'Magenschutz · Esomeprazol',           packSize: 28,   einheit: 'Säckchen',  dosePer: 0.5,  hinweis: '½ Säckchen tägl.' },
+  // Timmy
+  { id: 'timmy-semintra',     katze: 'timmy', name: 'Semintra',        wirkstoff: 'Telmisartan · Blutdruck / Niere',     packSize: 35,   einheit: 'ml',        dosePer: 0.6,  hinweis: 'Dosierspritze nutzen' },
+  { id: 'timmy-felimazole',   katze: 'timmy', name: 'Felimazole',      wirkstoff: 'Thiamazol · Schilddrüse',             packSize: 100,  einheit: 'Tabletten', dosePer: 2,    hinweis: '2× tägl. 1 Tablette' },
+  // Rudi & Timmy gemeinsam
+  { id: 'beide-kalium',       katze: 'beide', name: 'Kalium-Glukonat', wirkstoff: 'Kalium-Ergänzung',                    packSize: 50,   einheit: 'g',         dosePer: 4,    hinweis: 'Je 2× tägl. 1 Msfl. pro Katze = 4g/Tag' },
+  { id: 'beide-bdecaplex',    katze: 'beide', name: 'B-DecapleX K',    wirkstoff: 'Vitamin B-Komplex',                   packSize: null, einheit: 'Tabletten', dosePer: 2,    hinweis: '1 Tablette tägl. pro Katze' },
+  { id: 'beide-cosequin',     katze: 'beide', name: 'Cosequin',        wirkstoff: 'Gelenkunterstützung',                 packSize: 45,   einheit: 'Kapseln',   dosePer: 1,    hinweis: '½ Kapsel tägl. pro Katze' },
+  // Lotte
+  { id: 'lotte-forthyron',    katze: 'lotte', name: 'Forthyron 200',   wirkstoff: 'Levothyroxin · Schilddrüse',          packSize: 250,  einheit: 'Tabletten', dosePer: 1,    hinweis: '1× tägl.' },
+];
+
+const BUFFER_DAYS = 7;
+
+// ---- STORAGE ----
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem('med-state') || '{}');
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem('med-state', JSON.stringify(state));
+}
+
+// ---- HELPERS ----
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatDate(iso) {
+  if (!iso) return '–';
+  const [y, m, d] = iso.split('-');
+  return `${d}.${m}.${y}`;
+}
+
+function addDays(iso, n) {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+function daysUntil(iso) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = new Date(iso);
+  return Math.round((target - now) / 86400000);
+}
+
+function daysLeft(openedDate, packSize, dosePer) {
+  if (!openedDate || !packSize || !dosePer) return null;
+  const usedDays = daysUntil(openedDate) * -1; // days since opened (negative of daysUntil)
+  const daysSinceOpen = Math.max(0, Math.round((new Date() - new Date(openedDate)) / 86400000));
+  const remaining = packSize - (daysSinceOpen * dosePer);
+  if (remaining <= 0) return 0;
+  return Math.floor(remaining / dosePer);
+}
+
+// ---- RENDER ----
+function getStatus(days) {
+  if (days === null) return 'unknown';
+  if (days <= BUFFER_DAYS) return 'danger';
+  if (days <= 14) return 'warn';
+  return 'ok';
+}
+
+function statusLabel(status) {
+  if (status === 'danger') return 'Dringend!';
+  if (status === 'warn') return 'Bald kaufen';
+  if (status === 'ok') return 'Vorrat OK';
+  return 'Unbekannt';
+}
+
+function renderMed(med, state) {
+  const s = state[med.id] || {};
+  const openedDate = s.openedDate || null;
+  const packSize = s.packSize || med.packSize;
+
+  let days = null;
+  let nachkaufDate = null;
+
+  if (openedDate && packSize && med.dosePer) {
+    days = daysLeft(openedDate, packSize, med.dosePer);
+    if (days !== null) {
+      const nachkaufDays = Math.max(0, days - BUFFER_DAYS);
+      nachkaufDate = addDays(today(), nachkaufDays);
+    }
+  }
+
+  const status = getStatus(days);
+
+  const progressPct = (days !== null && packSize && med.dosePer)
+    ? Math.max(0, Math.min(100, (days / (packSize / med.dosePer)) * 100))
+    : null;
+
+  const progressColor = status === 'danger' ? '#ef4444' : status === 'warn' ? '#f59e0b' : '#22c55e';
+
+  const cat = med.katze;
+
+  return `
+  <div class="med-card ${cat}" id="card-${med.id}">
+    <div>
+      <div class="med-name">${med.name}</div>
+      <div class="med-info">${med.wirkstoff}</div>
+      <div class="med-details">
+        <span class="detail-chip"><strong>${med.dosePer}</strong> ${med.einheit}/Tag</span>
+        ${packSize ? `<span class="detail-chip">Packung: <strong>${packSize} ${med.einheit}</strong></span>` : '<span class="detail-chip" style="color:var(--warn)">Packungsgröße unbekannt</span>'}
+        ${med.hinweis ? `<span class="detail-chip">💡 ${med.hinweis}</span>` : ''}
+      </div>
+      ${progressPct !== null ? `<div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%;background:${progressColor}"></div></div>` : ''}
+    </div>
+    <div class="status-block">
+      <div class="days-left" style="color:${status==='danger'?'var(--danger)':status==='warn'?'var(--warn)':status==='ok'?'var(--ok)':'var(--muted)'}">${days !== null ? days : '?'}</div>
+      <div class="days-label">Tage übrig</div>
+      <span class="status-badge status-${status}">${statusLabel(status)}</span>
+      ${nachkaufDate ? `<div class="nachkauf-date" style="color:${status==='danger'?'var(--danger)':status==='warn'?'var(--warn)':'var(--muted)'}">kaufen bis ${formatDate(nachkaufDate)}</div>` : ''}
+    </div>
+    <div class="action-row">
+      <button class="btn-new-pack ${cat}" onclick="openModal('${med.id}')">
+        📦 Neue Packung geöffnet
+      </button>
+      <button class="btn-edit" onclick="openEditModal('${med.id}')">✏️ Bearbeiten</button>
+      ${openedDate ? `<span class="opened-date">Geöffnet: ${formatDate(openedDate)}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function render() {
+  const state = loadState();
+  let danger = 0, warn = 0, ok = 0;
+
+  const rudiMeds = defaultMeds.filter(m => m.katze === 'rudi');
+  const timmyMeds = defaultMeds.filter(m => m.katze === 'timmy');
+  const lotteMeds = defaultMeds.filter(m => m.katze === 'lotte');
+  const beideMeds = defaultMeds.filter(m => m.katze === 'beide');
+
+  document.getElementById('rudi-meds').innerHTML = rudiMeds.map(m => renderMed(m, state)).join('');
+  document.getElementById('timmy-meds').innerHTML = timmyMeds.map(m => renderMed(m, state)).join('');
+  document.getElementById('lotte-meds').innerHTML = lotteMeds.map(m => renderMed(m, state)).join('');
+  document.getElementById('beide-meds').innerHTML = beideMeds.map(m => renderMed(m, state)).join('');
+
+  defaultMeds.forEach(med => {
+    const s = state[med.id] || {};
+    const packSize = s.packSize || med.packSize;
+    const days = s.openedDate && packSize ? daysLeft(s.openedDate, packSize, med.dosePer) : null;
+    const status = getStatus(days);
+    if (status === 'danger') danger++;
+    else if (status === 'warn') warn++;
+    else if (status === 'ok') ok++;
+  });
+
+  document.getElementById('count-danger').textContent = `${danger} dringend`;
+  document.getElementById('count-warn').textContent = `${warn} bald nachkaufen`;
+  document.getElementById('count-ok').textContent = `${ok} in Ordnung`;
+
+  const t = new Date();
+  document.getElementById('today-display').textContent =
+    `Heute: ${t.toLocaleDateString('de-AT', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}`;
+}
+
+// ---- MODAL ----
+let modalMedId = null;
+let modalMode = 'new'; // 'new' or 'edit'
+
+function openModal(medId) {
+  modalMedId = medId;
+  modalMode = 'new';
+  const med = defaultMeds.find(m => m.id === medId);
+  document.getElementById('modal-title').textContent = `📦 Neue Packung – ${med.name}`;
+  document.getElementById('modal-date').value = today();
+  document.getElementById('modal-size').value = med.packSize || '';
+  document.getElementById('modal').classList.add('active');
+}
+
+function openEditModal(medId) {
+  modalMedId = medId;
+  modalMode = 'edit';
+  const med = defaultMeds.find(m => m.id === medId);
+  const state = loadState();
+  const s = state[medId] || {};
+  document.getElementById('modal-title').textContent = `✏️ Bearbeiten – ${med.name}`;
+  document.getElementById('modal-date').value = s.openedDate || today();
+  document.getElementById('modal-size').value = s.packSize || med.packSize || '';
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  modalMedId = null;
+}
+
+function confirmModal() {
+  if (!modalMedId) return;
+  const openedDate = document.getElementById('modal-date').value;
+  const packSize = parseFloat(document.getElementById('modal-size').value);
+  if (!openedDate || isNaN(packSize) || packSize <= 0) {
+    alert('Bitte Datum und gültige Packungsgröße eingeben.');
+    return;
+  }
+  const state = loadState();
+  state[modalMedId] = { openedDate, packSize };
+  saveState(state);
+  closeModal();
+  
+// Vorgeladene Daten (aus alter App übernommen)
+(function() {
+  var existing = localStorage.getItem('med-state');
+  if (!existing || existing === '{}') {
+    localStorage.setItem('med-state', '{"rudi-prednicortone": {"openedDate": "2026-03-07", "packSize": 10}, "rudi-atopica": {"openedDate": "2026-03-13", "packSize": 17}, "rudi-gabapentin": {"openedDate": "2026-03-13", "packSize": 10}, "rudi-redonyl": {"openedDate": "2026-03-13", "packSize": 30}, "rudi-remend": {"openedDate": "2026-02-27", "packSize": 360}, "rudi-nexium": {"openedDate": "2026-02-27", "packSize": 28}, "timmy-semintra": {"openedDate": "2026-03-20", "packSize": 35}, "timmy-felimazole": {"openedDate": "2026-03-06", "packSize": 100}, "beide-kalium": {"openedDate": "2026-03-20", "packSize": 50}, "beide-bdecaplex": {"openedDate": "2026-02-20", "packSize": 150}, "beide-cosequin": {"openedDate": "2026-03-13", "packSize": 45}, "lotte-forthyron": {"openedDate": "2026-02-20", "packSize": 250}}');
+  }
+})();
+render();
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function exportState() {
+  var state = loadState();
+  var json = JSON.stringify(state, null, 2);
+  try {
+    navigator.clipboard.writeText(json).then(function(){
+      alert('✅ Daten in die Zwischenablage kopiert!\n\nSpeichere diesen Text z.B. in einer Notiz, um die Daten zu sichern.');
+    });
+  } catch(e) {
+    var ta = document.createElement('textarea');
+    ta.value = json;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('✅ Kopiert! Speichere den Text als Backup.');
+  }
+}
+
+function importState() {
+  var area = document.getElementById('importArea');
+  var btn = document.getElementById('importConfirm');
+  if(area.style.display === 'none'){
+    area.style.display = 'block';
+    btn.style.display = 'inline-block';
+    area.focus();
+  } else {
+    area.style.display = 'none';
+    btn.style.display = 'none';
+  }
+}
+
+function confirmImport() {
+  var area = document.getElementById('importArea');
+  try {
+    var data = JSON.parse(area.value.trim());
+    saveState(data);
+    area.style.display = 'none';
+    document.getElementById('importConfirm').style.display = 'none';
+    render();
+    alert('✅ Daten erfolgreich importiert!');
+  } catch(e) {
+    alert('❌ Ungültiges Format. Bitte den exportierten JSON-Text einfügen.');
+  }
+}
+
+function showBackupInfo() {
+  alert('📋 So sicherst du deine Daten:\n\n1. Tippe auf "Daten exportieren"\n2. Der Text wird in die Zwischenablage kopiert\n3. Füge ihn in eine Notiz-App ein\n\nBeim nächsten Start:\n1. Tippe auf "Daten importieren"\n2. Füge den gesicherten Text ein\n3. Tippe "Importieren"\n\n⚠️ Die Daten bleiben im Browser gespeichert,\nnicht in der HTML-Datei.');
+}
+
+render();
+</script>
+</body>
+</html>

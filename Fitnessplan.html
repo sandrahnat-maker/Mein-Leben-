@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitnessplan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root { --cream:#F7F3EE; --ink:#1A1A2E; --green:#1A6B3C; --blue:#2D6A9F; --purple:#7D3C98; --orange:#CA6F1E; --grey:#717D7E; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); font-family:'DM Sans',sans-serif; color:var(--ink); padding:1.2rem 1rem; }
+  .page { max-width:520px; margin:0 auto; }
+
+  .header { background:var(--ink); color:white; border-radius:16px; padding:1.5rem 1.8rem; margin-bottom:1rem; position:relative; overflow:hidden; }
+  .header::before { content:'&#127940;'; position:absolute; right:1.2rem; top:0.8rem; font-size:3.5rem; opacity:0.12; }
+  .header-title { font-family:'DM Serif Display',serif; font-size:1.7rem; position:relative; z-index:1; }
+  .header-sub { font-size:0.82rem; color:#A9CCE3; margin-top:0.3rem; font-weight:300; }
+
+  .rotation { display:grid; grid-template-columns:repeat(7,1fr); gap:0.3rem; margin-bottom:1rem; }
+  .day-pill { border-radius:10px; padding:0.5rem 0.3rem; text-align:center; }
+  .day-pill .day-name { font-size:0.7rem; font-weight:700; color:white; margin-bottom:0.3rem; }
+  .day-pill .day-icon { font-size:1.2rem; }
+  .day-pill .day-label { font-size:0.6rem; font-weight:600; color:white; margin-top:0.2rem; opacity:0.85; }
+  .dp-kraft { background:var(--green); }
+  .dp-surf  { background:var(--blue); }
+  .dp-yoga  { background:var(--purple); }
+  .dp-ruhe  { background:#A0A0A0; }
+
+  .block { background:white; border-radius:14px; margin-bottom:0.8rem; box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow:hidden; }
+  .block-header { padding:0.8rem 1.2rem; color:white; display:flex; align-items:center; gap:0.7rem; }
+  .block-icon { font-size:1.4rem; }
+  .block-title { font-family:'DM Serif Display',serif; font-size:1.1rem; }
+  .block-meta { font-size:0.75rem; opacity:0.85; margin-left:auto; }
+  .block-body { padding:0.5rem 0; }
+
+  .exercise { display:flex; align-items:center; gap:0.7rem; padding:0.55rem 1.1rem; border-bottom:1px solid #F5F5F5; }
+  .exercise:last-child { border-bottom:none; }
+  .ex-num { width:22px; height:22px; border-radius:50%; color:white; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ex-name { flex:1; font-size:0.85rem; font-weight:500; }
+  .ex-detail { font-size:0.75rem; color:var(--grey); }
+  .ex-note { font-size:0.72rem; color:var(--grey); margin-top:2px; }
+
+  .bh-kraft { background:linear-gradient(135deg,#1A6B3C,#0E4620); }
+  .bh-surf  { background:linear-gradient(135deg,#2D6A9F,#1A4A7A); }
+  .bh-yoga  { background:linear-gradient(135deg,#7D3C98,#5B2C6F); }
+  .en-kraft { background:var(--green); }
+  .en-surf  { background:var(--blue); }
+  .en-yoga  { background:var(--purple); }
+
+  .tipp { background:#FEF5E7; border-left:4px solid var(--orange); border-radius:10px; padding:0.8rem 1rem; margin-bottom:0.8rem; font-size:0.82rem; color:#784212; }
+  .tipp strong { display:block; margin-bottom:0.2rem; }
+  .footer { text-align:center; margin-top:1.5rem; font-size:0.73rem; color:var(--grey); padding-bottom:1rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <div class="header-title">Fitnessplan</div>
+  <div class="header-sub">K&#246;rpergewicht &#183; Surfbalanceboard &#183; Yoga &#183; In fr&#246;hlicher Gelassenheit &#127807;</div>
+</div>
+
+<!-- WOCHENROTATION -->
+<div class="rotation">
+  <div class="day-pill dp-kraft"><div class="day-name">Mo</div><div class="day-icon">&#128170;</div><div class="day-label">Kraft</div></div>
+  <div class="day-pill dp-ruhe"><div class="day-name">Di</div><div class="day-icon">&#128564;</div><div class="day-label">Ruhe</div></div>
+  <div class="day-pill dp-surf"><div class="day-name">Mi</div><div class="day-icon">&#127940;</div><div class="day-label">Balance</div></div>
+  <div class="day-pill dp-ruhe"><div class="day-name">Do</div><div class="day-icon">&#128564;</div><div class="day-label">Ruhe</div></div>
+  <div class="day-pill dp-kraft"><div class="day-name">Fr</div><div class="day-icon">&#128170;</div><div class="day-label">Kraft</div></div>
+  <div class="day-pill dp-ruhe"><div class="day-name">Sa</div><div class="day-icon">&#128564;</div><div class="day-label">Uni</div></div>
+  <div class="day-pill dp-yoga"><div class="day-name">So</div><div class="day-icon">&#129496;</div><div class="day-label">Yoga</div></div>
+</div>
+
+<!-- K&#214;RPERGEWICHT -->
+<div class="block">
+  <div class="block-header bh-kraft">
+    <div class="block-icon">&#128170;</div>
+    <div><div class="block-title">K&#246;rpergewicht</div><div style="font-size:0.75rem;opacity:0.85">Mo + Fr &#183; 10:00 &#183; nach Spaziergang</div></div>
+    <div class="block-meta">20 Min &#183; 3 Runden</div>
+  </div>
+  <div class="block-body">
+    <div class="exercise"><div class="ex-num en-kraft">1</div><div><div class="ex-name">Squats</div><div class="ex-note">F&#252;&#223;e schulterbreit &#183; Knie &#252;ber Zehen &#183; tief runtergehen</div></div><div class="ex-detail">40 Sek / 20 Pause</div></div>
+    <div class="exercise"><div class="ex-num en-kraft">2</div><div><div class="ex-name">Wandliegest&#252;tze</div><div class="ex-note">H&#228;nde auf Schulterh&#246;he &#183; K&#246;rper gerade &#183; schonend f&#252;r Gelenke</div></div><div class="ex-detail">40 Sek / 20 Pause</div></div>
+    <div class="exercise"><div class="ex-num en-kraft">3</div><div><div class="ex-name">Beckenheben</div><div class="ex-note">R&#252;cken auf Boden &#183; F&#252;&#223;e aufgestellt &#183; Ges&#228;&#223; langsam heben/senken</div></div><div class="ex-detail">40 Sek / 20 Pause</div></div>
+    <div class="exercise"><div class="ex-num en-kraft">4</div><div><div class="ex-name">Ausfallschritte</div><div class="ex-note">Abwechselnd links/rechts &#183; Knie 90&#176; &#183; aufrecht bleiben</div></div><div class="ex-detail">40 Sek / 20 Pause</div></div>
+    <div class="exercise"><div class="ex-num en-kraft">5</div><div><div class="ex-name">Plank</div><div class="ex-note">Unterarme oder H&#228;nde &#183; K&#246;rper gerade wie ein Brett &#183; atmen!</div></div><div class="ex-detail">40 Sek / 20 Pause</div></div>
+  </div>
+</div>
+
+<!-- SURFBALANCEBOARD -->
+<div class="block">
+  <div class="block-header bh-surf">
+    <div class="block-icon">&#127940;</div>
+    <div><div class="block-title">Surfbalanceboard</div><div style="font-size:0.75rem;opacity:0.85">Mi &#183; 10:00 &#183; nach Spaziergang</div></div>
+    <div class="block-meta">30 Min</div>
+  </div>
+  <div class="block-body">
+    <div class="exercise"><div class="ex-num en-surf">1</div><div><div class="ex-name">Grundbalance</div><div class="ex-note">Beide F&#252;&#223;e mittig &#183; Arme locker ausgestreckt &#183; ruhig atmen &#183; einpendeln lassen</div></div><div class="ex-detail">5 Min Warm-up</div></div>
+    <div class="exercise"><div class="ex-num en-surf">2</div><div><div class="ex-name">Gewichtsverlagerung</div><div class="ex-note">Langsam von links nach rechts &#183; kontrolliert &#183; Board nie ganz aufsetzen lassen</div></div><div class="ex-detail">5 Min</div></div>
+    <div class="exercise"><div class="ex-num en-surf">3</div><div><div class="ex-name">Squats auf dem Board</div><div class="ex-note">Langsam in die Knie &#183; Balance halten &#183; Tiefe langsam steigern</div></div><div class="ex-detail">3 &#215; 10 Wdh</div></div>
+    <div class="exercise"><div class="ex-num en-surf">4</div><div><div class="ex-name">Einbeinstand</div><div class="ex-note">Abwechselnd links/rechts &#183; Blick auf fixen Punkt &#183; 30 Sek pro Seite</div></div><div class="ex-detail">3 &#215; 30 Sek</div></div>
+    <div class="exercise"><div class="ex-num en-surf">5</div><div><div class="ex-name">Dreher / Rotation</div><div class="ex-note">Oberk&#246;rper langsam links/rechts drehen &#183; H&#252;fte stabil &#183; gut f&#252;r Taille!</div></div><div class="ex-detail">3 Min</div></div>
+    <div class="exercise"><div class="ex-num en-surf">6</div><div><div class="ex-name">Freies Balancieren</div><div class="ex-note">Einfach spielen &#183; Musik an &#183; keine Vorgabe &#183; macht das meiste Spa&#223; &#128522;</div></div><div class="ex-detail">Rest der Zeit</div></div>
+  </div>
+</div>
+
+<!-- YOGA -->
+<div class="block">
+  <div class="block-header bh-yoga">
+    <div class="block-icon">&#129496;</div>
+    <div><div class="block-title">Yoga</div><div style="font-size:0.75rem;opacity:0.85">So &#183; 10:00 &#183; nach Waldspaziergang</div></div>
+    <div class="block-meta">30 Min</div>
+  </div>
+  <div class="block-body">
+    <div class="exercise"><div class="ex-num en-yoga">1</div><div><div class="ex-name">Katze-Kuh (Marjaryasana)</div><div class="ex-note">Vierf&#252;&#223;ler &#183; beim Einatmen R&#252;cken hohlmachen, beim Ausatmen w&#246;lben &#183; sanfter Einstieg</div></div><div class="ex-detail">2 Min</div></div>
+    <div class="exercise"><div class="ex-num en-yoga">2</div><div><div class="ex-name">Herabschauender Hund</div><div class="ex-note">Umgekehrtes V &#183; Fersen Richtung Boden &#183; R&#252;cken lang strecken</div></div><div class="ex-detail">3 &#215; 30 Sek</div></div>
+    <div class="exercise"><div class="ex-num en-yoga">3</div><div><div class="ex-name">Krieger I + II</div><div class="ex-note">Kr&#228;ftigt Beine + Ges&#228;&#223; &#183; H&#252;fte &#246;ffnen &#183; ruhig atmen</div></div><div class="ex-detail">Je 45 Sek pro Seite</div></div>
+    <div class="exercise"><div class="ex-num en-yoga">4</div><div><div class="ex-name">Br&#252;cke (Setu Bandha)</div><div class="ex-note">R&#252;cken auf Boden &#183; Becken heben &#183; gut f&#252;r R&#252;cken + Ges&#228;&#223; &#183; lp(a)-freundlich</div></div><div class="ex-detail">3 &#215; 30 Sek</div></div>
+    <div class="exercise"><div class="ex-num en-yoga">5</div><div><div class="ex-name">Sitzende Vorw&#228;rtsbeuge</div><div class="ex-note">Beine gestreckt &#183; sanft nach vorne &#183; nicht zwingen &#183; R&#252;cken lang lassen</div></div><div class="ex-detail">2 Min</div></div>
+    <div class="exercise"><div class="ex-num en-yoga">6</div><div><div class="ex-name">Shavasana (Totenstellung)</div><div class="ex-note">Einfach liegen &#183; loslassen &#183; 5 Min nichts tun &#8212; das wichtigste!</div></div><div class="ex-detail">5 Min</div></div>
+  </div>
+</div>
+
+
+<div class="block" style="background:white;border-radius:14px;margin-bottom:0.8rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;">
+  <div class="block-header" style="background:linear-gradient(135deg,#7D3C98,#5B2C6F);padding:0.8rem 1.2rem;color:white;display:flex;align-items:center;gap:0.7rem;">
+    <div style="font-size:1.4rem;">&#9654;</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;">Mady Morrison &#8211; Sonntagsvideos</div>
+  </div>
+  <div style="padding:0.6rem 0;">
+    <a href="https://www.youtube.com/watch?v=5HswL9z6RgU" target="_blank" style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1.1rem;border-bottom:1px solid #F5F5F5;text-decoration:none;color:inherit;">
+      <div style="width:36px;height:36px;background:#1A6B3C;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#11088;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;">Selfcare Yoga &#8211; 30 Min</div>
+        <div style="font-size:0.75rem;color:#717D7E;">Gesunder R&#252;cken &#183; Verspannungen l&#246;sen &#183; Anf&#228;nger & Ge&#252;bte &#183; <span style="color:#7D3C98;">&#128279; YouTube</span></div>
+      </div>
+    </a>
+    <a href="https://youtu.be/qH-3MOOYQBw" target="_blank" style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1.1rem;border-bottom:1px solid #F5F5F5;text-decoration:none;color:inherit;">
+      <div style="width:36px;height:36px;background:#2D6A9F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#127754;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;">Stretch & Relax &#8211; 30 Min</div>
+        <div style="font-size:0.75rem;color:#717D7E;">Yin inspiriert &#183; Loslassen & Entspannen &#183; H&#252;ften & R&#252;cken &#183; <span style="color:#7D3C98;">&#128279; YouTube</span></div>
+      </div>
+    </a>
+    <a href="https://youtu.be/9VywzXZHXkw" target="_blank" style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1.1rem;text-decoration:none;color:inherit;">
+      <div style="width:36px;height:36px;background:#7D3C98;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#127800;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;">Yin Yoga Deep Stretch &#8211; 30 Min</div>
+        <div style="font-size:0.75rem;color:#717D7E;">Tiefe Dehnung &#183; Faszien &#183; Schmetterling &#183; sehr entspannend &#183; <span style="color:#7D3C98;">&#128279; YouTube</span></div>
+      </div>
+    </a>
+  </div>
+</div>
+<div class="tipp"><strong>&#128155; In fr&#246;hlicher Gelassenheit</strong>Kein Training muss perfekt sein. Wer Di + Do keinen Sport macht, erholt sich besser und trainiert Mo + Fr effektiver. Ruhetage sind kein Versagen &#8212; sie sind Teil des Plans!</div>
+<div class="tipp"><strong>&#129658; F&#252;r lp(a) + Blutdruck besonders gut</strong>Regelm&#228;&#223;ige moderate Bewegung (kein Leistungssport!) ist die wirksamste nicht-medikament&#246;se Ma&#223;nahme. Dein Plan ist genau richtig dosiert.</div>
+
+<div class="footer">Fitnessplan &#183; Wochenrotation &#183; In fr&#246;hlicher Gelassenheit &#127807;</div>
+</div>
+</body>
+</html>

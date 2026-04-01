@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bad Früh</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#F0F7F4;color:#1A2E25;padding:.75rem;padding-bottom:4rem}
+h1{font-size:1.05rem;font-weight:700;color:#2E7D4F;margin-bottom:.15rem}
+.sub{font-size:.65rem;color:#5a8a6a;margin-bottom:.7rem;letter-spacing:.04em}
+.prog-row{display:flex;justify-content:space-between;font-size:.6rem;color:#5a8a6a;margin-bottom:.2rem}
+.prog-bg{background:rgba(46,125,79,.12);border-radius:3px;height:3px;margin-bottom:.7rem;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#2E7D4F,#4CAF50);border-radius:3px;transition:width .3s}
+
+.section{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2E7D4F;margin:.75rem 0 .35rem .05rem}
+
+.item{background:#fff;border-radius:10px;padding:.55rem .75rem;margin-bottom:.32rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;border:1px solid rgba(46,125,79,.1);transition:all .18s;-webkit-tap-highlight-color:transparent}
+.item:active{transform:scale(.98)}
+.item.done{opacity:.38}
+.item.done .iname{text-decoration:line-through;color:#999}
+.cb{width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(46,125,79,.3);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.item.done .cb{background:#2E7D4F;border-color:#2E7D4F}
+.cbx{display:none}
+.item.done .cbx{display:block}
+.ico{font-size:1.1rem;flex-shrink:0}
+.iinfo{flex:1}
+.iname{font-size:.82rem;font-weight:500;line-height:1.3}
+.idesc{font-size:.67rem;color:#5a8a6a;margin-top:.05rem;line-height:1.35}
+.itip{font-size:.6rem;color:#2E7D4F;margin-top:.08rem;font-style:italic}
+
+/* App-Link Button */
+.app-item{background:#2E7D4F;border-radius:10px;padding:.55rem .75rem;margin-bottom:.32rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;border:none;width:100%;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.app-item .iname{color:#fff;font-size:.82rem;font-weight:600}
+.app-item .idesc{color:rgba(255,255,255,.75);font-size:.67rem}
+.app-item .ico{font-size:1.1rem}
+
+.reset-btn{position:fixed;bottom:1rem;right:1rem;background:#2E7D4F;color:#fff;border:none;border-radius:20px;padding:.38rem 1rem;font-size:.72rem;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(46,125,79,.3)}
+.w2w-btn{display:inline-block;margin-top:.3rem;background:#1565C0;color:#fff;border-radius:8px;padding:.25rem .6rem;font-size:.65rem;font-weight:600;text-decoration:none;}
+.done-banner{background:linear-gradient(135deg,#2E7D4F,#388E3C);border-radius:10px;padding:.7rem 1rem;margin-bottom:.7rem;text-align:center;display:none}
+.done-banner.show{display:block}
+.done-banner p{color:#fff;font-size:.82rem;font-weight:600}
+.done-banner span{color:rgba(255,255,255,.8);font-size:.68rem}
+</style>
+</head>
+<body>
+<h1>&#x1F6C1; Bad Früh</h1>
+<p class="sub">Fertig machen · für Lotte &amp; Sport · ~15 Min</p>
+
+<div class="prog-row"><span id="plbl">0 von 0</span><span id="ppct">0%</span></div>
+<div class="prog-bg"><div class="prog-fill" id="pb" style="width:0%"></div></div>
+
+<div class="done-banner" id="doneBanner">
+  <p>&#x2728; Fertig!</p>
+  <span>Viel Spaß mit Lotte &amp; beim Sport!</span>
+</div>
+
+<div id="list"></div>
+
+<button class="reset-btn" onclick="resetAll()">&#x21BA; Neu</button>
+
+<script>
+var SECTIONS = [
+  {
+    label: "&#x1F9B7; Mundhygiene",
+    items: [
+      {id:'zaehne', ico:'&#x1FAA5;', name:'Zähne putzen', desc:'2 Min · elektrische Bürste · alle Flächen', tip:'Nicht zu fest drücken'},
+      {id:'zahnseide', ico:'&#x1F9F5;', name:'Zahnseide', desc:'Alle Zahnzwischenräume · vor dem Bürsten ist besser'},
+      {id:'mund', ico:'&#x1F4A7;', name:'Mundspülung', desc:'30 Sek spülen · nicht nachspülen mit Wasser'},
+    ]
+  },
+  {
+    label: "&#x1F485; Nägel & Brauen",
+    items: [
+      {id:'naegel', ico:'&#x1F485;', name:'Nägel reinigen', desc:'Nagelbürste · besonders nach draußen wichtig'},
+      {id:'brauen', ico:'&#x1F98B;', name:'Augenbrauen', desc:'Bürstchen · in Wuchsrichtung · formen wenn nötig'},
+    ]
+  },
+  {
+    label: "&#x1F338; Gesicht (minimal · vor Sport)",
+    items: [
+      {id:'reinigung', ico:'&#x1FAE7;', name:'Reinigungsmilch', desc:'Lavera Basis Sensitiv · kurz einmassieren · abwaschen', tip:'Kein heißes Wasser · lauwarm'},
+      {id:'serum', ico:'&#x2728;', name:'Feuchtigkeitsserum', desc:'Lavera 3-fach Hyaluron · 2–3 Tropfen · eintippen', tip:'Nicht einreiben – leicht eintippen'},
+      {id:'creme', ico:'&#x1F331;', name:'Leichte Tagescreme', desc:'Lavera My Age · dünn auftragen · vor Sonnencreme'},
+      {id:'sonne', ico:'&#x2600;&#xFE0F;', name:'Sonnencreme LSF 30', desc:'Lavera Anti-Age · täglich auch im Winter! · letzter Schritt', tip:'Auch bei Bewölkung – UV-Strahlung ist immer da'},
+    ]
+  },
+  {
+    label: "&#x1F9B1; Haare",
+    items: [
+      {id:'haare', ico:'&#x1F9B1;', name:'Haare', desc:'Kämmen · stylen · bei Bedarf binden für Sport'},
+      {id:'anziehen', ico:'&#x1F455;', name:'Anziehen', desc:'Fertig! &#x1F4F1;', w2w:true},
+    ]
+  },
+];
+
+var KEY = 'bad_frueh_v1';
+var checked = {};
+
+function load() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) checked = JSON.parse(raw);
+    var sd = localStorage.getItem(KEY + '_d');
+    var td = new Date().toISOString().slice(0,10);
+    if (sd !== td) { checked = {}; save(); localStorage.setItem(KEY + '_d', td); }
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(checked)); } catch(e) {}
+  try { if(window.parent) window.parent._bad_frueh_data = JSON.stringify(checked); } catch(e) {}
+}
+function toggle(id) { checked[id] = !checked[id]; save(); render(); }
+function resetAll() { checked = {}; save(); render(); }
+
+function getAllItems() {
+  var all = [];
+  SECTIONS.forEach(function(s){ s.items.forEach(function(i){ all.push(i); }); });
+  return all;
+}
+
+function openAnziehen() {
+  try {
+    var p = window.parent || window.top;
+    if (p && p.openApp) { p.openApp('Fertigmachen_Frueh', '\uD83D\uDC55 Anziehen'); return; }
+  } catch(e) {}
+  alert('Bitte über den Kalender öffnen');
+}
+
+function render() {
+  var all = getAllItems();
+  var done = all.filter(function(i){ return !!checked[i.id]; }).length;
+  var total = all.length;
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('plbl').textContent = done + ' von ' + total;
+  document.getElementById('ppct').textContent = pct + '%';
+  document.getElementById('pb').style.width = pct + '%';
+  document.getElementById('doneBanner').className = 'done-banner' + (done===total&&total>0?' show':'');
+
+  var h = '';
+  SECTIONS.forEach(function(sec) {
+    h += '<div class="section">' + sec.label + '</div>';
+    sec.items.forEach(function(item) {
+      var d = !!checked[item.id];
+      h += '<div class="item' + (d?' done':'') + '" onclick="toggle(\'' + item.id + '\')">'
+        + '<div class="cb"><svg class="cbx" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
+        + '<span class="ico">' + item.ico + '</span>'
+        + '<div class="iinfo"><div class="iname">' + item.name + '</div>'
+        + '<div class="idesc">' + item.desc + '</div>'
+        + (item.tip ? '<div class="itip">&#x1F4A1; ' + item.tip + '</div>' : '')
+        + '</div></div>';
+    });
+  });
+
+  // Anziehen als normaler Schritt
+  h += '<div class="section">&#x1F455; Abschluss</div>';
+
+  document.getElementById('list').innerHTML = h;
+}
+
+load();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lernplan</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f7f3ee;color:#1a1a2e;padding:.8rem;padding-bottom:3rem}
+h1{font-size:1.05rem;font-weight:700;color:#8B6020;margin-bottom:.2rem}
+.sub{font-size:.72rem;color:#9a8060;margin-bottom:.8rem}
+.modul{background:#fff;border-radius:12px;margin-bottom:.7rem;border:1px solid #e8ddd0;overflow:hidden}
+.modul-hdr{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;cursor:pointer}
+.mh-migration{background:#FDE8E8}
+.mh-grammatik{background:#E8FDE8}
+.mh-aesthetisch{background:#E8F0FD}
+.mh-lehrskizze{background:#F0E8FD}
+.mh-praktikum{background:#FDF5E8}
+.modul-name{font-size:.88rem;font-weight:700;color:#2c2416}
+.modul-prog{font-size:.68rem;color:#8B6020;font-weight:600}
+.abgabe{font-size:.7rem;background:#FDE8E8;color:#B03030;padding:.2rem .6rem;margin:.3rem .8rem;border-radius:6px;display:inline-block;font-weight:600}
+.progress-bar{height:3px;background:#e8ddd0}
+.progress-fill{height:100%;transition:width .3s}
+.fill-migration{background:#B03030}
+.fill-grammatik{background:#2E7D4F}
+.fill-aesthetisch{background:#4A7FA8}
+.fill-lehrskizze{background:#7B5EA7}
+.fill-praktikum{background:#8B6020}
+.aufgaben{padding:.3rem 0}
+.aufgabe{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem .8rem;border-bottom:1px solid #f5ede0;cursor:pointer;transition:background .15s}
+.aufgabe:last-child{border:none}
+.aufgabe:active{background:#f0e4d0}
+.aufgabe.done{opacity:.45}
+.check{width:22px;height:22px;border-radius:50%;border:2px solid #c5b99a;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:.05rem;transition:all .15s;font-size:.8rem}
+.check.on{background:#2E7D4F;border-color:#2E7D4F;color:#fff}
+.aufg-body{flex:1}
+.aufg-datum{font-size:.65rem;color:#b08040;font-weight:600}
+.aufg-text{font-size:.82rem;color:#2c2416;margin-top:.05rem}
+.aufg-text.done-text{text-decoration:line-through;color:#9a8060}
+.aufg-dauer{font-size:.65rem;color:#9a8060}
+.reset-btn{position:fixed;bottom:1rem;right:1rem;background:#8B6020;color:#fff;border:none;border-radius:20px;padding:.4rem 1rem;font-size:.75rem;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<h1>&#128214; Lernplan &#8211; Sandra Hnat-Gerersdorfer</h1>
+<p class="sub">8. Maerz &#8211; 21. Juni 2026 &middot; <a href="https://moodle.univie.ac.at" target="_blank">Moodle</a></p>
+
+<div class="modul">
+<div class="modul-hdr mh-migration" onclick="toggleModul('migration')">
+<span class="modul-name">&#9995; Migration, Flucht, Trauma</span>
+<span class="modul-prog" id="prog-migration">0/11</span>
+</div>
+<span class="abgabe">&#128276; Abgabe: So 29.03.2026</span>
+<div class="progress-bar"><div class="progress-fill fill-migration" id="fill-migration"></div></div>
+<div class="aufgaben" id="list-migration"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr mh-grammatik" onclick="toggleModul('grammatik')">
+<span class="modul-name">&#128218; Grammatik &amp; Grammatikunterricht</span>
+<span class="modul-prog" id="prog-grammatik">0/9</span>
+</div>
+<span class="abgabe">&#128276; Abgabe: So 12.04.2026</span>
+<div class="progress-bar"><div class="progress-fill fill-grammatik" id="fill-grammatik"></div></div>
+<div class="aufgaben" id="list-grammatik"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr mh-aesthetisch" onclick="toggleModul('aesthetisch')">
+<span class="modul-name">&#127912; Aesthetisches Lernen</span>
+<span class="modul-prog" id="prog-aesthetisch">0/6</span>
+</div>
+<span class="abgabe">&#128276; Abgabe: Sa 26.04.2026</span>
+<div class="progress-bar"><div class="progress-fill fill-aesthetisch" id="fill-aesthetisch"></div></div>
+<div class="aufgaben" id="list-aesthetisch"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr mh-lehrskizze" onclick="toggleModul('lehrskizze')">
+<span class="modul-name">&#128221; Lehrskizzen &amp; Unterricht</span>
+<span class="modul-prog" id="prog-lehrskizze">0/8</span>
+</div>
+<div class="progress-bar"><div class="progress-fill fill-lehrskizze" id="fill-lehrskizze"></div></div>
+<div class="aufgaben" id="list-lehrskizze"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr mh-praktikum" onclick="toggleModul('praktikum')">
+<span class="modul-name">&#127979; Unterrichtspraktikum</span>
+<span class="modul-prog" id="prog-praktikum">0/12</span>
+</div>
+<span class="abgabe">&#128276; Runde 1: Mi 16.04. | Runde 2: So 21.06.2026</span>
+<div class="progress-bar"><div class="progress-fill fill-praktikum" id="fill-praktikum"></div></div>
+<div class="aufgaben" id="list-praktikum"></div>
+</div>
+
+<button class="reset-btn" onclick="resetAll()">&#8634; Zuruecksetzen</button>
+
+<script>
+var TASKS = {
+  migration: [
+    {id:'m1', datum:'Do 19.03.', text:'Konzett (2019) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
+    {id:'m2', datum:'Do 19.03. Abend', text:'Garcia (2017) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
+    {id:'m3', datum:'Fr 20.03.', text:'Plutzar (2016/2019) lesen + Notizen', dauer:'1 Std.'},
+    {id:'m4', datum:'Fr 20.03.', text:'Don Bosco + Logbuch Neuland + Notizen', dauer:'1 Std.'},
+    {id:'m5', datum:'Mo 23.03. Abend', text:'Synthese-Fragen + roten Faden entwickeln', dauer:'2 Std.'},
+    {id:'m6', datum:'Di 24.03.', text:'Einleitung + Abschnitt 1 schreiben', dauer:'2 Std.'},
+    {id:'m7', datum:'Mi 25.03.', text:'Abschnitt 2 schreiben (Don Bosco & Logbuch)', dauer:'2 Std.'},
+    {id:'m8', datum:'Mi 25.03. Nachm.', text:'Abschnitt 3 schreiben (Plutzar)', dauer:'1 Std.'},
+    {id:'m9', datum:'Do 26.03.', text:'Ueberarbeiten + Zitate + Quellenangaben', dauer:'2 Std.'},
+    {id:'m10', datum:'Fr 27.03.', text:'Korrekturlesen + finales Layout', dauer:'1 Std.'},
+    {id:'m11', datum:'So 29.03.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+  ],
+  grammatik: [
+    {id:'g1', datum:'Mo 30.03.', text:'Aufgabenstellung lesen + Text auswaehlen', dauer:'1,5 Std.'},
+    {id:'g2', datum:'Di 31.03.', text:'Analytischen Zyklus planen (Niveau A + B)', dauer:'2 Std.'},
+    {id:'g3', datum:'Mi 01.04.', text:'Suche-X + Sammeln & Sortieren + Tafelbild', dauer:'2 Std.'},
+    {id:'g4', datum:'Do 02.04.', text:'Regelbildung + Recyclingaktivitaet', dauer:'2 Std.'},
+    {id:'g5', datum:'Fr 03.04.', text:'Dialog + freiere Aktivitaet', dauer:'2 Std.'},
+    {id:'g6', datum:'So 05.04.', text:'Arbeitsblatter erstellen', dauer:'2 Std.'},
+    {id:'g7', datum:'Mo 06.04.', text:'Ueberarbeiten + Hypothesen & Regelformulierung', dauer:'2 Std.'},
+    {id:'g8', datum:'Di 07.04.', text:'Korrekturlesen + Quellenangaben', dauer:'1,5 Std.'},
+    {id:'g9', datum:'So 12.04.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+  ],
+  aesthetisch: [
+    {id:'a1', datum:'Di 24.03. Nachm.', text:'Thema + Material suchen', dauer:'2 Std.'},
+    {id:'a2', datum:'Mi 25.03. Nachm.', text:'Material sichten + Lernziele formulieren', dauer:'2 Std.'},
+    {id:'a3', datum:'Do 26.03.', text:'Aufgaben entwerfen', dauer:'2 Std.'},
+    {id:'a4', datum:'Fr 27.03.', text:'Kommentar (ca. 1 Seite) schreiben', dauer:'2 Std.'},
+    {id:'a5', datum:'Fr 10.04.', text:'Aufgaben finalisieren + Loesungen + Quellen', dauer:'2 Std.'},
+    {id:'a6', datum:'Sa 26.04.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+  ],
+  lehrskizze: [
+    {id:'l1', datum:'Mi 18.03.', text:'Lehrskizze fertigstellen \u2013 Unterricht 25.3.', dauer:'1,5 Std.'},
+    {id:'l2', datum:'Mi 24.03. bis 18:00', text:'Lehrskizze auf Moodle hochladen!', dauer:'15 Min.'},
+    {id:'l3', datum:'Mi 25.03.', text:'&#127979; UNTERRICHTEN \u2013 Runde 1 (Ute Bock)', dauer:'Praxis'},
+    {id:'l4', datum:'Do 26.03.', text:'Hospitationsprotokoll Di 24.3. schreiben', dauer:'1 Std.'},
+    {id:'l5', datum:'Do 26.03.', text:'Selbstreflexion Unterricht 25.3. schreiben', dauer:'1 Std.'},
+    {id:'l6', datum:'Mi 29.04.', text:'Lehrskizze ausarbeiten \u2013 Unterricht 11.5.', dauer:'2 Std.'},
+    {id:'l7', datum:'Mo 11.05. bis 18:00', text:'Lehrskizze auf Moodle hochladen!', dauer:'15 Min.'},
+    {id:'l8', datum:'Mo 11.05.', text:'&#127979; UNTERRICHTEN \u2013 Runde 2 (Ute Bock)', dauer:'Praxis'},
+  ],
+  praktikum: [
+    {id:'p1', datum:'Di 24.03.', text:'&#128065; Hospitation Runde 1 \u2013 UP DaZ/DaF', dauer:'Praxis'},
+    {id:'p2', datum:'Mi 25.03.', text:'Hospitationsprotokoll Di 24.3. fertigstellen', dauer:'1 Std.'},
+    {id:'p3', datum:'Do 26.03.', text:'Selbstreflexion Unterricht 25.3. schreiben', dauer:'1 Std.'},
+    {id:'p4', datum:'Di 01.04.', text:'&#128308; DEADLINE: Selbstreflexion auf Moodle', dauer:'30 Min.'},
+    {id:'p5', datum:'Di 14.04.', text:'Abgabe Runde 1 \u2013 Checkliste vorbereiten', dauer:'1 Std.'},
+    {id:'p6', datum:'Do 16.04.', text:'&#128308; ABGABE Runde 1 auf Moodle hochladen', dauer:'30 Min.'},
+    {id:'p7', datum:'Mi 06.05.', text:'&#128065; Hospitation Runde 2 \u2013 UP DaZ/DaF', dauer:'Praxis'},
+    {id:'p8', datum:'Do 07.05.', text:'Hospitationsprotokoll Mi 6.5. schreiben', dauer:'1 Std.'},
+    {id:'p9', datum:'Di 12.05.', text:'Selbstreflexion Unterricht 11.5. schreiben', dauer:'1 Std.'},
+    {id:'p10', datum:'Mo 18.05.', text:'&#128308; DEADLINE: Selbstreflexion auf Moodle', dauer:'30 Min.'},
+    {id:'p11', datum:'Mo 08.06.', text:'Schriftl. Feedback Beobachtung Runde 2 verfassen', dauer:'2 Std.'},
+    {id:'p12', datum:'So 21.06.', text:'&#128308; ABGABE Runde 2 komplett auf Moodle!', dauer:'1 Std.'},
+  ]
+};
+
+var KEY = 'lernplan_v2';
+var checked = JSON.parse(localStorage.getItem(KEY) || '{}');
+function save(){ localStorage.setItem(KEY, JSON.stringify(checked)); }
+
+function render(){
+  Object.keys(TASKS).forEach(function(modul){
+    var list = document.getElementById('list-'+modul);
+    var tasks = TASKS[modul];
+    var done = 0;
+    list.innerHTML = '';
+    tasks.forEach(function(t){
+      var isDone = !!checked[t.id];
+      if(isDone) done++;
+      var div = document.createElement('div');
+      div.className = 'aufgabe'+(isDone?' done':'');
+      div.innerHTML = '<div class="check'+(isDone?' on':'')+'">'+(isDone?'&#10003;':'')+
+        '</div><div class="aufg-body">'+
+        '<div class="aufg-datum">'+t.datum+'</div>'+
+        '<div class="aufg-text'+(isDone?' done-text':'')+'">'+t.text+'</div>'+
+        '<div class="aufg-dauer">'+t.dauer+'</div></div>';
+      div.onclick = function(){ checked[t.id]=!checked[t.id]; save(); render(); };
+      list.appendChild(div);
+    });
+    var pct = Math.round(done/tasks.length*100);
+    document.getElementById('prog-'+modul).textContent = done+'/'+tasks.length;
+    document.getElementById('fill-'+modul).style.width = pct+'%';
+  });
+}
+
+function toggleModul(id){
+  var list = document.getElementById('list-'+id);
+  list.style.display = list.style.display==='none' ? '' : 'none';
+}
+
+function resetAll(){
+  if(confirm('Alle Haken zuruecksetzen?')){ checked={}; save(); render(); }
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hausverkauf Weidlingbach</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root { --cream:#F7F3EE; --ink:#1A1A2E; --grey:#717D7E; --green:#1A6B3C; --orange:#CA6F1E; --red:#C0392B; --blue:#2D6A9F; --purple:#7D3C98; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); font-family:'DM Sans',sans-serif; color:var(--ink); padding:1.2rem 1rem; }
+  .page { max-width:520px; margin:0 auto; }
+  .header { background:var(--ink); color:white; border-radius:16px; padding:1.4rem 1.6rem; margin-bottom:1rem; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:rgba(45,106,159,0.25); }
+  .header-title { font-family:'DM Serif Display',serif; font-size:1.6rem; position:relative; z-index:1; }
+  .header-sub { font-size:0.82rem; color:#A9CCE3; margin-top:0.25rem; font-weight:300; position:relative; z-index:1; }
+
+  .tipp { background:#D6EAF8; border-left:4px solid var(--blue); border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:#1A4A7A; }
+
+  .phase { background:white; border-radius:14px; margin-bottom:0.9rem; box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow:hidden; }
+  .phase-header { padding:0.8rem 1.1rem; color:white; display:flex; justify-content:space-between; align-items:center; }
+  .phase-title { font-family:'DM Serif Display',serif; font-size:1rem; }
+  .phase-time { font-size:0.72rem; font-family:'DM Sans',sans-serif; opacity:0.85; }
+  .phase-body { padding:0.3rem 0; }
+
+  .item { display:flex; align-items:flex-start; gap:0.7rem; padding:0.55rem 1rem; cursor:pointer; border-bottom:1px solid #F5F5F5; transition:background 0.15s; }
+  .item:last-child { border-bottom:none; }
+  .item:hover { background:#FAFAFA; }
+  .item.done { opacity:0.4; }
+  .item.done .item-text { text-decoration:line-through; }
+  .item-check { width:18px; height:18px; border-radius:4px; border:2px solid #CCC; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.7rem; margin-top:2px; }
+  .item.done .item-check { background:var(--green); border-color:var(--green); color:white; }
+  .item-content { flex:1; }
+  .item-text { font-size:0.83rem; line-height:1.4; }
+  .item-note { font-size:0.72rem; color:var(--grey); margin-top:2px; }
+  .item-urgent { font-size:0.68rem; background:#FADBD8; color:var(--red); padding:0.1rem 0.4rem; border-radius:8px; margin-left:0.4rem; font-weight:600; }
+
+  .ph1 { background:linear-gradient(135deg,#C0392B,#922B21); }
+  .ph2 { background:linear-gradient(135deg,#CA6F1E,#A04000); }
+  .ph3 { background:linear-gradient(135deg,#2D6A9F,#1A4A7A); }
+  .ph4 { background:linear-gradient(135deg,#7D3C98,#5B2C6F); }
+  .ph5 { background:linear-gradient(135deg,#1A6B3C,#0E4620); }
+
+  .progress-bar { background:#E8F8F5; border-radius:10px; padding:0.8rem 1rem; margin-bottom:1rem; }
+  .bar-bg { background:#C8E6C9; border-radius:10px; height:8px; }
+  .bar-fill { background:var(--green); border-radius:10px; height:8px; width:0%; transition:width 0.3s; }
+  .progress-text { font-size:0.72rem; color:var(--grey); margin-top:0.3rem; text-align:right; }
+
+  .footer { text-align:center; margin-top:1.5rem; font-size:0.73rem; color:var(--grey); padding-bottom:1rem; }
+  .note { background:#FADBD8; border-left:4px solid var(--red); border-radius:10px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.8rem; color:#922B21; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <div class="header-title">&#127969; Hausverkauf Weidlingbach</div>
+  <div class="header-sub">Checkliste &#183; &#214;sterreich &#183; Fr&#252;hjahr 2026</div>
+</div>
+
+<div class="tipp">&#128161; Fr&#252;hjahr ist die beste Verkaufszeit &#8212; ihr seid genau richtig dran! Weidlingbach (Klosterneuburg) ist eine sehr gefragte Lage.</div>
+
+<div class="note">&#9878;&#65039; Kein Rechtsrat &#8212; f&#252;r Steuerfragen (Immobilienertragsteuer!) unbedingt Steuerberater konsultieren.</div>
+
+<div class="progress-bar">
+  <div class="bar-bg"><div class="bar-fill" id="bar"></div></div>
+  <div class="progress-text" id="progress-text">0 von 0 erledigt</div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase">
+  <div class="phase-header ph1">
+    <div class="phase-title">1&#65039;&#8419; Sofort &#8212; Vorbereitung</div>
+    <div class="phase-time">Jetzt bis ~4 Wochen</div>
+  </div>
+  <div class="phase-body">
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Haus entr&#252;mpeln & ausr&#228;umen <span class="item-urgent">l&#228;uft!</span></div><div class="item-note">Etappenweise &#8212; ihr habt schon begonnen &#128077;</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Grundbuchauszug besorgen</div><div class="item-note">Online &#252;ber Grundbuch.justiz.gv.at oder Gemeinde</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Energieausweis erstellen lassen <span class="item-urgent">Pflicht!</span></div><div class="item-note">Ohne g&#252;ltigen EA kein Verkauf m&#246;glich &#183; Kosten ca. 300&#8211;600&#8364;</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Baupl&#228;ne & Baugenehmigungen zusammensuchen</div><div class="item-note">Gemeinde Klosterneuburg falls nicht vorhanden</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Steuerberater kontaktieren</div><div class="item-note">Immobilienertragsteuer (ImmoESt) pr&#252;fen &#8212; kann entfallen bei Hauptwohnsitz</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Kleine M&#228;ngel beheben</div><div class="item-note">Tropfende H&#228;hne, kaputte Fenster, Schimmel &#8212; erh&#246;ht Verkaufspreis deutlich</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Fotos machen &#8212; aber erst nach Entr&#252;mpelung!</div><div class="item-note">Profifotograf lohnt sich, kostet ca. 200&#8211;400&#8364;</div></div></div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase">
+  <div class="phase-header ph2">
+    <div class="phase-title">2&#65039;&#8419; Bewertung & Strategie</div>
+    <div class="phase-time">~2&#8211;4 Wochen</div>
+  </div>
+  <div class="phase-body">
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Marktpreis recherchieren</div><div class="item-note">willhaben.at, ImmobilienScout, RE/MAX Marktberichte f&#252;r Weidlingbach/Klosterneuburg</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">2&#8211;3 Makler zur Bewertung einladen</div><div class="item-note">Kostenlose Erstbewertung &#8212; Vergleich lohnt sich</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Entscheidung: Makler oder Privatverkauf?</div><div class="item-note">Makler: 3% + MwSt. des Verkaufspreises &#183; aber weniger Aufwand + rechtliche Sicherheit</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Verkaufspreis festlegen</div><div class="item-note">Realistisch ansetzen &#8212; &#252;berh&#246;hte Preise schrecken K&#228;ufer ab</div></div></div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase">
+  <div class="phase-header ph3">
+    <div class="phase-title">3&#65039;&#8419; Vermarktung</div>
+    <div class="phase-time">~4&#8211;8 Wochen</div>
+  </div>
+  <div class="phase-body">
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Inserat erstellen</div><div class="item-note">willhaben.at + ImmobilienScout24 + ggf. Makler-Netzwerk</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Besichtigungstermine organisieren</div><div class="item-note">Sammelbesichtigungen sparen Zeit &#183; Haus vorher l&#252;ften + aufr&#228;umen</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Interessenten-Unterlagen vorbereiten</div><div class="item-note">Grundriss, Fotos, EA, Grundbuchauszug als PDF-Mappe</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Kaufinteressenten pr&#252;fen</div><div class="item-note">Finanzierungsbest&#228;tigung der Bank anfordern bevor Kaufvertrag</div></div></div>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase">
+  <div class="phase-header ph4">
+    <div class="phase-title">4&#65039;&#8419; Kaufvertrag & Notar</div>
+    <div class="phase-time">~8&#8211;12 Wochen</div>
+  </div>
+  <div class="phase-body">
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Notar beauftragen <span class="item-urgent">Pflicht!</span></div><div class="item-note">In &#214;sterreich muss der Kaufvertrag notariell beglaubigt werden</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Kaufvertrag pr&#252;fen lassen</div><div class="item-note">Eigenen Anwalt hinzuziehen empfohlen</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Treuhandkonto einrichten</div><div class="item-note">Kaufpreis &#252;ber Notar-Treuhand abwickeln &#8212; Standard in &#214;sterreich</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Grunderwerbsteuer + Eintragungsgeb&#252;hr kl&#228;ren</div><div class="item-note">Zahlt der K&#228;ufer &#183; trotzdem im Vertrag regeln</div></div></div>
+  </div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase">
+  <div class="phase-header ph5">
+    <div class="phase-title">5&#65039;&#8419; &#220;bergabe</div>
+    <div class="phase-time">Nach Vertragsunterzeichnung</div>
+  </div>
+  <div class="phase-body">
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">&#220;bergabeprotokoll erstellen</div><div class="item-note">Z&#228;hlerst&#228;nde (Strom, Gas, Wasser), Schl&#252;ssel, M&#228;ngel dokumentieren</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Versicherungen ummelden/k&#252;ndigen</div><div class="item-note">Haushaltsversicherung, Feuerversicherung etc.</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Gemeinde & Finanzamt informieren</div><div class="item-note">Grundsteuer-Ummeldung, Meldeadresse etc.</div></div></div>
+    <div class="item" onclick="tog(this)"><div class="item-check"></div><div class="item-content"><div class="item-text">Schl&#252;ssel&#252;bergabe + Grundbucheintragung</div><div class="item-note">Erst nach vollst&#228;ndiger Kaufpreiszahlung!</div></div></div>
+  </div>
+</div>
+
+<div class="footer">Hausverkauf Weidlingbach &#183; Checkliste &#214;sterreich 2026<br>&#9878;&#65039; Kein Rechtsrat &#8212; Steuerberater + Notar konsultieren</div>
+</div>
+
+<script>
+function updateBar() {
+  const total = document.querySelectorAll(".item").length;
+  const done = document.querySelectorAll(".item.done").length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("progress-text").textContent = done + " von " + total + " erledigt (" + pct + "%)";
+}
+function tog(item) {
+  item.classList.toggle("done");
+  item.querySelector(".item-check").textContent = item.classList.contains("done") ? "&#10003;" : "";
+  updateBar();
+}
+window.onload = updateBar;
+</script>
+</body>
+</html>

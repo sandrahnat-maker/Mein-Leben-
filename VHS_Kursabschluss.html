@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kursabschluss</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,'Times New Roman',serif;background:#f5f0e8;min-height:100vh}
+header{background:#2c2416;color:#f5f0e8;padding:1.2rem 1.2rem 1rem;border-bottom:4px solid #c4a265}
+.label{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:#c4a265;margin-bottom:.25rem}
+h1{font-size:1.5rem;font-weight:normal}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.9rem;align-items:center}
+.tab{padding:.32rem .8rem;border:2px solid #5a4a30;border-radius:2px;background:transparent;color:#c4a265;font-size:.72rem;letter-spacing:.05em;cursor:pointer;font-family:Georgia,serif;transition:all .15s}
+.tab.active{border-color:#c4a265;background:#c4a265;color:#2c2416}
+.reset{margin-left:auto;padding:.32rem .8rem;border:2px solid #5a4a30;border-radius:2px;background:transparent;color:#8a7a60;font-size:.7rem;cursor:pointer;font-family:Georgia,serif}
+.reset:active{background:#5a4a30;color:#f5f0e8}
+main{max-width:860px;margin:0 auto;padding:1.2rem}
+.cards{display:grid;gap:1rem}
+.card{background:#fff;border:2px solid #ddd5c5;border-radius:4px;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.card-header{padding:.8rem 1.2rem;display:flex;align-items:center;gap:.8rem;transition:background .3s}
+.card-icon{font-size:.68rem;letter-spacing:.1em;font-weight:bold;flex-shrink:0}
+.card-title{font-weight:bold;font-size:.95rem;color:#2c2416}
+.card-subtitle{font-size:.75rem;color:#6b5a3e}
+.card-count{text-align:right;flex-shrink:0}
+.count-num{font-size:1.2rem;font-weight:bold;line-height:1}
+.count-label{font-size:.65rem;color:#999;letter-spacing:.05em}
+.progress-bar{height:3px;background:#eee}
+.progress-fill{height:100%;transition:width .4s ease}
+.task-list{padding:.3rem 0}
+.task-item{display:flex;align-items:center;gap:.7rem;padding:.5rem 1.2rem;cursor:pointer;border-bottom:1px solid #f0ebe0;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.task-item:last-child{border:none}
+.task-item:active{background:#f0ebe088}
+.checkbox{width:20px;height:20px;border:2px solid #c5b99a;border-radius:2px;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.task-label{font-size:.86rem;color:#2c2416;font-family:Georgia,serif;transition:all .2s;line-height:1.35}
+.task-label.done-text{text-decoration:line-through;color:#8a7a60}
+footer{text-align:center;font-size:.7rem;color:#a09070;letter-spacing:.05em;padding:1.2rem;margin-top:.5rem}
+.all-done-banner{display:none;background:#2c2416;color:#c4a265;text-align:center;padding:.6rem;font-size:.82rem;letter-spacing:.1em;border-top:2px solid #c4a265}
+</style>
+</head>
+<body>
+<header>
+  <div class="label">Volkshochschule</div>
+  <h1>Kursabschluss</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="setDay('mo')">Mo &#183; Johann-Hoffmann-Platz</button>
+    <button class="tab" onclick="setDay('di')">Di &#183; Johannagasse</button>
+    <button class="tab" onclick="setDay('mi')">Mi &#183; Singrienergasse</button>
+    <button class="tab" onclick="setDay('do')">Do &#183; Rosasgasse</button>
+    <button class="reset" onclick="resetDay()">&#x21BA; Reset</button>
+  </div>
+</header>
+<main>
+  <div class="cards" id="cards"></div>
+  <div class="all-done-banner" id="banner">&#x2713; Alle Aufgaben erledigt!</div>
+  <footer>Nach dem Kurs &middot; Kursabschluss &amp; Nachbereitung</footer>
+</main>
+<script>
+var courses = {
+  mo: [
+    {id:'mo1', name:'Johann-Hoffmann-Platz', subtitle:'Gruppe 1 / 2', color:'#f0dce4', accent:'#a8476a', icon:'&#x2460; &#x2461;'}
+  ],
+  di: [
+    {id:'di1', name:'Johannagasse', subtitle:'Abschluss online', color:'#d8e6f0', accent:'#4a7aa8', icon:'&#x2460;'}
+  ],
+  mi: [
+    {id:'mi1', name:'Singrienergasse', subtitle:'Gruppe 1 / 2', color:'#f0e4c8', accent:'#c4a265', icon:'&#x2460; &#x2461;'},
+    {id:'mi2', name:'Singrienergasse', subtitle:'Gruppe 3', color:'#dcecd8', accent:'#5a9e52', icon:'&#x2462;'}
+  ],
+  do: [
+    {id:'do1', name:'Rosasgasse', subtitle:'Gruppe 1 &#x2013; 4', color:'#d0ece8', accent:'#3a8c7c', icon:'&#x2460; &#x2461; &#x2462; &#x2463;'}
+  ]
+};
+
+var tasks = {
+  mo: [
+    {id:'anwesenheit',  label:'Anwesenheit eintragen (Sammelp\u00E4sse)'},
+    {id:'sammelpasse',  label:'Sammelp\u00E4sse nachkleben falls n\u00F6tig'},
+    {id:'notizen',      label:'Notizen zum Kurs sichern'},
+    {id:'feedback',     label:'Beobachtungen & Feedback notieren'},
+    {id:'materialien',  label:'Materialien wegr\u00E4umen & einpacken'},
+    {id:'naechste',     label:'N\u00E4chste Einheit vormerken'}
+  ],
+  di: [
+    {id:'anwesenheit',  label:'Anwesenheit online eintragen'},
+    {id:'notizen',      label:'Notizen zum Kurs sichern'},
+    {id:'materialien',  label:'Spielmaterialien fertig machen'},
+    {id:'einsortieren', label:'Unterlagen in Ordner einsortieren'},
+    {id:'naechste',     label:'N\u00E4chste Einheit vormerken'}
+  ],
+  mi: {
+    mi1: [
+      {id:'anwesenheit',  label:'Anwesenheit eintragen \u2013 Gr. 1/2'},
+      {id:'sammelpasse',  label:'Sammelp\u00E4sse nachkleben falls n\u00F6tig'},
+      {id:'notizen',      label:'Notizen Gr. 1/2 sichern'},
+      {id:'feedback',     label:'Beobachtungen & Feedback notieren'},
+      {id:'materialien',  label:'Materialien Gr. 1/2 einpacken'},
+      {id:'naechste',     label:'N\u00E4chste Einheit Gr. 1/2 vormerken'}
+    ],
+    mi2: [
+      {id:'anwesenheit',  label:'Anwesenheit eintragen \u2013 Gr. 3'},
+      {id:'sammelpasse',  label:'Sammelp\u00E4sse nachkleben falls n\u00F6tig'},
+      {id:'notizen',      label:'Notizen Gr. 3 sichern'},
+      {id:'feedback',     label:'Beobachtungen & Feedback notieren'},
+      {id:'materialien',  label:'Materialien Gr. 3 einpacken'},
+      {id:'naechste',     label:'N\u00E4chste Einheit Gr. 3 vormerken'}
+    ]
+  },
+  do: [
+    {id:'anwesenheit',  label:'Anwesenheit eintragen (alle 4 Gruppen)'},
+    {id:'sammelpasse',  label:'Sammelp\u00E4sse nachkleben falls n\u00F6tig'},
+    {id:'notizen',      label:'Notizen sichern'},
+    {id:'feedback',     label:'Beobachtungen & Feedback notieren'},
+    {id:'materialien',  label:'Materialien wegr\u00E4umen & einpacken'},
+    {id:'naechste',     label:'N\u00E4chste Einheit vormerken'}
+  ]
+};
+
+// In-memory storage (kein localStorage - funktioniert nicht im iframe)
+var checked = {};
+var activeDay = 'mo';
+
+// Versuche window.parent.storage als Br\u00FCcke, fallback in-memory
+function storageKey(){ return 'vhs_abschluss_v2'; }
+
+function loadData(){
+  try {
+    var s = window.parent && window.parent._kursabschluss_data;
+    if(s) { checked = JSON.parse(s); return; }
+  } catch(e){}
+  try {
+    var raw = localStorage.getItem(storageKey());
+    if(raw) checked = JSON.parse(raw);
+  } catch(e){}
+}
+
+function saveData(){
+  var json = JSON.stringify(checked);
+  try { window.parent._kursabschluss_data = json; } catch(e){}
+  try { localStorage.setItem(storageKey(), json); } catch(e){}
+}
+
+function setDay(day){
+  activeDay = day;
+  var days = ['mo','di','mi','do'];
+  document.querySelectorAll('.tab').forEach(function(b,i){
+    b.classList.toggle('active', days[i] === day);
+  });
+  render();
+}
+
+function toggle(courseId, taskId){
+  var key = courseId + '-' + taskId;
+  checked[key] = !checked[key];
+  saveData();
+  render();
+}
+
+function isChecked(courseId, taskId){
+  return !!checked[courseId + '-' + taskId];
+}
+
+function resetDay(){
+  var crs = courses[activeDay];
+  var tks = tasks[activeDay];
+  crs.forEach(function(c){
+    tks.forEach(function(t){
+      delete checked[c.id + '-' + t.id];
+    });
+  });
+  saveData();
+  render();
+}
+
+function render(){
+  var dayTasks = tasks[activeDay];
+  var crs = courses[activeDay];
+  var container = document.getElementById('cards');
+  container.innerHTML = '';
+
+  var totalAll = 0, doneAll = 0;
+
+  crs.forEach(function(course){
+    var list = Array.isArray(dayTasks) ? dayTasks : (dayTasks[course.id] || []);
+    var done = list.filter(function(t){ return isChecked(course.id, t.id); }).length;
+    var total = list.length;
+    var pct = total ? Math.round(done/total*100) : 0;
+    var allDone = done === total;
+    totalAll += total; doneAll += done;
+
+    var hbg = allDone ? course.accent : course.color;
+    var tc  = allDone ? '#fff' : '#2c2416';
+    var sc  = allDone ? '#ffffffbb' : '#6b5a3e';
+    var ic  = allDone ? '#ffffffcc' : course.accent;
+    var cc  = allDone ? '#fff' : course.accent;
+
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.style.borderColor = allDone ? course.accent : '#ddd5c5';
+    if(allDone) card.style.boxShadow = '0 2px 12px ' + course.accent + '55';
+
+    card.innerHTML =
+      '<div class="card-header" style="background:'+hbg+'">' +
+        '<div class="card-icon" style="color:'+ic+'">'+course.icon+'</div>' +
+        '<div style="flex:1">' +
+          '<div class="card-title" style="color:'+tc+'">'+course.name+'</div>' +
+          '<div class="card-subtitle" style="color:'+sc+'">'+course.subtitle+'</div>' +
+        '</div>' +
+        '<div class="card-count">' +
+          '<div class="count-num" style="color:'+cc+'">'+done+'/'+total+'</div>' +
+          '<div class="count-label" style="color:'+(allDone?'#ffffffaa':'#999')+'">erledigt</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+course.accent+'"></div></div>' +
+      '<ul class="task-list" id="tasks-'+course.id+'"></ul>';
+
+    container.appendChild(card);
+
+    var taskList = card.querySelector('#tasks-' + course.id);
+    list.forEach(function(task){
+      var chk = isChecked(course.id, task.id);
+      var li = document.createElement('li');
+      li.className = 'task-item';
+      if(chk) li.style.background = course.color + '99';
+      li.innerHTML =
+        '<div class="checkbox" style="'+(chk?'background:'+course.accent+';border-color:'+course.accent:'border-color:'+course.accent+'88')+'">' +
+          (chk ? '<svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+        '</div>' +
+        '<span class="task-label'+(chk?' done-text':'')+'">'+task.label+'</span>';
+      li.addEventListener('click', function(){ toggle(course.id, task.id); });
+      taskList.appendChild(li);
+    });
+  });
+
+  // Banner
+  var banner = document.getElementById('banner');
+  banner.style.display = (doneAll === totalAll && totalAll > 0) ? 'block' : 'none';
+}
+
+loadData();
+render();
+</script>
+</body>
+</html>

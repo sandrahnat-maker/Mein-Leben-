@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tee des Tages</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1a14;
+    --surface: #122018;
+    --border: rgba(180,210,170,0.12);
+    --accent: #8fc49a;
+    --accent2: #c4a87a;
+    --text: #e8f0e4;
+    --muted: rgba(232,240,228,0.5);
+    --steam: rgba(200,230,200,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 40px 0;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(60,120,60,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(100,80,40,0.1) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 0 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 32px 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .date-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+
+  .main-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Tea card */
+  .tea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 0 16px 0;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tea-hero {
+    padding: 28px 24px 22px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tea-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .day-tag {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .tea-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .tea-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+  }
+
+  .tea-emoji {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 42px;
+    opacity: 0.6;
+    filter: saturate(0.7);
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+
+  .stat-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-unit {
+    font-size: 9px;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+    font-weight: 300;
+  }
+
+  /* Details */
+  .details {
+    padding: 18px 24px;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .detail-row:last-child { margin-bottom: 0; }
+
+  .detail-icon {
+    font-size: 14px;
+    width: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .detail-text {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(232,240,228,0.75);
+    font-weight: 300;
+  }
+
+  .detail-text strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Benefits */
+  .benefits-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 18px 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    font-weight: 500;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .benefit-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .benefit-item:last-child { margin-bottom: 0; }
+
+  .benefit-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .benefit-text {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(232,240,228,0.75);
+    font-weight: 300;
+  }
+
+  /* Week nav */
+  .week-nav {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 16px 20px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .week-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+
+  .day-btn:hover {
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .day-btn.active {
+    border-color: var(--accent);
+    background: rgba(143,196,154,0.08);
+    color: var(--accent);
+  }
+
+  .day-abbr {
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .day-emoji {
+    font-size: 16px;
+  }
+
+  /* Timer */
+  .timer-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 18px 24px;
+    margin-top: 16px;
+    text-align: center;
+    animation: fadeUp 0.6s 0.45s ease both;
+  }
+
+  .timer-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    margin: 12px 0;
+    letter-spacing: 4px;
+  }
+
+  .timer-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .timer-progress {
+    height: 2px;
+    background: rgba(143,196,154,0.15);
+    border-radius: 1px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 1s linear;
+    width: 0%;
+  }
+
+  .timer-btns {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  .btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 9px 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn.primary {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn.primary:hover {
+    background: rgba(143,196,154,0.12);
+  }
+
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .timer-phase {
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    margin-top: 8px;
+    min-height: 16px;
+  }
+
+  /* Temp note */
+  .temp-note {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Steaming animation on emoji */
+  @keyframes steam {
+    0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.6; }
+    50% { transform: translateY(-4px) scaleY(1.05); opacity: 0.4; }
+  }
+  .tea-emoji { animation: steam 3s ease-in-out infinite; }
+
+  .transition-fade {
+    animation: fadeUp 0.4s ease both;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="date-label" id="todayDate"></div>
+    <div class="main-title">Tee des Tages</div>
+  </header>
+
+  <div id="teaCard" class="tea-card">
+    <div class="tea-hero">
+      <span class="day-tag" id="dayTag"></span>
+      <div class="tea-emoji" id="teaEmoji"></div>
+      <div class="tea-name" id="teaName"></div>
+      <div class="tea-tagline" id="teaTagline"></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-label">Menge</span>
+        <span class="stat-value" id="statMenge"></span>
+        <span class="stat-unit" id="statMengeUnit"></span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Temperatur</span>
+        <span class="stat-value" id="statTemp"></span>
+        <span class="stat-unit">°C</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ziehzeit</span>
+        <span class="stat-value" id="statZieh"></span>
+        <span class="stat-unit">Min</span>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail-row">
+        <div class="detail-icon">🌡️</div>
+        <div class="detail-text" id="tempTip"></div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-icon">💡</div>
+        <div class="detail-text" id="teaTip"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="benefits-card">
+    <span class="section-label">Wirkung</span>
+    <div id="benefitsList"></div>
+  </div>
+
+  <div class="week-nav">
+    <span class="week-label">Wochenplan</span>
+    <div class="days-grid" id="daysGrid"></div>
+  </div>
+
+  <div class="timer-section">
+    <span class="section-label">Zieh-Timer</span>
+    <span class="timer-label" id="timerLabel">Bereit</span>
+    <div class="timer-display" id="timerDisplay">—:——</div>
+    <div class="timer-progress">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+    <div class="timer-phase" id="timerPhase"></div>
+    <div class="timer-btns">
+      <button class="btn primary" id="btnStart" onclick="startTimer()">Start</button>
+      <button class="btn" id="btnReset" onclick="resetTimer()" disabled>Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEAS = [
+  {
+    day: 'Montag',
+    abbr: 'Mo',
+    emoji: '🌺',
+    name: 'Hibiskustee',
+    tagline: 'Rubinrot & fruchtig-säuerlich',
+    menge: '4–5',
+    mengeUnit: 'TL Blüten',
+    temp: '100',
+    tempRange: [100, 100],
+    zieh: '8–10',
+    ziehMin: 8,
+    tempTip: 'Kochend heißes Wasser verwenden (100 °C) — direkt nach dem Wasserkocher aufgießen.',
+    tip: 'Schmeckt auch kalt sehr gut — abkühlen lassen und in den Kühlschrank. Schön rubinrot.',
+    benefits: [
+      'Senkt nachweislich sowohl Blutdruck als auch Cholesterinwerte',
+      'Anthozyan & Polyphenol wirken entzündungshemmend',
+      'Harntreibend — spült Wasser und Salz aus dem Körper',
+      'Vitamin C stärkt das Immunsystem'
+    ]
+  },
+  {
+    day: 'Dienstag',
+    abbr: 'Di',
+    emoji: '🍃',
+    name: 'Grüner Tee',
+    tagline: 'Frisch & graskräuterig',
+    menge: '2',
+    mengeUnit: 'TL für 5 × 200 ml',
+    temp: '70–80',
+    tempRange: [70, 80],
+    zieh: '2–3',
+    ziehMin: 2,
+    tempTip: 'Nicht kochen lassen — wird sonst bitter! Entweder 8–12 Min. nach dem Abkochen warten, oder einen Schluck kaltes Wasser in die Kanne geben.',
+    tip: '<strong>Tagesprozedere:</strong> Morgens 2 TL in einen Aufguss-Behälter geben. 5× im Tagesverlauf je 200 ml aufgießen (= 1 Liter). Die ersten 2 Aufgüsse sind kräftig und aromatisch, die späteren milder — ideal, da das Koffein nachmittags ohnehin weniger erwünscht ist.',
+    benefits: [
+      'Catechine senken LDL-Cholesterin und hemmen die Cholesterin-Produktion in der Leber',
+      'Erweitert die Blutgefäße via Stickstoffmonoxid → blutdrucksenkend',
+      'Hemmt die Aufnahme von Cholesterin im Darm',
+      'Antioxidativ, entzündungshemmend, unterstützt den Stoffwechsel'
+    ]
+  },
+  {
+    day: 'Mittwoch',
+    abbr: 'Mi',
+    emoji: '🌸',
+    name: 'Weißdorntee',
+    tagline: 'Mild & leicht blumig',
+    menge: '3–4',
+    mengeUnit: 'TL Blüten/Blätter',
+    temp: '100',
+    tempRange: [100, 100],
+    zieh: '10–15',
+    ziehMin: 10,
+    tempTip: 'Kochend heißes Wasser (100 °C) — direkt aufgießen.',
+    tip: 'Im Reformhaus oder der Apotheke erhältlich. Gut mit einem Spritzer Zitrone kombinierbar.',
+    benefits: [
+      'Erweitert die Herzkranzgefäße — fördert die Durchblutung',
+      'Senkt den Blutdruck auf natürliche Weise',
+      'Schützt die innere Zellschicht der Blutgefäße',
+      'Traditionell bei Herzrhythmusstörungen eingesetzt'
+    ]
+  },
+  {
+    day: 'Donnerstag',
+    abbr: 'Do',
+    emoji: '🌿',
+    name: 'Artischocken-Löwenzahn',
+    tagline: 'Bitter & leberstärkend',
+    menge: 'je 2 TL',
+    mengeUnit: 'Artischocke + Löwenzahn',
+    temp: '100',
+    tempRange: [100, 100],
+    zieh: '10',
+    ziehMin: 10,
+    tempTip: 'Kochend heißes Wasser (100 °C) — direkt aufgießen.',
+    tip: 'Deutliche Bitternote — das sind genau die cholesterinsenkenden Bitterstoffe! Wer es milder mag, gibt 1 TL Pfefferminze dazu.',
+    benefits: [
+      'Artischocke steigert den Gallefluss und hemmt die Cholesterinbildung',
+      'Beteiligt an der Auflösung bestehender Cholesterinablagerungen',
+      'Bitterstoffe unterstützen die Leber und den Fettstoffwechsel',
+      'Löwenzahn wirkt entwässernd und unterstützt die Leber'
+    ]
+  },
+  {
+    day: 'Freitag',
+    abbr: 'Fr',
+    emoji: '🍂',
+    name: 'Rooibos',
+    tagline: 'Warm, süßlich & koffeinfrei',
+    menge: '2–3',
+    mengeUnit: 'TL für 2–3 × 200 ml',
+    temp: '100',
+    tempRange: [100, 100],
+    zieh: '5–8',
+    ziehMin: 5,
+    tempTip: 'Kochend heißes Wasser (100 °C) — kann auch länger ziehen, wird nicht bitter.',
+    tip: '<strong>Mehrfach aufgießen:</strong> 2–3 TL morgens einlegen, 2–3× je 200 ml aufgießen. Rooibos wird nicht bitter, daher auch den zweiten und dritten Aufguss ruhig gleich lang ziehen lassen. Koffeinfrei — ideal für den ganzen Tag.',
+    benefits: [
+      'Quercetin (gelber Naturfarbstoff) wirkt blutdrucksenkend',
+      'Reich an Antioxidantien — schützt die Gefäße',
+      'Entzündungshemmend und immunstärkend',
+      'Koffeinfrei — ideal auch abends'
+    ]
+  },
+  {
+    day: 'Samstag',
+    abbr: 'Sa',
+    emoji: '🫚',
+    name: 'Ingwer-Kurkuma',
+    tagline: 'Würzig, warm & entzündungshemmend',
+    menge: '3–4 Scheiben',
+    mengeUnit: 'Ingwer + ½ TL Kurkuma',
+    temp: '100',
+    tempRange: [100, 100],
+    zieh: '10–15',
+    ziehMin: 10,
+    tempTip: 'Kochend heißes Wasser (100 °C) — oder kurz köcheln lassen für mehr Intensität.',
+    tip: 'Eine Prise schwarzer Pfeffer dazugeben — erhöht die Aufnahme von Kurkuma im Körper erheblich! Etwas Zitronensaft macht es milder.',
+    benefits: [
+      'Kurkuma senkt den Cholesterinspiegel und Gesamtblutfette',
+      'Leberschützend und stark antioxidativ',
+      'Ingwer kurbelt die Fettverbrennung und Fettverdauung an',
+      'Beide stark entzündungshemmend'
+    ]
+  },
+  {
+    day: 'Sonntag',
+    abbr: 'So',
+    emoji: '🫖',
+    name: 'Oolong',
+    tagline: 'Nussig, blumig & halbfermentiert',
+    menge: '2',
+    mengeUnit: 'TL für 4–5 × 200 ml',
+    temp: '85–90',
+    tempRange: [85, 90],
+    zieh: '3–4',
+    ziehMin: 3,
+    tempTip: '85–90 °C: entweder 3–5 Minuten nach dem Abkochen warten, oder einen kleinen Schluck kaltes Wasser dazugeben.',
+    tip: '<strong>Tagesprozedere:</strong> Morgens 2 TL einlegen, 4–5× im Tagesverlauf je 200 ml aufgießen (= fast 1 Liter). Oolong entfaltet sich mit jedem Aufguss anders — der zweite und dritte sind oft am aromatischsten. Die späteren Aufgüsse kürzer ziehen lassen.',
+    benefits: [
+      'Hemmt die Aufnahme von Nahrungsfetten → senkt LDL',
+      'Enthält Catechine ähnlich wie Grüntee',
+      'Schonender für den Magen als Grüntee',
+      'Fördert den Stoffwechsel und die Fettverbrennung'
+    ]
+  }
+];
+
+const DAYS_DE = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const MONTHS_DE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+let currentDayIndex = 0;
+let timerInterval = null;
+let timerRunning = false;
+let timerTotal = 0;
+let timerRemaining = 0;
+
+function getTodayTeaIndex() {
+  const d = new Date().getDay(); // 0=So, 1=Mo...
+  // TEAS: 0=Mo(1), 1=Di(2), 2=Mi(3), 3=Do(4), 4=Fr(5), 5=Sa(6), 6=So(0)
+  const map = {1:0,2:1,3:2,4:3,5:4,6:5,0:6};
+  return map[d];
+}
+
+function formatDate() {
+  const d = new Date();
+  return `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_DE[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function renderTea(idx) {
+  const tea = TEAS[idx];
+  document.getElementById('dayTag').textContent = tea.day;
+  document.getElementById('teaEmoji').textContent = tea.emoji;
+  document.getElementById('teaName').textContent = tea.name;
+  document.getElementById('teaTagline').textContent = tea.tagline;
+  document.getElementById('statMenge').textContent = tea.menge;
+  document.getElementById('statMengeUnit').textContent = tea.mengeUnit;
+  document.getElementById('statTemp').textContent = tea.temp;
+  document.getElementById('statZieh').textContent = tea.zieh;
+  document.getElementById('tempTip').innerHTML = tea.tempTip;
+  document.getElementById('teaTip').innerHTML = `<strong>Tipp:</strong> ${tea.tip}`;
+
+  const bl = document.getElementById('benefitsList');
+  bl.innerHTML = tea.benefits.map(b => `
+    <div class="benefit-item">
+      <div class="benefit-dot"></div>
+      <div class="benefit-text">${b}</div>
+    </div>`).join('');
+
+  // Update day buttons
+  document.querySelectorAll('.day-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+
+  // Reset timer for new tea
+  resetTimer();
+  document.getElementById('timerLabel').textContent = `Ziehzeit: ${tea.zieh} Min`;
+}
+
+function buildDaysGrid() {
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = TEAS.map((t, i) => `
+    <button class="day-btn ${i === currentDayIndex ? 'active' : ''}" onclick="selectDay(${i})">
+      <span class="day-abbr">${t.abbr}</span>
+      <span class="day-emoji">${t.emoji}</span>
+    </button>`).join('');
+}
+
+function selectDay(idx) {
+  currentDayIndex = idx;
+  renderTea(idx);
+  document.querySelectorAll('.day-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function startTimer() {
+  if (timerRunning) return;
+  const tea = TEAS[currentDayIndex];
+  if (timerRemaining === 0) {
+    timerTotal = tea.ziehMin * 60;
+    timerRemaining = timerTotal;
+  }
+  timerRunning = true;
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('btnReset').disabled = false;
+  document.getElementById('timerPhase').textContent = 'Tee zieht …';
+
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    const pct = ((timerTotal - timerRemaining) / timerTotal) * 100;
+    document.getElementById('timerDisplay').textContent = formatTime(timerRemaining);
+    document.getElementById('timerBar').style.width = pct + '%';
+
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('timerDisplay').textContent = '✓ Fertig';
+      document.getElementById('timerPhase').textContent = 'Tee ist fertig — guten Genuss! 🍵';
+      document.getElementById('timerBar').style.width = '100%';
+      document.getElementById('btnStart').disabled = true;
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerRemaining = 0;
+  timerTotal = 0;
+  document.getElementById('timerDisplay').textContent = '—:——';
+  document.getElementById('timerBar').style.width = '0%';
+  document.getElementById('timerPhase').textContent = '';
+  const tea = TEAS[currentDayIndex];
+  document.getElementById('timerLabel').textContent = `Ziehzeit: ${tea.zieh} Min`;
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnReset').disabled = true;
+}
+
+// Init
+document.getElementById('todayDate').textContent = formatDate();
+currentDayIndex = getTodayTeaIndex();
+buildDaysGrid();
+renderTea(currentDayIndex);
+</script>
+</body>
+</html>

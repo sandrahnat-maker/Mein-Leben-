@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gesichtsyoga</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#fdf8f2;color:#2c1a0e;min-height:100vh;display:flex;flex-direction:column}
+
+/* Header */
+.hdr{background:linear-gradient(135deg,#8B6A3E,#c4956a);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr h1{color:#fff;font-size:.95rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.6rem;margin-top:.05rem}
+.reset-btn{background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:.3rem .6rem;font-size:.65rem;cursor:pointer;font-family:inherit}
+
+/* Progress */
+.prog-bar{height:3px;background:rgba(139,106,62,.12);flex-shrink:0}
+.prog-fill{height:100%;background:linear-gradient(90deg,#8B6A3E,#c4956a);transition:width .4s}
+
+/* Übungsanzeige */
+.ex-card{flex:1;display:flex;flex-direction:column;padding:1rem;gap:.7rem;overflow-y:auto}
+
+/* Illustration */
+.illus{background:#fff;border-radius:16px;border:1px solid #ede4d8;padding:1rem;text-align:center;flex-shrink:0}
+.face-emoji{font-size:4.5rem;line-height:1;margin-bottom:.4rem;display:block;filter:drop-shadow(0 2px 8px rgba(139,106,62,.15))}
+.zone-label{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c4956a;margin-bottom:.3rem}
+.ex-name{font-size:1.1rem;font-weight:700;color:#5a3a1a;margin-bottom:.15rem}
+.ex-repeat{font-size:.75rem;font-weight:700;color:#c4956a;background:#fdf0e0;padding:.2rem .5rem;border-radius:6px;display:inline-block}
+
+/* Timer Ring */
+.timer-wrap{display:flex;justify-content:center;flex-shrink:0}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(139,106,62,.1);stroke-width:8}
+.ring-fill{fill:none;stroke:#8B6A3E;stroke-width:8;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset .5s linear}
+.ring-num{font-size:1.6rem;font-weight:700;fill:#5a3a1a;dominant-baseline:middle;text-anchor:middle}
+.ring-lbl{font-size:.55rem;fill:#c4956a;dominant-baseline:middle;text-anchor:middle;letter-spacing:.06em;text-transform:uppercase}
+
+/* Anleitung */
+.instruction{background:#fff;border-radius:12px;border:1px solid #ede4d8;padding:.8rem .9rem}
+.inst-title{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#c4956a;margin-bottom:.4rem}
+.inst-steps{list-style:none}
+.inst-steps li{font-size:.8rem;color:#3a2010;line-height:1.5;padding:.15rem 0;display:flex;gap:.5rem}
+.inst-steps li::before{content:"→";color:#c4956a;flex-shrink:0}
+.inst-tip{font-size:.68rem;color:#9A7A50;margin-top:.4rem;font-style:italic;line-height:1.4}
+
+/* Buttons */
+.btns{display:flex;gap:.5rem;padding:.75rem 1rem;flex-shrink:0;background:#fdf8f2}
+.btn-prev{background:#fff;color:#8B6A3E;border:1.5px solid #c4956a;border-radius:10px;padding:.6rem;font-size:.82rem;cursor:pointer;font-family:inherit;font-weight:600;flex:0 0 2.8rem}
+.btn-main{flex:1;background:linear-gradient(135deg,#8B6A3E,#c4956a);color:#fff;border:none;border-radius:10px;padding:.6rem 1rem;font-size:.88rem;cursor:pointer;font-family:inherit;font-weight:700;transition:all .15s}
+.btn-main:active{transform:scale(.97)}
+.btn-main.paused{background:linear-gradient(135deg,#c4956a,#e8b87a)}
+.btn-skip{background:#fff;color:#8B6A3E;border:1.5px solid #c4956a;border-radius:10px;padding:.6rem;font-size:.82rem;cursor:pointer;font-family:inherit;font-weight:600;flex:0 0 2.8rem}
+
+/* Übersicht Dots */
+.dots{display:flex;gap:.3rem;justify-content:center;padding:.4rem 1rem;flex-shrink:0;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(139,106,62,.15);transition:all .2s;cursor:pointer}
+.dot.done{background:#c4956a}
+.dot.active{background:#8B6A3E;transform:scale(1.3)}
+
+/* Fertig-Screen */
+.done-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;gap:.8rem}
+.done-emoji{font-size:4rem}
+.done-title{font-size:1.2rem;font-weight:700;color:#5a3a1a}
+.done-sub{font-size:.78rem;color:#9A7A50;line-height:1.5}
+.done-again{background:linear-gradient(135deg,#8B6A3E,#c4956a);color:#fff;border:none;border-radius:12px;padding:.6rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem}
+
+/* Intro */
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center;gap:.7rem}
+.intro-emoji{font-size:3.5rem}
+.intro-title{font-size:1.1rem;font-weight:700;color:#5a3a1a}
+.intro-info{font-size:.75rem;color:#9A7A50;line-height:1.6;max-width:280px}
+.intro-start{background:linear-gradient(135deg,#8B6A3E,#c4956a);color:#fff;border:none;border-radius:12px;padding:.7rem 2rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.3rem;width:100%;max-width:280px}
+.ex-list{width:100%;max-width:300px;text-align:left}
+.ex-list-item{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid #ede4d8;font-size:.75rem;color:#5a3a1a}
+.ex-list-item:last-child{border:none}
+.ex-ico{font-size:1.1rem;flex-shrink:0}
+.ex-dur{font-size:.65rem;color:#c4956a;margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr h1" style="color:#fff;font-size:.95rem;font-weight:700">🌸 Gesichtsyoga</div>
+    <div class="hdr-sub" id="hdrSub">7 Übungen · ca. 12 Minuten</div>
+  </div>
+  <button class="reset-btn" onclick="goIntro()">↺ Neu</button>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+<div id="mainContent"></div>
+
+<script>
+var EXERCISES = [
+  {
+    name: "Stirn gl\u00e4tten",
+    zone: "\uD83E\uDDE0 Stirn & Augenbrauen",
+    emoji: "\uD83E\uDDE0",
+    reps: "10 Wiederholungen",
+    dur: 40,
+    cues: [
+      {at:0,  txt:"Beide Zeige- und Mittelfinger quer auf die Stirn legen."},
+      {at:5,  txt:"Leichten Druck nach unten aus\u00FCben."},
+      {at:9,  txt:"Jetzt Augenbrauen langsam nach oben ziehen \u2013 gegen den Fingerwiderstand."},
+      {at:15, txt:"Drei Sekunden halten. Dann entspannen."},
+      {at:20, txt:"Nochmal. Augenbrauen hoch \u2013 gegen den Druck. Halten."},
+      {at:28, txt:"Langsam und bewusst. Nicht rei\u00DFen."},
+      {at:35, txt:"Letzte Wiederholungen. Sp\u00FCrst du die Spannung in der Stirn?"}
+    ],
+    steps: [
+      "Beide Zeige- und Mittelfinger quer auf die Stirn legen",
+      "Leichten Druck nach unten aus\u00FCben",
+      "Gleichzeitig Augenbrauen langsam nach oben ziehen \u2013 gegen den Fingerwiderstand",
+      "3 Sekunden halten, dann entspannen",
+      "Langsam und bewusst \u2013 nicht rei\u00DFen"
+    ],
+    tip: "Die Finger bremsen die Bewegung \u2013 so arbeitet der Muskel gegen Widerstand. Perfekt gegen horizontale Stirnfalten."
+  },
+  {
+    name: "Augenringe",
+    zone: "\uD83D\uDC41\uFE0F Augenpartie",
+    emoji: "\uD83D\uDC41\uFE0F",
+    reps: "20 Wiederholungen",
+    dur: 50,
+    cues: [
+      {at:0,  txt:"Ringfinger sanft unter das Auge legen. Innenseite, nahe der Nase."},
+      {at:6,  txt:"Ganz sanft von innen nach au\u00DFen tippen. Keine ruckartigen Bewegungen."},
+      {at:14, txt:"Gleichzeitig die Unterlider leicht nach oben dr\u00FCcken."},
+      {at:22, txt:"Beim Tippen die Augen leicht zusammenkneifen."},
+      {at:32, txt:"Sehr sanft! Die Haut unter den Augen ist extrem empfindlich."},
+      {at:42, txt:"Noch ein paar Tipps. F\u00F6rdert die Durchblutung."}
+    ],
+    steps: [
+      "Ringfinger sanft unter das Auge legen (Innenseite, nahe Nase)",
+      "Ganz sanft von innen nach au\u00DFen tippen \u2013 keine Gummiband-Bewegung",
+      "Gleichzeitig die Unterlider leicht nach oben dr\u00FCcken",
+      "Beim Tippen die Augen leicht zusammenkneifen",
+      "Sehr sanft! Die Haut unter den Augen ist extrem empfindlich"
+    ],
+    tip: "Immer Ringfinger verwenden \u2013 er \u00FCbt automatisch den wenigsten Druck aus. F\u00F6rdert die Durchblutung und reduziert Schwellungen."
+  },
+  {
+    name: "Wangen straffen",
+    zone: "\uD83D\uDE04 Wangen & Wangenknochen",
+    emoji: "\uD83D\uDE04",
+    reps: "10 Wiederholungen",
+    dur: 45,
+    cues: [
+      {at:0,  txt:"Mund zu einem gro\u00DFen O formen."},
+      {at:5,  txt:"Wangen aufblasen. Luft gleichm\u00E4\u00DFig verteilen."},
+      {at:10, txt:"Drei Sekunden halten und die Wangenmuskeln sp\u00FCren."},
+      {at:16, txt:"Luft langsam durch die Nase ausatmen. Nicht platzen lassen."},
+      {at:22, txt:"Jetzt Lippen zu einem breiten L\u00E4cheln ziehen. Zwei Sekunden halten."},
+      {at:28, txt:"Wieder O formen. Wangen aufblasen. Halten."},
+      {at:38, txt:"Abwechseln zwischen O und L\u00E4cheln. Sp\u00FCrst du die Wangenb\u00E4ckchen?"}
+    ],
+    steps: [
+      "Mund zu einem gro\u00DFen O formen",
+      "Wangen aufblasen \u2013 Luft gleichm\u00E4\u00DFig verteilen",
+      "3 Sekunden halten und die Wangenmuskeln sp\u00FCren",
+      "Luft langsam durch die Nase ausatmen \u2013 nicht platzen lassen",
+      "Dann Lippen zu einem breiten L\u00E4cheln ziehen und 2 Sek halten"
+    ],
+    tip: "Das O formen und L\u00E4cheln abwechseln trainiert alle Wangenmuskeln. Hebt die Wangenb\u00E4ckchen sichtbar an."
+  },
+  {
+    name: "Kinn & Hals",
+    zone: "\uD83E\uDD73 Kinn & Halspartie",
+    emoji: "\uD83E\uDD73",
+    reps: "10 Wiederholungen",
+    dur: 50,
+    cues: [
+      {at:0,  txt:"Aufrecht sitzen. Schultern entspannen."},
+      {at:4,  txt:"Kopf langsam nach hinten neigen. Kinn zeigt zur Decke."},
+      {at:9,  txt:"Lippen zu einem Kuss spitzen. So weit wie m\u00F6glich."},
+      {at:14, txt:"F\u00FCnf Sekunden halten. Die Dehnung am Hals sp\u00FCren."},
+      {at:20, txt:"Langsam zur\u00FCck. Kurz entspannen."},
+      {at:26, txt:"Nochmal. Kopf zur\u00FCck. Kuss spitzen. Halten."},
+      {at:38, txt:"Nie ruckeln. Die Halswirbels\u00E4ule sanft behandeln."},
+      {at:45, txt:"Letzte Wiederholung. Sp\u00FCrst du die Dehnung?"}
+    ],
+    steps: [
+      "Aufrecht sitzen, Schultern entspannt",
+      "Kopf langsam nach hinten neigen \u2013 Kinn zeigt zur Decke",
+      "Lippen zu einem Kuss spitzen \u2013 so weit wie m\u00F6glich",
+      "5 Sekunden halten \u2013 die Dehnung am Hals sp\u00FCren",
+      "Langsam zur\u00FCck und kurz entspannen"
+    ],
+    tip: "Reduziert ein Doppelkinn und strafft den Hals. Nie ruckeln \u2013 die Halswirbels\u00E4ule schonend behandeln."
+  },
+  {
+    name: "Kiefer entspannen",
+    zone: "\uD83D\uDE10 Kiefer & Mundpartie",
+    emoji: "\uD83D\uDE10",
+    reps: "5x je Seite",
+    dur: 40,
+    cues: [
+      {at:0,  txt:"Mund leicht \u00F6ffnen. Kiefer locker lassen."},
+      {at:5,  txt:"Kiefer langsam im Kreis bewegen. Rechts herum. Gro\u00DFe, weiche Kreise."},
+      {at:12, txt:"Wie Kauen in Zeitlupe. Tief durch die Nase atmen."},
+      {at:20, txt:"Richtung wechseln. Links herum. Nochmal f\u00FCnf Runden."},
+      {at:32, txt:"L\u00F6st Verspannungen vom Knirschen. Sp\u00FCrst du die Entspannung?"}
+    ],
+    steps: [
+      "Mund leicht \u00F6ffnen \u2013 Kiefer locker lassen",
+      "Kiefer langsam im Kreis bewegen \u2013 erst rechts herum",
+      "Gro\u00DFe, weiche Kreisbewegungen \u2013 wie Kauen in Zeitlupe",
+      "5 Runden rechts, dann 5 Runden links",
+      "Dabei tief durch die Nase ein- und ausatmen"
+    ],
+    tip: "L\u00F6st Verspannungen vom Knirschen und Stress. Der Kiefer speichert sehr viel Spannung \u2013 t\u00E4gliche Lockerung ist wertvoll."
+  },
+  {
+    name: "L\u00E4chel\u00FCbung",
+    zone: "\uD83D\uDE01 Mundwinkel & Lippen",
+    emoji: "\uD83D\uDE01",
+    reps: "10 Sekunden halten",
+    dur: 35,
+    cues: [
+      {at:0,  txt:"Z\u00E4hne leicht zeigen. Nat\u00FCrliches Strahlen."},
+      {at:5,  txt:"Mundwinkel gleichm\u00E4\u00DFig nach oben und au\u00DFen ziehen."},
+      {at:10, txt:"Zehn Sekunden halten. Die Spannung in den Wangen sp\u00FCren."},
+      {at:15, txt:"Tief und ruhig durch die Nase atmen."},
+      {at:22, txt:"Kurz entspannen. Dann nochmal."},
+      {at:28, txt:"Mundwinkel hoch. Halten. Strahle!"}
+    ],
+    steps: [
+      "Z\u00E4hne leicht zeigen \u2013 nat\u00FCrliches Strahlen",
+      "Mundwinkel gleichm\u00E4\u00DFig nach oben und au\u00DFen ziehen",
+      "10 Sekunden halten \u2013 die Spannung in den Wangen sp\u00FCren",
+      "Tief und ruhig durch die Nase atmen dabei",
+      "Kurz entspannen, dann 3x wiederholen"
+    ],
+    tip: "Hebt die Mundwinkel dauerhaft an und trainiert die Hebe-Muskeln. Gleichzeitig stimmungsaufhellend durch echtes L\u00E4cheln!"
+  },
+  {
+    name: "Lymphdrainage",
+    zone: "\u2728 Lymphe & Entspannung",
+    emoji: "\u2728",
+    reps: "3 Minuten",
+    dur: 90,
+    cues: [
+      {at:0,  txt:"H\u00E4nde w\u00E4rmen. Aneinanderreiben bis sie warm sind."},
+      {at:6,  txt:"Fingerkuppen sanft an die Kinnmitte legen."},
+      {at:11, txt:"Ganz leichte Streichbewegungen von Kinn zu den Ohren."},
+      {at:22, txt:"Von den Nasenfl\u00FCgeln zu den Schl\u00E4fen streichen."},
+      {at:35, txt:"Von der Stirnmitte zu den Schl\u00E4fen. Sanft und gleichm\u00E4\u00DFig."},
+      {at:50, txt:"Noch sanfter als du denkst. Die Lymphgef\u00E4\u00DFe liegen direkt unter der Haut."},
+      {at:65, txt:"Hals von Kinn abw\u00E4rts zum Schl\u00FCsselbein streichen. Abschluss."},
+      {at:80, txt:"Noch ein paar Streichbewegungen. Du wirst sofort frischer aussehen."}
+    ],
+    steps: [
+      "H\u00E4nde w\u00E4rmen (aneinanderreiben)",
+      "Fingerkuppen sanft an die Kinnmitte legen",
+      "Ganz leichte Streichbewegungen \u2013 von Kinn zu den Ohren",
+      "Von Nasenfl\u00FCgeln zu den Schl\u00E4fen streichen",
+      "Von Stirnmitte zu den Schl\u00E4fen",
+      "Abschluss: Hals von Kinn abw\u00E4rts zum Schl\u00FCsselbein streichen"
+    ],
+    tip: "Noch sanfter als du denkst! Die Lymphgef\u00E4\u00DFe liegen direkt unter der Haut. Reduziert Schwellungen und gibt sofort Frische."
+  }
+];
+
+var synth = window.speechSynthesis;
+var voice = null;
+var curIdx = 0;
+var sec = 0;
+var interval = null;
+var isRunning = false;
+var isPaused = false;
+var state = 'intro'; // intro | running | done
+
+function loadVoice() {
+  var voices = synth.getVoices();
+  var pref = ['Anna','Helena','Katrin','Marlene','Google Deutsch'];
+  for (var i=0;i<pref.length;i++) {
+    var v = voices.find(function(v){ return v.name.indexOf(pref[i])>=0; });
+    if (v) { voice=v; break; }
+  }
+  if (!voice) voice = voices.find(function(v){ return v.lang&&v.lang.startsWith('de'); });
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoice;
+setTimeout(loadVoice, 500);
+
+var speakQueue = [];
+var isSpeaking = false;
+
+function speak(txt) {
+  speakQueue.push(txt);
+  if (!isSpeaking) processQueue();
+}
+
+function processQueue() {
+  if (speakQueue.length === 0) { isSpeaking = false; return; }
+  isSpeaking = true;
+  var txt = speakQueue.shift();
+  try {
+    var u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'de-DE'; u.rate = 0.9; u.volume = 1.0;
+    if (voice) u.voice = voice;
+    u.onend = function() { isSpeaking = false; processQueue(); };
+    u.onerror = function() { isSpeaking = false; processQueue(); };
+    synth.speak(u);
+  } catch(e) { isSpeaking = false; processQueue(); }
+}
+
+function speakNow(txt) {
+  speakQueue = []; isSpeaking = false;
+  try { synth.cancel(); } catch(e) {}
+  speak(txt);
+}
+function goIntro() {
+  clearInterval(interval); isRunning=false; isPaused=false;
+  curIdx=0; sec=0; state='intro';
+  speakQueue=[]; isSpeaking=false; try{synth.cancel();}catch(e){} speakQueue=[]; isSpeaking=false;
+  render();
+}
+
+function startTraining() {
+  state='running'; curIdx=0; sec=0; isRunning=true; isPaused=false;
+  render();
+  speakIntro();
+  startTimer();
+}
+
+function speakIntro() {
+  var ex = EXERCISES[curIdx];
+  speak('\u00DCbung '+(curIdx+1)+' von '+EXERCISES.length+': '+ex.name+'. '+ex.reps+'. '+ex.steps[0]);
+}
+
+function startTimer() {
+  clearInterval(interval);
+  interval = setInterval(function(){
+    if (isPaused) return;
+    sec++;
+    var ex = EXERCISES[curIdx];
+    var rem = Math.max(0, ex.dur - sec);
+    // Live-Cues
+    if (ex.cues) {
+      for (var c=0; c<ex.cues.length; c++) {
+        if (sec === ex.cues[c].at + 1) speak(ex.cues[c].txt);
+      }
+    }
+    if (rem === 0) {
+      clearInterval(interval);
+      if (curIdx < EXERCISES.length - 1) {
+        setTimeout(function(){
+          curIdx++; sec=0;
+          render();
+          speak('Übung '+(curIdx+1)+': '+EXERCISES[curIdx].name+'. '+EXERCISES[curIdx].cues[0].txt);
+          startTimer();
+        }, 1500);
+      } else {
+        state='done';
+        speakNow('Ausgezeichnet! Alle sieben Gesichtsyoga-Übungen abgeschlossen. Schön gemacht!');
+        render();
+      }
+    }
+    renderTimer();
+  }, 1000);
+}
+function togglePause() {
+  if (!isRunning) return;
+  isPaused = !isPaused;
+  if (isPaused) { try{synth.cancel();}catch(e){} speak('Pause.'); }
+  else speak('Weiter.');
+  renderTimer();
+}
+
+function skipEx() {
+  if (!isRunning) return;
+  clearInterval(interval);
+  try{synth.cancel();}catch(e){}
+  if (curIdx < EXERCISES.length-1) {
+    curIdx++; sec=0;
+    render();
+    speak('\u00DCbung '+(curIdx+1)+': '+EXERCISES[curIdx].name+'. '+EXERCISES[curIdx].steps[0]);
+    startTimer();
+  } else {
+    state='done'; render();
+  }
+}
+
+function goToEx(i) {
+  if (state!=='running') return;
+  clearInterval(interval);
+  try{synth.cancel();}catch(e){}
+  curIdx=i; sec=0; isPaused=false;
+  render();
+  speak('\u00DCbung '+(i+1)+': '+EXERCISES[i].name+'. '+EXERCISES[i].steps[0]);
+  startTimer();
+}
+
+function renderTimer() {
+  var ex = EXERCISES[curIdx];
+  var rem = Math.max(0, ex.dur - sec);
+  var pct = sec / ex.dur;
+  var circ = 2*Math.PI*45;
+  var offset = circ*(1-pct);
+
+  var el = document.getElementById('ringFill');
+  var numEl = document.getElementById('ringNum');
+  var btnMain = document.getElementById('btnMain');
+  if (el) el.style.strokeDashoffset = offset;
+  if (numEl) numEl.textContent = rem+'s';
+  if (btnMain) {
+    btnMain.textContent = isPaused ? '▶ Weiter' : '⏸ Pause';
+    btnMain.className = 'btn-main'+(isPaused?' paused':'');
+  }
+}
+
+function render() {
+  var html = '';
+  if (state==='intro') {
+    html = '<div class="intro">'
+      +'<div class="intro-emoji">🌸</div>'
+      +'<div class="intro-title">Gesichtsyoga</div>'
+      +'<div class="intro-info">'+EXERCISES.length+' Übungen · ca. 12 Minuten<br>Geführt mit Timer & Anleitung<br>Mit Sprachansagen</div>'
+      +'<div class="ex-list">';
+    EXERCISES.forEach(function(ex,i){
+      html += '<div class="ex-list-item"><span class="ex-ico">'+ex.emoji+'</span><span>'+ex.name+'</span><span class="ex-dur">'+ex.dur+'s</span></div>';
+    });
+    html += '</div><button class="intro-start" onclick="startTraining()">▶ Starten</button></div>';
+    document.getElementById('progFill').style.width='0%';
+    document.getElementById('hdrSub').textContent = EXERCISES.length+' Übungen · ca. 12 Minuten';
+
+  } else if (state==='done') {
+    html = '<div class="done-screen">'
+      +'<div class="done-emoji">✨</div>'
+      +'<div class="done-title">Geschafft!</div>'
+      +'<div class="done-sub">Alle '+EXERCISES.length+' Übungen abgeschlossen.<br>Dein Gesicht wird es dir danken 🌸</div>'
+      +'<button class="done-again" onclick="goIntro()">↺ Nochmal</button>'
+      +'</div>';
+    document.getElementById('progFill').style.width='100%';
+
+  } else {
+    var ex = EXERCISES[curIdx];
+    var pct = Math.round((curIdx/EXERCISES.length)*100);
+    document.getElementById('progFill').style.width=pct+'%';
+    document.getElementById('hdrSub').textContent = 'Übung '+(curIdx+1)+' von '+EXERCISES.length;
+
+    // Steps als HTML
+    var stepsHtml = ex.steps.map(function(s){ return '<li>'+s+'</li>'; }).join('');
+
+    // Dots
+    var dotsHtml = EXERCISES.map(function(e,i){
+      var cls = i<curIdx?'done':i===curIdx?'active':'';
+      return '<div class="dot '+cls+'" onclick="goToEx('+i+')"></div>';
+    }).join('');
+
+    html = '<div class="ex-card">'
+      +'<div class="illus">'
+      +'<span class="face-emoji">'+ex.emoji+'</span>'
+      +'<div class="zone-label">'+ex.zone+'</div>'
+      +'<div class="ex-name">'+ex.name+'</div>'
+      +'<div style="margin-top:.3rem"><span class="ex-repeat">'+ex.reps+'</span></div>'
+      +'</div>'
+
+      +'<div class="timer-wrap">'
+      +'<svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">'
+      +'<circle class="ring-bg" cx="55" cy="55" r="45"/>'
+      +'<circle class="ring-fill" id="ringFill" cx="55" cy="55" r="45" style="stroke-dasharray:'+2*Math.PI*45+';stroke-dashoffset:'+2*Math.PI*45+'"/>'
+      +'<text class="ring-num" id="ringNum" x="55" y="50">'+ex.dur+'s</text>'
+      +'<text class="ring-lbl" x="55" y="67">verbleibend</text>'
+      +'</svg></div>'
+
+      +'<div class="instruction">'
+      +'<div class="inst-title">So geht\'s</div>'
+      +'<ul class="inst-steps">'+stepsHtml+'</ul>'
+      +(ex.tip?'<div class="inst-tip">💡 '+ex.tip+'</div>':'')
+      +'</div>'
+      +'</div>'
+
+      +'<div class="dots">'+dotsHtml+'</div>'
+
+      +'<div class="btns">'
+      +'<button class="btn-prev" onclick="goToEx(Math.max(0,curIdx-1))" title="Zurück">◀</button>'
+      +'<button class="btn-main" id="btnMain" onclick="togglePause()">⏸ Pause</button>'
+      +'<button class="btn-skip" onclick="skipEx()" title="Überspringen">▶▶</button>'
+      +'</div>';
+  }
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+// Init
+render();
+</script>
+</body>
+</html>

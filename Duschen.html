@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Duschen & Fertig</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#F5EEF8;color:#1A0E2E;padding:.75rem;padding-bottom:4rem}
+h1{font-size:1.05rem;font-weight:700;color:#7B5EA7;margin-bottom:.15rem}
+.sub{font-size:.65rem;color:#9b7ec8;margin-bottom:.7rem;letter-spacing:.04em}
+.prog-row{display:flex;justify-content:space-between;font-size:.6rem;color:#9b7ec8;margin-bottom:.2rem}
+.prog-bg{background:rgba(123,94,167,.12);border-radius:3px;height:3px;margin-bottom:.7rem;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#7B5EA7,#AB47BC);border-radius:3px;transition:width .3s}
+.section{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7B5EA7;margin:.75rem 0 .35rem .05rem}
+.item{background:#fff;border-radius:10px;padding:.55rem .75rem;margin-bottom:.32rem;display:flex;align-items:center;gap:.65rem;cursor:pointer;border:1px solid rgba(123,94,167,.1);transition:all .18s;-webkit-tap-highlight-color:transparent}
+.item:active{transform:scale(.98)}
+.item.done{opacity:.38}
+.item.done .iname{text-decoration:line-through;color:#999}
+.cb{width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(123,94,167,.3);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.item.done .cb{background:#7B5EA7;border-color:#7B5EA7}
+.cbx{display:none}.item.done .cbx{display:block}
+.ico{font-size:1.1rem;flex-shrink:0}
+.iinfo{flex:1}
+.iname{font-size:.82rem;font-weight:500;line-height:1.3}
+.idesc{font-size:.67rem;color:#7a6a8a;margin-top:.05rem;line-height:1.35}
+.itip{font-size:.6rem;color:#7B5EA7;margin-top:.08rem;font-style:italic}
+.brand{font-size:.58rem;font-weight:700;padding:.05rem .3rem;border-radius:5px;margin-right:.3rem;vertical-align:middle}
+.lavera{background:#E8F5E9;color:#2E7D32}
+.benecos{background:#F3E5F5;color:#6A2E7D}
+.reset-btn{position:fixed;bottom:1rem;right:1rem;background:#7B5EA7;color:#fff;border:none;border-radius:20px;padding:.38rem 1rem;font-size:.72rem;cursor:pointer;font-family:inherit}
+.done-banner{background:linear-gradient(135deg,#7B5EA7,#AB47BC);border-radius:10px;padding:.7rem 1rem;margin-bottom:.7rem;text-align:center;display:none}
+.done-banner.show{display:block}
+.done-banner p{color:#fff;font-size:.82rem;font-weight:600}
+.done-banner span{color:rgba(255,255,255,.8);font-size:.68rem}
+</style>
+</head>
+<body>
+<h1>&#x1F6BF; Duschen &amp; Fertig machen</h1>
+<p class="sub">Volles Programm · Körperpflege + Schminken</p>
+<div class="prog-row"><span id="plbl">0 von 0</span><span id="ppct">0%</span></div>
+<div class="prog-bg"><div class="prog-fill" id="pb" style="width:0%"></div></div>
+<div class="done-banner" id="doneBanner">
+  <p>&#x2728; Fertig!</p>
+  <span>Du siehst toll aus!</span>
+</div>
+<div id="list"></div>
+<button class="reset-btn" onclick="resetAll()">&#x21BA; Neu</button>
+<script>
+var L = '<span class="brand lavera">Lavera</span>';
+var B = '<span class="brand benecos">Benecos</span>';
+
+var SECTIONS = [
+  {
+    label: "&#x1F6BF; Duschen",
+    items: [
+      {id:'trockenbuersten', ico:'&#x1FAA5;', name:'Trockenb\u00FCrsten', desc:'3\u20135 Min \u00B7 F\u00FC\u00DFe aufw\u00E4rts zum Herzen \u00B7 Naturborsten', tip:'Aktiviert Lymphe & Durchblutung \u00B7 bestes Mittel gegen Cellulite'},
+      {id:'duschen', ico:'&#x1F6BF;', name:'Lauwarm duschen', desc:'Kein hei\u00DFes Wasser \u00B7 Wechseldusche am Schluss (30 Sek kalt)', tip:'Hei\u00DFes Wasser trocknet Haut aus \u00B7 kalt strafft'},
+      {id:'haare_waschen', ico:'&#x1F9B1;', name:'Haare waschen (wenn Haartag)', desc:'Lavera Repair Shampoo \u00B7 Sp\u00FClung 2 Min einwirken'},
+    ]
+  },
+  {
+    label: "&#x1F9F4; K\u00F6rperpflege",
+    items: [
+      {id:'koerperoel', ico:'&#x2728;', name:'K\u00F6rper\u00F6l auf feuchter Haut', desc:'Direkt nach Dusche \u00B7 von unten nach oben einmassieren', tip:'Auf feuchter Haut \u2013 zieht viel besser ein'},
+      {id:'selbstmassage', ico:'&#x1F44C;', name:'Selbstmassage 5 Min', desc:'Kr\u00E4ftig kneten \u00B7 immer Richtung Herz \u00B7 Oberschenkel & Po', tip:'Jeden Tag \u2013 sichtbarer Effekt gegen Cellulite nach 4 Wochen'},
+    ]
+  },
+  {
+    label: "&#x1F338; Gesichtspflege",
+    items: [
+      {id:'reinigung', ico:'&#x1FAE7;', name:'Reinigungsmilch', desc:L+'Basis Sensitiv \u00B7 einmassieren \u00B7 mit lauwarmem Wasser abwaschen'},
+      {id:'serum', ico:'&#x2728;', name:'Straffendes Serum', desc:L+'3-fach Hyaluron & Bakuchiol \u00B7 abends nach Reinigung', tip:'Eintippen, nicht reiben'},
+      {id:'oel_serum', ico:'&#x1F7E3;', name:'\u00D6l-Serum', desc:L+'My Age Intensiv \u00B7 tiefe Feuchtigkeitspflege \u00B7 abends'},
+      {id:'tagescreme', ico:'&#x1F331;', name:'Tagescreme', desc:L+'My Age \u00B7 d\u00FCnn auftragen \u00B7 morgens nach Serum'},
+      {id:'sonnencreme', ico:'&#x2600;&#xFE0F;', name:'Sonnencreme LSF 30', desc:L+'Anti-Age \u00B7 letzter Schritt \u00B7 T\u00E4glich auch im Winter!'},
+    ]
+  },
+  {
+    label: "&#x1F484; Make-up",
+    items: [
+      {id:'bb', ico:'&#x1F4D6;', name:'BB Cream / Tinted Moisturizer', desc:L+'Tinted Moisturizer <em>oder</em> '+B+'BB Cream \u00B7 leichte Grundierung'},
+      {id:'concealer', ico:'&#x1F4D6;', name:'Concealer', desc:L+'Natural Concealer \u00B7 unter Augen sanft eintippen \u00B7 '+B+'CC Concealer'},
+      {id:'highlighter', ico:'&#x2728;', name:'Highlighter', desc:L+'Illuminating Powder \u00B7 Jochbein & Nasenr\u00FCcken \u00B7 '+B+'Beauty ID Highlighter'},
+      {id:'brauen', ico:'&#x1F4D6;', name:'Augenbrauen', desc:L+'Brow Styler dunkelbraun \u00B7 haarfeine Striche in Wuchsrichtung'},
+      {id:'lidschatten', ico:'&#x1F4D6;', name:'Lidschatten', desc:L+'Quattro warm tones \u00B7 Bronze/Kupfer/Braun f\u00FCr blaue Augen'},
+      {id:'eyeliner', ico:'&#x1F4D6;', name:'Eyeliner', desc:L+'Eyeliner braun \u00B7 d\u00FCnn \u00B7 nur Oberlid'},
+      {id:'mascara', ico:'&#x1F4D6;', name:'Mascara', desc:L+'Mascara Volume \u00B7 nur Oberwimpern'},
+      {id:'blush', ico:'&#x1F338;', name:'Blush / Rouge', desc:L+'Natural Blush ros\u00E9 \u00B7 Wangen\u00E4pfel \u00B7 l\u00E4cheln beim Auftragen'},
+      {id:'lip_liner', ico:'&#x1F484;', name:'Lip Liner', desc:L+'Lip Liner nude rose \u00B7 Lippenkontur zuerst'},
+      {id:'lipstick', ico:'&#x1F484;', name:'Lippenstift', desc:L+'Natural Lip Colour mauve rose \u00B7 auf Liner auftragen'},
+      {id:'lipgloss', ico:'&#x1F484;', name:'Lip Gloss', desc:L+'Lip Gloss transparent \u00B7 nur Lippenmitte \u00B7 macht voller'},
+    ]
+  },
+  {
+    label: "&#x1F9B1; Haare fertig",
+    items: [
+      {id:'haare_style', ico:'&#x1F9B1;', name:'Haare stylen', desc:'F\u00F6hnen \u00B7 Hitzeschutz vorher (Lavera Pflegespray) \u00B7 formen'},
+      {id:'haaroel', ico:'&#x1F7E1;', name:'Haar\u00F6l / Argan\u00F6l', desc:'2\u20133 Tropfen ins feuchte Haar \u00B7 Spitzen & L\u00E4ngen'},
+    ]
+  },
+,
+  {
+    label: "&#x1FA92; Haarentfernung (Sonntag)",
+    sunday: true,
+    items: [
+      {id:'haar_hinweis', ico:'&#x1FA92;', name:'Epilierer vorbereiten',
+       desc:'Nach dem Duschen \u00B7 Haut noch warm & weich \u00B7 leichter & weniger schmerzhaft'},
+      {id:'haar_beine', ico:'&#x1F9B5;', name:'Beine epilieren',
+       desc:'Von Kn\u00F6chel aufw\u00E4rts \u00B7 Haut straffen \u00B7 langsam f\u00FChren',
+       tip:'Gegen den Haarwuchs \u00B7 danach k\u00FChl absp\u00FClen'},
+      {id:'haar_achsel', ico:'&#x1F4AA;', name:'Achseln epilieren',
+       desc:'Arm heben & strecken \u00B7 Haut straffen \u00B7 mehrere Richtungen',
+       tip:'Sensibelste Zone \u2014 langsam und ruhig f\u00FChren'},
+      {id:'haar_bikini', ico:'&#x2728;', name:'Bikinizone rasieren',
+       desc:'Rasierschaum oder -gel \u00B7 frische Klinge \u00B7 in Haarwuchsrichtung',
+       tip:'Danach Aloe Vera oder Kamille \u2014 keine Parfums direkt danach'},
+      {id:'haar_kalt', ico:'&#x1F4A7;', name:'Kalt absp\u00FClen', desc:'Kaltes Wasser \u00FCber Beine & Achseln \u00B7 schlie\u00DFt Poren', tip:'30 Sek \u2014 macht gro\u00DFen Unterschied'},
+      {id:'haar_aloe_b', ico:'&#x1F331;', name:'Aloe Vera \u2013 Beine & Achseln', desc:'Pur auftragen \u00B7 kein Deo f\u00FCr 2\u20133 Std!', tip:'Aloe Vera pur \u2014 ohne Zusatzstoffe \u2014 aus der Einkaufsliste'},
+      {id:'haar_aloe_bk', ico:'&#x1F331;', name:'Aloe Vera \u2013 Bikinizone', desc:'Sanft \u00B7 kein Parfum \u00B7 kein Alkohol \u00B7 Lavera Lotion auch OK', tip:'Lockere Baumwollw\u00E4sche danach'},
+      {id:'haar_memo', ico:'&#x1F4CC;', name:'Morgen peelen!', desc:'Sanftes Peeling morgen \u00FCberall \u2014 verhindert eingewachsene Haare', tip:'Nie am selben Tag peelen \u2014 Haut noch gereizt'},
+    ]
+  }
+,
+  {
+    label: "&#x1FAA5; Peeling \u2014 nach Haarentfernung (Montag)",
+    monday: true,
+    items: [
+      {id:'peeling_ko', ico:'&#x1FAA5;', name:'K\u00F6rperpeeling \u2014 Beine & Achseln',
+       desc:'Sanftes Peeling \u00FCber epilierte Stellen \u00B7 kleine Kreise \u00B7 2 Min',
+       tip:'Verhindert eingewachsene Haare \u2014 wichtigster Schritt nach Epilieren!'},
+      {id:'peeling_bk', ico:'&#x1FAA5;', name:'Peeling \u2014 Bikinizone',
+       desc:'Sehr sanft \u00B7 keine rauen Peelings \u00B7 Kreisbewegungen',
+       tip:'Nur wenn keine Reizung mehr vorhanden'},
+      {id:'peeling_pfl', ico:'&#x1F331;', name:'Aloe Vera nachher auftragen',
+       desc:'Nach dem Peeling Aloe Vera oder Lavera Lotion auftragen',
+       tip:'Haut ist nach Peeling empfindlich \u2014 sanft pflegen'},
+    ]
+  }
+,
+  {
+    label: "\uD83E\uDEB4 Brust-Selbstuntersuchung (1\u00D7 monatlich \u00B7 am 7.)",
+    monthly7: true,
+    items: [
+      {id:'brust_1', ico:'\uD83D\uDD0D', name:'Sichtpr\u00FCfung im Spiegel',
+       desc:'Arme an H\u00FCften \u00B7 dann Arme heben \u00B7 Form, Haut, Symmetrie beobachten',
+       tip:'Auf Dellen, Einziehungen oder Ver\u00E4nderung der Brustwarze achten'},
+      {id:'brust_2', ico:'\uD83E\uDD32', name:'Rechte Brust abtasten',
+       desc:'Linke Hand hinter Kopf \u00B7 rechte Hand in Kreisen von au\u00DFen nach innen',
+       tip:'Gleichm\u00E4\u00DFiger Druck \u00B7 alle Bereiche bis zur Achselh\u00F6hle'},
+      {id:'brust_3', ico:'\uD83E\uDD32', name:'Linke Brust abtasten',
+       desc:'Rechte Hand hinter Kopf \u00B7 linke Hand tastet \u00B7 gleiche Kreisbewegungen',
+       tip:'Brustwarze leicht dr\u00FCcken \u2014 auf Ausfluss pr\u00FCfen'},
+      {id:'brust_4', ico:'\uD83D\uDC81', name:'Achselh\u00F6hlen abtasten',
+       desc:'Beide Seiten \u00B7 auf vergr\u00F6\u00DFerte Lymphknoten achten',
+       tip:'Vergr\u00F6\u00DFerte Lymphknoten \u2192 Arzt kontaktieren'},
+      {id:'brust_5', ico:'\uD83D\uDCDD', name:'Alles unver\u00E4ndert?',
+       desc:'Normal \u2192 gut! \u00B7 Knoten / Verh\u00E4rtung / Asymmetrie / Ausfluss \u2192 sofort zum Arzt',
+       tip:'Postmenopause: Brustgewebe ver\u00E4ndert sich \u2014 regelm\u00E4\u00DFig tasten ist wichtig!'},
+    ]
+  }
+];
+
+
+
+
+var KEY = 'duschen_v1';
+var checked = {};
+
+function load() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) checked = JSON.parse(raw);
+    var sd = localStorage.getItem(KEY+'_d');
+    var td = new Date().toISOString().slice(0,10);
+    if (sd !== td) { checked = {}; save(); localStorage.setItem(KEY+'_d', td); }
+  } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(checked)); } catch(e) {}
+  try { if(window.parent) window.parent._duschen_data = JSON.stringify(checked); } catch(e) {}
+}
+function toggle(id) { checked[id] = !checked[id]; save(); render(); }
+function resetAll() { checked = {}; save(); render(); }
+
+function getAllItems() {
+  var today = new Date().getDay();
+  var all = [];
+  SECTIONS.forEach(function(s){
+    if (s.sunday && today !== 0) return;
+    if (s.monday && today !== 1) return;
+    if (s.monthly7 && new Date().getDate() !== 7) return;
+    if (s.monthly7 && new Date().getDate() !== 7) return; // Peeling nur montags
+    s.items.forEach(function(i){ all.push(i); });
+  });
+  return all;
+}
+
+function render() {
+  var all = getAllItems();
+  var done = all.filter(function(i){ return !!checked[i.id]; }).length;
+  var total = all.length;
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('plbl').textContent = done + ' von ' + total;
+  document.getElementById('ppct').textContent = pct + '%';
+  document.getElementById('pb').style.width = pct + '%';
+  document.getElementById('doneBanner').className = 'done-banner'+(done===total&&total>0?' show':'');
+
+  var h = '';
+  SECTIONS.forEach(function(sec) {
+    h += '<div class="section">'+sec.label+'</div>';
+    sec.items.forEach(function(item) {
+      var d = !!checked[item.id];
+      h += '<div class="item'+(d?' done':'')+'" onclick="toggle(\''+item.id+'\')">'
+        +'<div class="cb"><svg class="cbx" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
+        +'<span class="ico">'+item.ico+'</span>'
+        +'<div class="iinfo"><div class="iname">'+item.name+'</div>'
+        +'<div class="idesc">'+item.desc+'</div>'
+        +(item.tip?'<div class="itip">&#x1F4A1; '+item.tip+'</div>':'')
+        +'</div></div>';
+    });
+  });
+  document.getElementById('list').innerHTML = h;
+}
+
+load(); render();
+</script>
+</body>
+</html>

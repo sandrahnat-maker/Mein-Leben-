@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonntags-Yoga</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --surface2: #f5f0e8;
+    --sage: #7a9e7e;
+    --sage-light: #a8c5ab;
+    --sage-pale: #e8f0e9;
+    --terra: #c4956a;
+    --terra-light: #e8c4a0;
+    --lavender: #9b8ab0;
+    --ink: #2a2520;
+    --ink2: #7a7068;
+    --muted: #b0a898;
+    --amber: #d4a843;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  /* Subtle texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(122,158,126,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(196,149,106,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 420px; width: 100%; position: relative; z-index: 1; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 1.8rem; padding-top: 0.5rem; }
+  .header-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.6rem;
+    font-weight: 300;
+    line-height: 1.0;
+    color: var(--ink);
+  }
+  .header-title em { font-style: italic; color: var(--sage); }
+  .header-sub {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+    color: var(--ink2);
+    font-weight: 300;
+  }
+
+  /* Progress flowers */
+  .progress-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .pf { font-size: 0.9rem; opacity: 0.2; transition: opacity 0.5s, transform 0.5s; }
+  .pf.done { opacity: 0.6; }
+  .pf.active { opacity: 1; transform: scale(1.2); }
+
+  /* Main card */
+  .yoga-card {
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 2rem 1.5rem 1.8rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 24px rgba(42,37,32,0.07), 0 1px 4px rgba(42,37,32,0.05);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.4s;
+  }
+  .yoga-card.active-pose {
+    box-shadow: 0 8px 40px rgba(122,158,126,0.15), 0 2px 8px rgba(42,37,32,0.06);
+  }
+
+  /* Pose illustration area */
+  .pose-emoji {
+    font-size: 3.5rem;
+    margin-bottom: 0.8rem;
+    line-height: 1;
+    transition: transform 0.5s ease;
+  }
+  .yoga-card.active-pose .pose-emoji { transform: scale(1.08); }
+
+  .phase-tag {
+    display: inline-block;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.8rem;
+    border-radius: 20px;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    transition: background 0.3s, color 0.3s;
+  }
+  .phase-tag.work     { background: var(--sage-pale); color: var(--sage); }
+  .phase-tag.breathe  { background: #eef0f8; color: var(--lavender); }
+  .phase-tag.rest     { background: #fef6ee; color: var(--terra); }
+  .phase-tag.savasana { background: #f5f0ff; color: var(--lavender); }
+  .phase-tag.prep     { background: var(--surface2); color: var(--ink2); }
+
+  .pose-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 0.4rem;
+    min-height: 2.3rem;
+  }
+  .pose-sanskrit {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    min-height: 1.2rem;
+  }
+  .pose-instruction {
+    font-size: 0.8rem;
+    color: var(--ink2);
+    line-height: 1.65;
+    margin-bottom: 1.4rem;
+    min-height: 3.5rem;
+    font-weight: 300;
+  }
+
+  /* Timer ring */
+  .timer-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1rem;
+  }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: #f0ece4; stroke-width: 4; }
+  .timer-fill  { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.4s; }
+  .timer-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+  .timer-text.last { color: var(--terra); }
+
+  /* Breath indicator */
+  .breath-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: #f0ece4;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+  }
+  .breath-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--lavender);
+    transition: width 0.5s ease-in-out;
+    width: 0%;
+  }
+
+  .counters {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    font-size: 0.72rem;
+    color: var(--ink2);
+    font-weight: 300;
+  }
+  .counter-val { color: var(--ink); font-weight: 500; }
+
+  /* Controls */
+  .controls { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; }
+  .btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: 1.5px solid #e8e0d8;
+    border-radius: 14px;
+    background: white;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--sage-light); background: var(--sage-pale); }
+  .btn-primary {
+    background: var(--sage);
+    color: white;
+    border-color: var(--sage);
+  }
+  .btn-primary:hover { background: #6a8e6e; border-color: #6a8e6e; }
+
+  /* Volume */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.2rem;
+    background: white;
+    border: 1.5px solid #f0e8e0;
+    border-radius: 14px;
+    margin-bottom: 1.2rem;
+    font-size: 0.75rem;
+    color: var(--ink2);
+  }
+  input[type=range] { flex: 1; accent-color: var(--sage); cursor: pointer; }
+  .voice-status {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    background: var(--surface2);
+    white-space: nowrap;
+  }
+  .voice-status.ok   { color: var(--sage); }
+  .voice-status.warn { color: var(--amber); }
+
+  /* Pose list */
+  .pose-list {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(42,37,32,0.05);
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+  }
+  .pose-list-title {
+    padding: 0.85rem 1.3rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid #f5f0e8;
+    font-weight: 500;
+  }
+  .pose-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.65rem 1.3rem;
+    border-bottom: 1px solid #faf7f2;
+    transition: background 0.3s;
+    font-size: 0.8rem;
+  }
+  .pose-item:last-child { border-bottom: none; }
+  .pose-item.active { background: var(--sage-pale); }
+  .pose-item.done   { opacity: 0.35; }
+  .pose-icon { font-size: 1.2rem; width: 28px; text-align: center; flex-shrink: 0; }
+  .pose-item-name { flex: 1; font-weight: 400; }
+  .pose-item-dur   { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+
+  /* Done screen */
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 2.2rem 1.5rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(42,37,32,0.07);
+    margin-bottom: 1.2rem;
+  }
+  .done-screen.visible { display: block; }
+  .done-emoji-big { font-size: 3.5rem; margin-bottom: 1rem; }
+  .done-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 0.6rem;
+  }
+  .done-sub { font-size: 0.8rem; color: var(--ink2); line-height: 1.8; font-weight: 300; }
+
+  /* Breath animation */
+  @keyframes breathe-in  { 0% { transform: scale(1); } 100% { transform: scale(1.06); } }
+  @keyframes breathe-out { 0% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  .breathing-in  { animation: breathe-in  4s ease-in-out forwards; }
+  .breathing-out { animation: breathe-out 4s ease-in-out forwards; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-label">Sonntag &#183; 10:00</div>
+    <h1 class="header-title">Sonntags<em>yoga</em></h1>
+    <div class="header-sub">30 Minuten &#183; liebevolles Treffen mit dir selbst &#127807;</div>
+  </div>
+
+  <div class="progress-row" id="progressFlowers"></div>
+
+  <!-- Yoga card -->
+  <div class="yoga-card" id="yogaCard">
+    <div class="pose-emoji" id="poseEmoji">&#127807;</div>
+    <div class="phase-tag prep" id="phaseTag">BEREIT</div>
+    <div class="pose-name" id="poseName">Bereit machen</div>
+    <div class="pose-sanskrit" id="poseSanskrit"> </div>
+    <div class="pose-instruction" id="poseInstruction">Matte ausrollen &#183; bequeme Kleidung &#183; Wasser bereitstellen<br>Nimm dir einen Moment nur f&#252;r dich.</div>
+
+    <!-- Timer ring -->
+    <div class="timer-wrap">
+      <svg class="timer-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="timer-track" cx="45" cy="45" r="38"/>
+        <circle class="timer-fill" id="timerRing" cx="45" cy="45" r="38"
+          stroke="#7a9e7e"
+          stroke-dasharray="238.76"
+          stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-text" id="timerText">&#8211;</div>
+    </div>
+
+    <!-- Breath bar -->
+    <div class="breath-bar"><div class="breath-fill" id="breathFill"></div></div>
+
+    <div class="counters">
+      <div>Pose <span class="counter-val" id="poseCount">&#8211;</span> / 8</div>
+      <div>Gesamt <span class="counter-val" id="totalTime">30:00</span></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn" onclick="startYoga()">&#9654; Beginnen</button>
+    <button class="btn" id="pauseBtn" onclick="togglePause()" style="display:none">&#9208; Pause</button>
+    <button class="btn" onclick="resetYoga()">&#8634; Reset</button>
+  </div>
+
+  <!-- Volume -->
+  <div class="settings-row">
+    <label>&#128266; Lautst&#228;rke</label>
+    <input type="range" id="volRange" min="0" max="1" step="0.1" value="0.85" oninput="updateVol()">
+    <div class="voice-status" id="voiceStatus">pr&#252;fe&#8230;</div>
+  </div>
+
+  <!-- Done screen -->
+  <div class="done-screen" id="doneScreen">
+    <div class="done-emoji-big">&#127800;</div>
+    <div class="done-title">Namaste, du Wundermensch.</div>
+    <div class="done-sub">30 Minuten nur f&#252;r dich.<br>Dein K&#246;rper, dein Geist, deine Seele<br>sagen von Herzen danke. &#128591;</div>
+  </div>
+
+  <!-- Pose list -->
+  <div class="pose-list">
+    <div class="pose-list-title">Heute auf der Matte</div>
+    <div class="pose-item" id="item-0"><div class="pose-icon">&#128049;</div><div class="pose-item-name">Katze-Kuh</div><div class="pose-item-dur">2 Min</div></div>
+    <div class="pose-item" id="item-1"><div class="pose-icon">&#128021;</div><div class="pose-item-name">Herabschauender Hund</div><div class="pose-item-dur">3 Min</div></div>
+    <div class="pose-item" id="item-2"><div class="pose-icon">&#9876;&#65039;</div><div class="pose-item-name">Krieger I</div><div class="pose-item-dur">3 Min</div></div>
+    <div class="pose-item" id="item-3"><div class="pose-icon">&#127775;</div><div class="pose-item-name">Krieger II</div><div class="pose-item-dur">3 Min</div></div>
+    <div class="pose-item" id="item-4"><div class="pose-icon">&#127753;</div><div class="pose-item-name">Br&#252;cke</div><div class="pose-item-dur">4 Min</div></div>
+    <div class="pose-item" id="item-5"><div class="pose-icon">&#129419;</div><div class="pose-item-name">Sitzende Vorw&#228;rtsbeuge</div><div class="pose-item-dur">3 Min</div></div>
+    <div class="pose-item" id="item-6"><div class="pose-icon">&#127744;</div><div class="pose-item-name">Liegender Twist</div><div class="pose-item-dur">3 Min</div></div>
+    <div class="pose-item" id="item-7"><div class="pose-icon">&#9729;&#65039;</div><div class="pose-item-name">Shavasana</div><div class="pose-item-dur">5 Min</div></div>
+  </div>
+
+  <!-- Mady Morrison Videos -->
+  <div style="margin-top:1.5rem; background:white; border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    <div style="background:linear-gradient(135deg,#9b8ab0,#7a6090); padding:0.85rem 1.2rem; color:white; display:flex; align-items:center; gap:0.7rem;">
+      <span style="font-size:1.3rem;">&#9654;</span>
+      <span style="font-family:'Cormorant Garamond',serif; font-size:1.05rem;">Mady Morrison &#183; Sonntagsvideos</span>
+    </div>
+    <a href="https://www.youtube.com/watch?v=5HswL9z6RgU" target="_blank" style="display:flex;align-items:center;gap:0.9rem;padding:0.8rem 1.1rem;border-bottom:1px solid #F5F0E8;text-decoration:none;color:inherit;">
+      <div style="width:38px;height:38px;background:#1A6B3C;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#11088;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;color:#2a2520;">Selfcare Yoga &#8211; 30 Min</div>
+        <div style="font-size:0.74rem;color:#7a7068;margin-top:2px;">Gesunder R&#252;cken &#183; Verspannungen l&#246;sen &#183; Anf&#228;nger &amp; Ge&#252;bte</div>
+      </div>
+      <div style="margin-left:auto;font-size:0.7rem;color:#9b8ab0;font-weight:700;">&#128279; YouTube</div>
+    </a>
+    <a href="https://youtu.be/qH-3MOOYQBw" target="_blank" style="display:flex;align-items:center;gap:0.9rem;padding:0.8rem 1.1rem;border-bottom:1px solid #F5F0E8;text-decoration:none;color:inherit;">
+      <div style="width:38px;height:38px;background:#2D6A9F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#127754;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;color:#2a2520;">Stretch &amp; Relax &#8211; 30 Min</div>
+        <div style="font-size:0.74rem;color:#7a7068;margin-top:2px;">Yin inspiriert &#183; Loslassen &amp; Entspannen &#183; H&#252;ften &amp; R&#252;cken</div>
+      </div>
+      <div style="margin-left:auto;font-size:0.7rem;color:#9b8ab0;font-weight:700;">&#128279; YouTube</div>
+    </a>
+    <a href="https://youtu.be/9VywzXZHXkw" target="_blank" style="display:flex;align-items:center;gap:0.9rem;padding:0.8rem 1.1rem;text-decoration:none;color:inherit;">
+      <div style="width:38px;height:38px;background:#7D3C98;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;">&#127800;</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;color:#2a2520;">Yin Yoga Deep Stretch &#8211; 30 Min</div>
+        <div style="font-size:0.74rem;color:#7a7068;margin-top:2px;">Tiefe Dehnung &#183; Faszien &#183; Schmetterling &#183; sehr entspannend</div>
+      </div>
+      <div style="margin-left:auto;font-size:0.7rem;color:#9b8ab0;font-weight:700;">&#128279; YouTube</div>
+    </a>
+  </div>
+
+</div>
+
+<script>
+// \u2500\u2500\u2500 POSES \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const POSES = [
+  {
+    name: "Katze-Kuh",
+    sanskrit: "Marjaryasana \u00B7 Bitilasana",
+    emoji: "\uD83D\uDC31",
+    duration: 2 * 60,
+    instruction: "Vierf\u00FC\u00DFler \u00B7 beim Einatmen R\u00FCcken hohlmachen \u00B7 beim Ausatmen w\u00F6lben",
+    color: "#7a9e7e",
+    tag: "work",
+    tagText: "WARM-UP",
+    voiceStart: "Wundersch\u00F6n, wir beginnen! Komm in den Vierf\u00FC\u00DFler. Knie unter die H\u00FCften, H\u00E4nde unter die Schultern. Und jetzt: beim Einatmen hebst du den Kopf und machst den R\u00FCcken hohl \u2014 das ist die Kuh. Beim Ausatmen rundest du den R\u00FCcken wie eine Katze und l\u00E4sst den Kopf schwer sinken. Lass diese sanfte Bewegung deinen R\u00FCcken aufw\u00E4rmen und komm dabei ganz bei dir an.",
+    voiceMid: "Du machst das wundersch\u00F6n. Sp\u00FCr wie sich deine Wirbels\u00E4ule St\u00FCck f\u00FCr St\u00FCck \u00F6ffnet. Lass jeden Atemzug die Bewegung f\u00FChren. Das ist deine Zeit.",
+    breathCue: "Mit dem Atem flie\u00DFen \u2014 ein, aus, ein, aus.",
+    sides: false
+  },
+  {
+    name: "Herabschauender Hund",
+    sanskrit: "Adho Mukha Svanasana",
+    emoji: "\uD83D\uDC15",
+    duration: 3 * 60,
+    instruction: "Umgekehrtes V \u00B7 Fersen Richtung Boden \u00B7 R\u00FCcken lang strecken \u00B7 leicht die Knie beugen",
+    color: "#7a9e7e",
+    tag: "work",
+    tagText: "DEHNUNG",
+    voiceStart: "Jetzt strecken wir uns! Komm in den herabschauenden Hund. H\u00E4nde schulterbreit, F\u00FC\u00DFe h\u00FCftbreit, und schie\u0628 dein Ges\u00E4\u00DF hoch zur Decke \u2014 ein umgekehrtes V. Lass die Fersen sanft Richtung Boden sinken, und streck deinen R\u00FCcken so lang wie m\u00F6glich. Die Knie d\u00FCrfen leicht gebeugt sein \u2014 kein Zwang. Atme ruhig und lass die Schwerkraft f\u00FCr dich arbeiten.",
+    voiceMid: "Wechsle jetzt sanft das Gewicht von einem Fu\u00DF auf den anderen \u2014 das l\u00F6st die Wadenmuskulatur wunderbar. Und atme tief in den R\u00FCcken hinein.",
+    breathCue: "Tief in den R\u00FCcken atmen \u00B7 bei jedem Ausatmen ein bisschen tiefer.",
+    sides: false
+  },
+  {
+    name: "Krieger I",
+    sanskrit: "Virabhadrasana I",
+    emoji: "\u2694\uFE0F",
+    duration: 3 * 60,
+    instruction: "Linkes Bein vorn \u00B7 rechtes Bein gestreckt \u00B7 Arme hoch \u00B7 H\u00FCfte nach vorn",
+    color: "#c4956a",
+    tag: "work",
+    tagText: "KR\u00C4FTIGUNG",
+    voiceStart: "Der Krieger! Steh aufrecht, und mach einen gro\u00DFen Schritt nach vorn mit dem linken Bein. Das vordere Knie beugt sich \u00FCber dem Kn\u00F6chel. Das hintere Bein ist gestreckt. Jetzt hebe die Arme hoch \u00FCber den Kopf, Handfl\u00E4chen zueinander, und schau nach oben. Sp\u00FCr die Kraft und W\u00FCrde dieser Haltung. Du bist ein Krieger \u2014 stark, geerdet, sch\u00F6n.",
+    voiceMid: "Atme tief ein und wachse mit jedem Atemzug ein bisschen mehr in die L\u00E4nge. Dann wechseln wir die Seite.",
+    breathCue: "Mit jedem Einatmen wachsen \u00B7 mit jedem Ausatmen verwurzeln.",
+    sides: true
+  },
+  {
+    name: "Krieger II",
+    sanskrit: "Virabhadrasana II",
+    emoji: "\uD83C\uDF1F",
+    duration: 3 * 60,
+    instruction: "Arme seitlich ausgestreckt \u00B7 Blick \u00FCber die Fingerspitzen \u00B7 H\u00FCfte \u00F6ffnen",
+    color: "#c4956a",
+    tag: "work",
+    tagText: "KR\u00C4FTIGUNG",
+    voiceStart: "Krieger zwei \u2014 \u00F6ffne die H\u00FCfte! Bleib in der Ausfallschrittposition, und \u00F6ffne jetzt die H\u00FCfte zur Seite. Arme strecken sich weit aus \u2014 vorne und hinten \u2014 wie Fl\u00FCgel. Schau \u00FCber deine vordere Fingerspitze. Strahle Energie aus von der Mitte aus in alle Richtungen. Du bist stark. Du bist pr\u00E4sent. Du bist hier.",
+    voiceMid: "Senk das vordere Knie noch ein bisschen tiefer wenn du magst. Dann wechseln wir die Seite. Bleib in deiner Kraft.",
+    breathCue: "Ruhig und gleichm\u00E4\u00DFig atmen \u00B7 Kraft flie\u00DFt mit dem Atem.",
+    sides: true
+  },
+  {
+    name: "Br\u00FCcke",
+    sanskrit: "Setu Bandha Sarvangasana",
+    emoji: "\uD83C\uDF09",
+    duration: 4 * 60,
+    instruction: "R\u00FCcken auf dem Boden \u00B7 F\u00FC\u00DFe aufgestellt \u00B7 Becken langsam heben \u00B7 3 Wiederholungen",
+    color: "#9b8ab0",
+    tag: "breathe",
+    tagText: "BODEN",
+    voiceStart: "Die Br\u00FCcke \u2014 eine meiner liebsten \u00DCbungen f\u00FCr den R\u00FCcken! Leg dich auf den R\u00FCcken, stelle die F\u00FC\u00DFe h\u00FCftbreit auf, die Arme liegen neben dem K\u00F6rper. Beim Einatmen hebst du das Becken langsam nach oben \u2014 Wirbel f\u00FCr Wirbel. Oben kurz halten, dann beim Ausatmen genauso langsam wieder ablegen. Das st\u00E4rkt deinen R\u00FCcken, dein Ges\u00E4\u00DF, und tut deinem gesamten K\u00F6rper wohl. Drei Runden machen wir gemeinsam.",
+    voiceMid: "Du kannst die H\u00E4nde unter dem R\u00FCcken verschr\u00E4nken und die Schultern zusammenschieben \u2014 das \u00F6ffnet die Brust wundersch\u00F6n. Sp\u00FCr wie gut sich das anf\u00FChlt.",
+    breathCue: "Einatmen \u2014 heben \u00B7 ausatmen \u2014 ablegen \u00B7 flie\u00DFend und sanft.",
+    sides: false
+  },
+  {
+    name: "Sitzende Vorw\u00E4rtsbeuge",
+    sanskrit: "Paschimottanasana",
+    emoji: "\uD83E\uDD8B",
+    duration: 3 * 60,
+    instruction: "Beine gestreckt \u00B7 sanft nach vorne lehnen \u00B7 R\u00FCcken lang lassen \u00B7 nicht zwingen",
+    color: "#7a9e7e",
+    tag: "work",
+    tagText: "DEHNUNG",
+    voiceStart: "Setz dich aufrecht hin, strecke beide Beine aus. Beim Einatmen w\u00E4chst du lang durch die Wirbels\u00E4ule, und beim Ausatmen beugst du dich ganz sanft nach vorne. Nicht ziehen, nicht zwingen \u2014 einfach loslassen und der Schwerkraft vertrauen. Es geht nicht darum wie weit du kommst. Es geht darum wie gut es sich anf\u00FChlt. Jeder K\u00F6rper ist anders, und das ist wundersch\u00F6n.",
+    voiceMid: "Bleib wo du bist. Atme tief in den unteren R\u00FCcken. Mit jedem Ausatmen darfst du ein ganz kleines bisschen tiefer loslassen \u2014 wenn es sich richtig anf\u00FChlt.",
+    breathCue: "Mit dem Ausatmen sanft loslassen \u00B7 kein Zwang \u00B7 nur Vertrauen.",
+    sides: false
+  },
+  {
+    name: "Liegender Twist",
+    sanskrit: "Supta Matsyendrasana",
+    emoji: "\uD83C\uDF00",
+    duration: 3 * 60,
+    instruction: "Auf dem R\u00FCcken \u00B7 Knie zur Brust \u00B7 dann zur Seite kippen \u00B7 Schultern am Boden",
+    color: "#9b8ab0",
+    tag: "breathe",
+    tagText: "TWIST",
+    voiceStart: "Der liegende Twist \u2014 absolute Wohltat f\u00FCr die Wirbels\u00E4ule! Leg dich auf den R\u00FCcken, zieh beide Knie zur Brust. Dann lass die Knie sanft zur linken Seite kippen, die Arme breiten sich wie ein Kreuz aus, und der Blick geht nach rechts. Beide Schultern bleiben am Boden. Atme tief in den Bauch und sp\u00FCr die sanfte Drehung. Die Wirbels\u00E4ule wird es dir danken!",
+    voiceMid: "Jetzt langsam zur\u00FCck zur Mitte, beide Knie kurz zur Brust, und dann auf die andere Seite \u2014 Knie fallen nach rechts, Blick geht nach links.",
+    breathCue: "Tief in den Bauch atmen \u00B7 mit jedem Ausatmen tiefer in die Drehung.",
+    sides: true
+  },
+  {
+    name: "Shavasana",
+    sanskrit: "die Totenstellung \u2014 die wichtigste Pose!",
+    emoji: "\u2601\uFE0F",
+    duration: 5 * 60,
+    instruction: "Flach auf dem R\u00FCcken \u00B7 Arme neben dem K\u00F6rper \u00B7 Augen schlie\u00DFen \u00B7 einfach sein",
+    color: "#9b8ab0",
+    tag: "savasana",
+    tagText: "SHAVASANA",
+    voiceStart: "Und jetzt das Wichtigste \u2014 Shavasana. Leg dich flach auf den R\u00FCcken. Arme liegen locker neben dem K\u00F6rper, Handfl\u00E4chen nach oben. F\u00FC\u00DFe fallen nach au\u00DFen. Schlie\u00DFe die Augen. Jetzt darfst du einfach sein. Nichts tun, nirgendwo hinm\u00FCssen. Der K\u00F6rper verarbeitet alles was ihr heute gemeinsam erlebt habt. Lass alles los. Du hast es dir verdient.",
+    voiceMid: "Sp\u00FCr wie schwer dein K\u00F6rper wird. Lass dein Gesicht weich werden, deinen Kiefer, deine Stirn. Jeder Atemzug tr\u00E4gt dich tiefer in die Entspannung.",
+    breathCue: "Einfach atmen \u00B7 nichts kontrollieren \u00B7 du bist vollkommen.",
+    sides: false
+  }
+];
+
+const TOTAL = POSES.reduce((s, p) => s + p.duration, 0); // 1800s = 30min
+const CIRCUMFERENCE = 2 * Math.PI * 38; // 238.76
+
+// \u2500\u2500\u2500 STATE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+let timer = null;
+let currentPose = 0;
+let secondsLeft = 0;
+let phaseDuration = 0;
+let elapsedPose = 0;
+let totalElapsed = 0;
+let phase = 'idle'; // idle | prep | pose | done
+let isPaused = false;
+let volume = 0.85;
+let midSpoken = false;
+let breathInterval = null;
+let breathPhase = 0; // 0=in, 1=hold, 2=out
+
+// \u2500\u2500\u2500 VOICE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+let synth = window.speechSynthesis;
+let germanVoice = null;
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  const pref = ['Anna', 'Helena', 'Katrin', 'Marlene', 'Google Deutsch'];
+  germanVoice = null;
+  for (let p of pref) {
+    germanVoice = voices.find(v => v.name.includes(p));
+    if (germanVoice) break;
+  }
+  if (!germanVoice) germanVoice = voices.find(v => v.lang && v.lang.startsWith('de'));
+  const status = document.getElementById('voiceStatus');
+  if (germanVoice) {
+    status.textContent = '\u2713 ' + germanVoice.name.split(' ')[0];
+    status.className = 'voice-status ok';
+  } else {
+    status.textContent = '\u26A0 keine DE-Stimme';
+    status.className = 'voice-status warn';
+  }
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+setTimeout(loadVoices, 600);
+
+function speak(text, rate = 0.88, pitch = 1.05) {
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.volume = volume;
+  u.rate = rate;
+  u.pitch = pitch;
+  u.lang = 'de-DE';
+  if (germanVoice) u.voice = germanVoice;
+  synth.speak(u);
+}
+
+function updateVol() {
+  volume = parseFloat(document.getElementById('volRange').value);
+}
+
+// \u2500\u2500\u2500 FLOWERS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function buildFlowers() {
+  const wrap = document.getElementById('progressFlowers');
+  wrap.innerHTML = '';
+  POSES.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'pf';
+    d.id = 'pf-' + i;
+    d.textContent = p.emoji;
+    wrap.appendChild(d);
+  });
+}
+buildFlowers();
+
+function updateFlowers() {
+  POSES.forEach((_, i) => {
+    const d = document.getElementById('pf-' + i);
+    if (i < currentPose) d.className = 'pf done';
+    else if (i === currentPose && phase === 'pose') d.className = 'pf active';
+    else d.className = 'pf';
+  });
+  if (phase === 'done') document.querySelectorAll('.pf').forEach(d => d.className = 'pf done');
+}
+
+// \u2500\u2500\u2500 RING TIMER \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function updateRing(sLeft, dur) {
+  const pct = sLeft / dur;
+  const offset = CIRCUMFERENCE * (1 - pct);
+  const ring = document.getElementById('timerRing');
+  ring.style.strokeDashoffset = offset;
+  const pose = POSES[currentPose];
+  ring.style.stroke = sLeft <= 10 ? '#e07070' : (pose ? pose.color : '#7a9e7e');
+  const txt = document.getElementById('timerText');
+  txt.textContent = sLeft > 60 ? Math.ceil(sLeft / 60) + 'min' : sLeft;
+  txt.className = 'timer-text' + (sLeft <= 10 ? ' last' : '');
+}
+
+// \u2500\u2500\u2500 BREATH ANIMATION \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function startBreathCycle() {
+  if (breathInterval) clearInterval(breathInterval);
+  let phase = 0; // 0=in(4s), 1=hold(1s), 2=out(4s), 3=pause(1s)
+  let tick = 0;
+  const fill = document.getElementById('breathFill');
+  const CYCLE = [4, 1, 4, 1]; // seconds per phase
+  breathInterval = setInterval(() => {
+    if (isPaused) return;
+    tick++;
+    const total = CYCLE[phase];
+    if (tick > total) { tick = 1; phase = (phase + 1) % 4; }
+    let pct = 0;
+    if (phase === 0) pct = (tick / total) * 100;       // inhale
+    else if (phase === 1) pct = 100;                    // hold
+    else if (phase === 2) pct = (1 - tick / total) * 100; // exhale
+    else pct = 0;                                       // pause
+    fill.style.width = pct + '%';
+  }, 1000);
+}
+
+function stopBreath() {
+  if (breathInterval) clearInterval(breathInterval);
+  document.getElementById('breathFill').style.width = '0%';
+}
+
+// \u2500\u2500\u2500 UI UPDATE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function formatTotalTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function updateUI() {
+  document.getElementById('totalTime').textContent = formatTotalTime(Math.max(0, TOTAL - totalElapsed));
+
+  if (phase === 'idle') return;
+
+  if (phase === 'prep') {
+    document.getElementById('phaseTag').textContent = 'VORBEREITUNG';
+    document.getElementById('phaseTag').className = 'phase-tag prep';
+    document.getElementById('poseName').textContent = 'Gleich geht\'s los\u2026';
+    document.getElementById('poseSanskrit').textContent = ' ';
+    document.getElementById('poseInstruction').textContent = 'Matte ausrollen \u00B7 hinlegen oder hinsetzen \u00B7 tief durchatmen';
+    document.getElementById('poseEmoji').textContent = '\uD83C\uDF3F';
+    document.getElementById('poseCount').textContent = '\u2013';
+    updateRing(secondsLeft, phaseDuration);
+    return;
+  }
+
+  if (phase === 'pose') {
+    const p = POSES[currentPose];
+    document.getElementById('phaseTag').textContent = p.tagText;
+    document.getElementById('phaseTag').className = 'phase-tag ' + p.tag;
+    document.getElementById('poseName').textContent = p.name;
+    document.getElementById('poseSanskrit').textContent = p.sanskrit;
+    document.getElementById('poseInstruction').textContent = p.instruction;
+    document.getElementById('poseEmoji').textContent = p.emoji;
+    document.getElementById('poseCount').textContent = (currentPose + 1);
+    document.getElementById('yogaCard').classList.add('active-pose');
+    updateRing(secondsLeft, phaseDuration);
+    updatePoseList();
+    updateFlowers();
+    return;
+  }
+
+  if (phase === 'done') {
+    document.getElementById('phaseTag').textContent = 'NAMASTE';
+    document.getElementById('phaseTag').className = 'phase-tag savasana';
+    document.getElementById('poseName').textContent = 'Fertig \uD83D\uDE4F';
+    document.getElementById('poseSanskrit').textContent = ' ';
+    document.getElementById('poseInstruction').textContent = 'Du warst wundersch\u00F6n heute auf der Matte.';
+    document.getElementById('poseEmoji').textContent = '\uD83C\uDF38';
+    document.getElementById('poseCount').textContent = '8';
+    const ring = document.getElementById('timerRing');
+    ring.style.strokeDashoffset = 0;
+    ring.style.stroke = '#7a9e7e';
+    document.getElementById('timerText').textContent = '\uD83D\uDE4F';
+    document.getElementById('yogaCard').classList.remove('active-pose');
+    document.getElementById('doneScreen').classList.add('visible');
+    updatePoseList();
+    updateFlowers();
+  }
+}
+
+function updatePoseList() {
+  POSES.forEach((_, i) => {
+    const item = document.getElementById('item-' + i);
+    item.classList.remove('active', 'done');
+    if (i < currentPose) item.classList.add('done');
+    else if (i === currentPose && phase === 'pose') item.classList.add('active');
+  });
+  if (phase === 'done') POSES.forEach((_, i) => document.getElementById('item-' + i).classList.add('done'));
+}
+
+// \u2500\u2500\u2500 POSE LOGIC \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function startPose(idx) {
+  currentPose = idx;
+  const p = POSES[idx];
+  phase = 'pose';
+  secondsLeft = p.duration;
+  phaseDuration = p.duration;
+  elapsedPose = 0;
+  midSpoken = false;
+
+  updateUI();
+  startBreathCycle();
+
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    if (isPaused) return;
+    elapsedPose++;
+    secondsLeft--;
+    totalElapsed++;
+
+    // Mid cue
+    const mid = Math.floor(p.duration / 2);
+    if (!midSpoken && elapsedPose === mid) {
+      midSpoken = true;
+      setTimeout(() => speak(p.voiceMid, 0.87, 1.05), 200);
+    }
+
+    // Breath cue at 3/4 mark
+    const breathMark = Math.floor(p.duration * 0.75);
+    if (elapsedPose === breathMark) {
+      setTimeout(() => speak(p.breathCue, 0.85, 1.05), 200);
+    }
+
+    // Last 10s countdown
+    if (secondsLeft === 10) speak("Noch zehn Sekunden.", 0.9);
+    if (secondsLeft === 5)  speak("F\u00FCnf.", 0.9);
+    if (secondsLeft === 3)  speak("Drei.", 0.9);
+    if (secondsLeft === 2)  speak("Zwei.", 0.9);
+    if (secondsLeft === 1)  speak("Eins.", 0.9);
+
+    updateUI();
+
+    if (secondsLeft <= 0) {
+      clearInterval(timer);
+      stopBreath();
+      onPoseEnd();
+    }
+  }, 1000);
+
+  // Speak start cue after short delay
+  setTimeout(() => speak(p.voiceStart, 0.87, 1.05), 300);
+}
+
+function onPoseEnd() {
+  if (currentPose >= POSES.length - 1) {
+    // All done
+    phase = 'done';
+    updateUI();
+    speak("Und\u2026 bleib einfach noch einen Moment so liegen. Du hast heute drei\u00DFig wundervolle Minuten f\u00FCr dich selbst geschenkt. Das ist so wertvoll. Dein K\u00F6rper, dein Geist und deine Seele sagen von Herzen danke. Namaste.", 0.84, 1.05);
+  } else {
+    // Transition
+    const next = POSES[currentPose + 1];
+    speak("Wunderbar! Komm langsam heraus aus der Pose. Als n\u00E4chstes: " + next.name + ".", 0.88, 1.05);
+    setTimeout(() => {
+      currentPose++;
+      startPose(currentPose);
+    }, 4000);
+  }
+}
+
+// \u2500\u2500\u2500 CONTROLS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function startYoga() {
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('pauseBtn').style.display = 'flex';
+  document.getElementById('doneScreen').classList.remove('visible');
+  totalElapsed = 0;
+
+  speak("Herzlich willkommen auf der Matte! Ich freue mich so sehr dass du heute hier bist. Nimm dir einen Moment, komme bei dir an, und lass den Alltag hinter dir. Deine Yoga-Einheit beginnt jetzt.", 0.87, 1.05);
+
+  phase = 'prep';
+  secondsLeft = 6;
+  phaseDuration = 6;
+  updateUI();
+  const ring = document.getElementById('timerRing');
+  ring.style.strokeDashoffset = 0;
+
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    if (isPaused) return;
+    secondsLeft--;
+    totalElapsed++;
+    updateRing(secondsLeft, phaseDuration);
+    if (secondsLeft <= 0) {
+      clearInterval(timer);
+      startPose(0);
+    }
+  }, 1000);
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  const btn = document.getElementById('pauseBtn');
+  if (isPaused) {
+    btn.textContent = '\u25B6 Weiter';
+    synth.cancel();
+    speak("Kurze Pause. Ich bin hier wenn du weitermachen m\u00F6chtest.", 0.88);
+  } else {
+    btn.textContent = '\u23F8 Pause';
+    speak("Willkommen zur\u00FCck. Atme tief ein, und weiter.", 0.88, 1.05);
+  }
+}
+
+function resetYoga() {
+  if (timer) clearInterval(timer);
+  stopBreath();
+  synth.cancel();
+  isPaused = false;
+  phase = 'idle';
+  currentPose = 0;
+  secondsLeft = 0;
+  phaseDuration = 0;
+  elapsedPose = 0;
+  totalElapsed = 0;
+
+  document.getElementById('startBtn').style.display = 'flex';
+  document.getElementById('pauseBtn').style.display = 'none';
+  document.getElementById('pauseBtn').textContent = '\u23F8 Pause';
+  document.getElementById('doneScreen').classList.remove('visible');
+  document.getElementById('phaseTag').textContent = 'BEREIT';
+  document.getElementById('phaseTag').className = 'phase-tag prep';
+  document.getElementById('poseName').textContent = 'Bereit machen';
+  document.getElementById('poseSanskrit').textContent = ' ';
+  document.getElementById('poseInstruction').textContent = 'Matte ausrollen \u00B7 bequeme Kleidung \u00B7 Wasser bereitstellen\nNimm dir einen Moment nur f\u00FCr dich.';
+  document.getElementById('poseEmoji').textContent = '\uD83C\uDF3F';
+  document.getElementById('poseCount').textContent = '\u2013';
+  document.getElementById('totalTime').textContent = '30:00';
+  document.getElementById('timerText').textContent = '\u2013';
+  document.getElementById('timerText').className = 'timer-text';
+  document.getElementById('timerRing').style.strokeDashoffset = 0;
+  document.getElementById('timerRing').style.stroke = '#7a9e7e';
+  document.getElementById('yogaCard').classList.remove('active-pose');
+  document.getElementById('breathFill').style.width = '0%';
+
+  POSES.forEach((_, i) => {
+    const item = document.getElementById('item-' + i);
+    item.classList.remove('active', 'done');
+  });
+  buildFlowers();
+}
+
+setTimeout(loadVoices, 800);
+</script>
+</body>
+</html>

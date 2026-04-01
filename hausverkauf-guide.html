@@ -1,0 +1,1195 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hausverkauf Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  /* START SCREEN */
+  #start-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 30px;
+    text-align: center;
+  }
+
+  #start-screen.hidden {
+    display: none;
+  }
+
+  .start-house {
+    font-size: 5rem;
+    margin-bottom: 24px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .start-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .start-subtitle {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .start-deadline {
+    font-size: 0.8rem;
+    color: var(--gold);
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 48px;
+  }
+
+  .start-btn {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    color: var(--bg);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(201,168,76,0.15);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .start-btn:active {
+    transform: scale(0.94);
+    box-shadow: 0 0 20px rgba(201,168,76,0.3);
+  }
+
+  .start-btn-icon { font-size: 2.2rem; }
+
+  .start-hint {
+    margin-top: 32px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  :root {
+    --bg: #1a1a18;
+    --surface: #252520;
+    --surface2: #2e2e28;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --cream: #f5f0e8;
+    --muted: #888880;
+    --done: #4a7c59;
+    --done-light: #6aab7a;
+    --red: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Source Sans 3', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  #header {
+    background: linear-gradient(135deg, #1a1a18 0%, #2a2a20 100%);
+    border-bottom: 1px solid var(--gold);
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  #header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  #progress-bar-wrap {
+    margin-top: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  #progress-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ROOM TABS */
+  #room-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 12px 16px;
+    scrollbar-width: none;
+    background: var(--surface);
+    border-bottom: 1px solid #333330;
+  }
+
+  #room-tabs::-webkit-scrollbar { display: none; }
+
+  .room-tab {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #444440;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .room-tab.active {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+    font-weight: 600;
+  }
+
+  .room-tab.completed {
+    border-color: var(--done);
+    color: var(--done-light);
+  }
+
+  /* CURRENT STEP HERO */
+  #step-hero {
+    padding: 24px 20px 16px;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  }
+
+  #phase-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  #current-step-num {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  #current-step-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    color: var(--cream);
+    min-height: 80px;
+  }
+
+  #step-detail {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+    min-height: 24px;
+  }
+
+  /* SPEAK BUTTON */
+  #speak-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 20px 0;
+    padding: 12px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--gold);
+    border-radius: 30px;
+    color: var(--gold);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: calc(100% - 40px);
+    justify-content: center;
+  }
+
+  #speak-btn:active { transform: scale(0.97); }
+  #speak-btn.speaking { background: var(--gold); color: var(--bg); }
+
+  .speak-icon { font-size: 1.2rem; }
+
+  /* ACTION BUTTONS */
+  #action-buttons {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .btn-done {
+    flex: 1;
+    padding: 16px;
+    background: var(--done);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-done:active { transform: scale(0.97); background: #3d6b4a; }
+
+  .btn-skip {
+    padding: 16px 20px;
+    background: transparent;
+    border: 1px solid #444440;
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-skip:active { background: var(--surface2); }
+
+  /* STEP LIST */
+  #step-list-wrap {
+    padding: 0 20px 100px;
+  }
+
+  .phase-header {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 16px 0 8px;
+    border-top: 1px solid #333330;
+    margin-top: 8px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #2a2a26;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .step-item.current {
+    background: rgba(201, 168, 76, 0.08);
+    margin: 0 -20px;
+    padding: 12px 20px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .step-item.done .step-item-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .step-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid #444440;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+
+  .step-item.done .step-checkbox {
+    background: var(--done);
+    border-color: var(--done);
+    color: white;
+  }
+
+  .step-item.current .step-checkbox {
+    border-color: var(--gold);
+  }
+
+  .step-item-num {
+    font-size: 0.7rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    width: 20px;
+    margin-top: 3px;
+  }
+
+  .step-item-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--cream);
+  }
+
+  /* ROOM COMPLETE OVERLAY */
+  #room-complete {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  #room-complete.show { display: flex; }
+
+  .room-complete-card {
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+  }
+
+  .room-complete-icon { font-size: 3rem; margin-bottom: 16px; }
+
+  .room-complete-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+
+  .room-complete-card p {
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .btn-next-room {
+    width: 100%;
+    padding: 16px;
+    background: var(--gold);
+    border: none;
+    border-radius: 12px;
+    color: var(--bg);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* AUTO-SPEAK TOGGLE */
+  #auto-speak-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 36px;
+    height: 20px;
+    background: #444;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--gold); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after { transform: translateX(16px); }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start-screen">
+  <div class="start-house">🏡</div>
+  <div class="start-title">Hausverkauf<br>Guide</div>
+  <div class="start-subtitle">Kopfhörer rein, Lautstärke auf –<br>ich leite dich Schritt für Schritt durch das Haus.</div>
+  <div class="start-deadline">📅 Ziel: Karsamstag 5. April · Fertig für die Maklerin</div>
+  <button class="start-btn" onclick="startApp()">
+    <span class="start-btn-icon">▶</span>
+    <span>Los geht's!</span>
+  </button>
+  <div class="start-hint">
+    Die App liest jeden Schritt automatisch vor.<br>
+    Du tippst nur "Erledigt" – und weiter geht's.
+  </div>
+</div>
+
+<div id="header">
+  <h1>🏡 Hausverkauf Guide</h1>
+  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+  <div id="progress-text">0 von 0 Schritten erledigt</div>
+</div>
+
+<div id="room-tabs"></div>
+
+<div id="step-hero">
+  <div id="phase-label"></div>
+  <div id="current-step-num"></div>
+  <div id="current-step-text">Lade...</div>
+  <div id="step-detail"></div>
+</div>
+
+<div id="auto-speak-wrap">
+  <div class="toggle on" id="auto-speak-toggle" onclick="toggleAutoSpeak()"></div>
+  <span>Automatisch vorlesen</span>
+</div>
+
+<button id="speak-btn" onclick="speakCurrent()">
+  <span class="speak-icon">🔊</span>
+  <span id="speak-label">Nochmal vorlesen</span>
+</button>
+
+<div id="action-buttons">
+  <button class="btn-done" onclick="markDone()">✓ Erledigt – weiter!</button>
+  <button class="btn-skip" onclick="skipStep()">Überspringen</button>
+</div>
+
+<div id="step-list-wrap"></div>
+
+<div id="room-complete">
+  <div class="room-complete-card">
+    <div class="room-complete-icon">🎉</div>
+    <h2 id="room-complete-title">Raum fertig!</h2>
+    <p id="room-complete-text">Super gemacht! Kurze Pause, dann weiter.</p>
+    <button class="btn-next-room" onclick="nextRoom()">Weiter zum nächsten Raum →</button>
+  </div>
+</div>
+
+<script>
+const ROOMS = [
+  {
+    id: "wohnzimmer",
+    name: "Wohnzimmer",
+    icon: "🛋️",
+    phases: [
+      {
+        name: "Vorbereiten",
+        steps: [
+          { text: "Müllsäcke bereitstellen", detail: "Mindestens 3 große Säcke: Müll, Sozialkaufhaus, Anderer Raum" },
+          { text: "2 bis 3 Umzugskartons aufstellen", detail: "Einen für Müll, einen für Sozialkaufhaus, einen für andere Räume" },
+          { text: "Alle Türen öffnen", detail: "Damit du freien Durchgang hast beim Rausstragen" },
+        ]
+      },
+      {
+        name: "Tisch entrümpeln",
+        steps: [
+          { text: "Tischdecke abnehmen und in die Wäsche", detail: "" },
+          { text: "Alle Wasserflaschen in die Küche tragen", detail: "" },
+          { text: "Alle Taschen und Mappen wegräumen", detail: "In anderen Raum oder Sozialkaufhaus-Karton" },
+          { text: "Alle losen Gegenstände vom Tisch", detail: "Der Tisch bleibt komplett leer" },
+        ]
+      },
+      {
+        name: "Boden freiräumen",
+        steps: [
+          { text: "Alle Kabel vom Boden aufwickeln", detail: "In Schublade oder Kiste – kein Kabel liegt mehr auf dem Boden" },
+          { text: "Alle Bücherstapel vom Boden in Karton", detail: "" },
+          { text: "Radio wegräumen", detail: "In anderen Raum" },
+          { text: "Weidenkorb wegräumen", detail: "In Garage oder Keller" },
+          { text: "Stofftier vom Sofa nehmen", detail: "In anderen Raum" },
+        ]
+      },
+      {
+        name: "Sofa",
+        steps: [
+          { text: "Decke vom Sofa abnehmen", detail: "" },
+          { text: "Kissen gerade rücken", detail: "Ordentlich und symmetrisch platzieren" },
+        ]
+      },
+      {
+        name: "Antike Kommode",
+        steps: [
+          { text: "Alle Figuren von der Kommode nehmen", detail: "In Sozialkaufhaus-Karton oder anderen Raum" },
+          { text: "Alle Bilder und Rahmen von der Kommode", detail: "" },
+          { text: "Kerzenständer wegräumen", detail: "" },
+          { text: "Alle Schalen und Dosen weg", detail: "Die Kommode bleibt komplett leer – sie ist wunderschön und braucht keine Deko" },
+        ]
+      },
+      {
+        name: "Kleines Bücherregal",
+        steps: [
+          { text: "Bücherregal komplett leeren", detail: "Alle Bücher in Karton" },
+          { text: "Bücherregal aus dem Zimmer stellen", detail: "In Garage oder Abstellraum – der Raum wirkt sofort größer" },
+        ]
+      },
+      {
+        name: "Bücherregalwand",
+        steps: [
+          { text: "Bücher in den Regalen ordentlich einräumen", detail: "Nichts quer, nichts davor stehend" },
+          { text: "Fernseher-Kabel bündeln", detail: "Mit Kabelbinder oder hinter Gerät stecken" },
+          { text: "Alten Videorekorder rausstellen", detail: "In Sozialkaufhaus-Karton" },
+          { text: "Nichts mehr auf dem Boden vor den Regalen", detail: "" },
+        ]
+      },
+      {
+        name: "Antike Highlights",
+        steps: [
+          { text: "Blauer Bauernschrank: nichts daneben stellen", detail: "Mindestens 50 Zentimeter Abstand auf jeder Seite freilassen" },
+          { text: "Blauer Bauernschrank: alles von oben drauf entfernen", detail: "Die Schnitzerei oben soll frei sichtbar sein" },
+          { text: "Bemalte Truhe: Teppich darunter gerade legen", detail: "" },
+          { text: "Eisentruhe: als Einzelstück positionieren", detail: "Freiraum darum lassen – sie soll wie ein Museumsstück wirken" },
+          { text: "Beide Truhen: Oberfläche leer lassen", detail: "" },
+        ]
+      },
+      {
+        name: "Bilder reduzieren",
+        steps: [
+          { text: "Einen Schritt zurücktreten und die Wände anschauen", detail: "Welche 2 bis 3 Bilder gefallen dir am besten?" },
+          { text: "Alle anderen Bilder abnehmen", detail: "Vorsichtig stapeln, nicht beschädigen" },
+          { text: "Die verbleibenden Bilder gerade hängen", detail: "Augenmaß – auf gleiche Höhe achten" },
+        ]
+      },
+      {
+        name: "Putzen",
+        steps: [
+          { text: "Spinnweben von der Decke entfernen", detail: "Mit Besen oder langem Tuch" },
+          { text: "Holzbalken abwischen", detail: "Feuchtes Tuch reicht" },
+          { text: "Alle Möbeloberflächen abwischen", detail: "Kommode, Truhen, Regale – von oben nach unten" },
+          { text: "Panoramafenster von innen putzen", detail: "Glasreiniger und Microfasertuch – streifenfrei! Das ist das wichtigste Fenster im Haus" },
+          { text: "Vorhänge gerade hängen", detail: "" },
+          { text: "Boden saugen", detail: "Alle Ecken, unter den Möbeln" },
+          { text: "Boden wischen", detail: "" },
+        ]
+      },
+      {
+        name: "Abschluss-Check",
+        steps: [
+          { text: "An die Türschwelle stellen und in den Raum schauen", detail: "Was stört noch? Was fällt als erstes auf?" },
+          { text: "Störende Dinge sofort entfernen", detail: "" },
+          { text: "Foto machen!", detail: "Vorher-Nachher für dich selbst – du hast das verdient!" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "vorzimmer",
+    name: "Vorzimmer",
+    icon: "🚪",
+    phases: [
+      {
+        name: "Chaos beseitigen",
+        steps: [
+          { text: "Alle Kartons und Kisten raus", detail: "Das ist der dringendste Schritt – wirkt wie Umzugschaos" },
+          { text: "Alle Kabel vom Boden aufwickeln und wegräumen", detail: "" },
+          { text: "Tüten und Plastiksachen weg", detail: "" },
+          { text: "Rotes Metallgestell wegräumen", detail: "In Garage" },
+          { text: "Getrocknetes Kräuterbündel von der Decke abnehmen", detail: "Wirkt verstaubt" },
+        ]
+      },
+      {
+        name: "Antike Möbel",
+        steps: [
+          { text: "Bauernschrank oben: Deko auf 1 bis 2 Objekte reduzieren", detail: "Rest weg – der Schrank ist das Highlight, nicht die Deko" },
+          { text: "Kommode komplett leerräumen", detail: "Die Schnitzereien sind wunderschön und aktuell völlig verdeckt" },
+          { text: "Kommode abwischen", detail: "" },
+        ]
+      },
+      {
+        name: "Reinigen",
+        steps: [
+          { text: "Terrassentür putzen", detail: "Innen und außen – lässt mehr Licht rein" },
+          { text: "Fliesen wischen", detail: "" },
+          { text: "Boden saugen", detail: "" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "kabinett",
+    name: "Kabinett",
+    icon: "📚",
+    phases: [
+      {
+        name: "Sofa und Boden",
+        steps: [
+          { text: "Grüne Decke vom Sofa nehmen", detail: "" },
+          { text: "Kissen ordentlich platzieren", detail: "" },
+          { text: "Plastiksäcke vom Boden wegräumen", detail: "" },
+          { text: "Alle Kabel und Geräte vom Boden", detail: "" },
+          { text: "Taschen wegräumen", detail: "" },
+        ]
+      },
+      {
+        name: "Vitrinen mit Kamerasammlung",
+        steps: [
+          { text: "Kartons von oben auf den Vitrinen wegräumen", detail: "" },
+          { text: "Papierfetzen und grüne Tücher aus den Vitrinen nehmen", detail: "" },
+          { text: "Zufällige Gegenstände aus den Vitrinen entfernen", detail: "Nur die Kameras bleiben – ordentlich aufgereiht" },
+          { text: "Glasscheiben der Vitrinen von innen putzen", detail: "Glasreiniger und Microfasertuch" },
+          { text: "Glasscheiben der Vitrinen von außen putzen", detail: "" },
+        ]
+      },
+      {
+        name: "Schrank und Vorhänge",
+        steps: [
+          { text: "Kleider vom Hängeregal nehmen", detail: "" },
+          { text: "Lamellenschrank außen abwischen", detail: "" },
+          { text: "Rote Blumenvorhänge abnehmen", detail: "Lässt das Zimmer heller und größer wirken" },
+          { text: "Fenster putzen", detail: "" },
+          { text: "Boden saugen", detail: "" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "schlafzimmer",
+    name: "Schlafzimmer",
+    icon: "🛏️",
+    phases: [
+      {
+        name: "Wichtigstes zuerst",
+        steps: [
+          { text: "Pflegebett aus dem Zimmer schaffen", detail: "Thomas und Werner bitten – das ist die höchste Priorität des ganzen Hauses" },
+          { text: "Fitnessrad aus dem Zimmer", detail: "In Garage oder Keller" },
+          { text: "Leiter wegstellen", detail: "" },
+          { text: "Teddybären wegräumen", detail: "" },
+        ]
+      },
+      {
+        name: "Tisch und Oberflächen",
+        steps: [
+          { text: "Tisch komplett leeren", detail: "Mappen, Rollen, Bücher, Kartons – alles weg" },
+          { text: "Schränke oben komplett leerräumen", detail: "Vasen, Krüge, Technik – alles weg" },
+          { text: "Alte Kamera auf Stativ: als Blickfang stehen lassen", detail: "Das ist ein echtes Highlight!" },
+        ]
+      },
+      {
+        name: "Vitrine und Bilder",
+        steps: [
+          { text: "Glasscheiben der Vitrine innen putzen", detail: "" },
+          { text: "Glasscheiben der Vitrine außen putzen", detail: "" },
+          { text: "Vitrineninhalt ordentlich aufstellen", detail: "" },
+          { text: "Bildersammlung auf 2 bis 3 reduzieren", detail: "Ordentlich und gerade hängen" },
+        ]
+      },
+      {
+        name: "Vorhänge und Boden",
+        steps: [
+          { text: "Orangefarbene Vorhänge abnehmen wenn möglich", detail: "Mehr Licht macht den Raum größer" },
+          { text: "Teppiche gerade legen", detail: "" },
+          { text: "Boden saugen", detail: "Alle Ecken, unter den Möbeln" },
+          { text: "Fenster putzen", detail: "" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "schrankraum",
+    name: "Schrankraum",
+    icon: "👗",
+    phases: [
+      {
+        name: "Ankleidezimmer",
+        steps: [
+          { text: "Schmetterlinge und Blumen-Sticker von der Wand abmachen", detail: "Unbedingt – wirkt kindlich" },
+          { text: "Wandflecken feucht abreiben", detail: "So gut es geht" },
+          { text: "Kommode komplett leerräumen", detail: "Bild, Kiste, Aschenbecher, Gläser – alles weg" },
+          { text: "Drahtkorb und Hocker wegräumen", detail: "" },
+          { text: "Teppiche gerade legen oder weglegen", detail: "Zwei übereinanderliegende Teppiche wirken unordentlich" },
+          { text: "Fenster putzen", detail: "" },
+        ]
+      },
+      {
+        name: "Begehbarer Kleiderschrank",
+        steps: [
+          { text: "Alle Kleidung von den Regalen räumen", detail: "" },
+          { text: "Alle Bücher in Karton", detail: "" },
+          { text: "Kartons raus", detail: "" },
+          { text: "Alle Bügel entfernen", detail: "" },
+          { text: "Teppich vom Boden", detail: "" },
+          { text: "Wäschekorb von der Decke abhängen", detail: "" },
+          { text: "Regale abwischen", detail: "" },
+          { text: "Boden fegen und wischen", detail: "" },
+          { text: "Fenster putzen", detail: "Ein leerer sauberer Walk-in-Closet ist ein Verkaufsargument!" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "bad",
+    name: "Bad & WC",
+    icon: "🚿",
+    phases: [
+      {
+        name: "Bad",
+        steps: [
+          { text: "Alles vom Waschtisch räumen", detail: "Alle Flaschen, Putzmittel, Zahnbürsten, Seifenspender – alles weg" },
+          { text: "Spiegelschranktür schließen", detail: "" },
+          { text: "Waschtisch gründlich putzen und trocknen", detail: "" },
+          { text: "Armatur putzen und trocknen", detail: "" },
+          { text: "Alle Produkte aus der Duschkabine raus", detail: "" },
+          { text: "Duschkabine innen putzen", detail: "Kalkflecken entfernen" },
+          { text: "Duschkabine außen putzen", detail: "Glasscheiben streifenfrei" },
+          { text: "Handtücher und Wäschekorb wegräumen", detail: "" },
+          { text: "Fliesen und Fugen schrubben", detail: "" },
+          { text: "Fenster putzen", detail: "" },
+        ]
+      },
+      {
+        name: "WC",
+        steps: [
+          { text: "Alle Flaschen und Putzmittel vom Fensterbrett", detail: "" },
+          { text: "Alle Gegenstände vom Waschbecken", detail: "" },
+          { text: "Reinigungsmittel und Zahnbürsten vom Boden", detail: "" },
+          { text: "WC gründlich putzen", detail: "" },
+          { text: "Waschbecken putzen", detail: "" },
+          { text: "Fliesen und Fensterbrett wischen", detail: "" },
+          { text: "Nur eine frische Toilettenpapierrolle sichtbar lassen", detail: "Ordentlich platziert" },
+          { text: "Fenster putzen", detail: "Mehr Licht hilft – der Raum ist sehr dunkel" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "kueche",
+    name: "Küche",
+    icon: "🍳",
+    phases: [
+      {
+        name: "Alle Flächen leeren",
+        steps: [
+          { text: "Alles von der Spüle räumen", detail: "Putzmittel, Schwämme, Handschuhe – alles in Schränke" },
+          { text: "Alles von der linken Arbeitsfläche", detail: "Schüsseln, Besteck, alles weg" },
+          { text: "Alles von der rechten Arbeitsfläche", detail: "Toaster, Küchenwaage, Flaschen, Dosen – in Schränke" },
+          { text: "Küchenregal komplett leeren", detail: "Teller, Uhr, Rubik's Cube, Figuren – alles weg oder in Schränke" },
+          { text: "Oben auf allen Hängeschränken: alles weg", detail: "Teekannen, Körbe, Figuren" },
+          { text: "Fensterbank komplett leeren", detail: "Gläser, Teelichter, Töpfe weg" },
+        ]
+      },
+      {
+        name: "Putzen",
+        steps: [
+          { text: "Spüle gründlich putzen und trocknen", detail: "Glänzende Spüle wirkt sofort hochwertiger" },
+          { text: "Armatur putzen", detail: "" },
+          { text: "Ceran-Kochfeld sauber putzen", detail: "" },
+          { text: "Fliesenspiegel wischen", detail: "" },
+          { text: "Alle Schranktüren abwischen", detail: "" },
+          { text: "Fenster putzen", detail: "Die Küche ist sehr dunkel – jeder Lichtstrahl hilft" },
+          { text: "Boden wischen", detail: "" },
+        ]
+      },
+      {
+        name: "Kellerabgang",
+        steps: [
+          { text: "Weidenkorb und Kisten von der Treppe entfernen", detail: "" },
+          { text: "Treppenstufen abwischen", detail: "" },
+          { text: "Geländer abwischen", detail: "" },
+          { text: "Boden oben fegen", detail: "" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "garage",
+    name: "Garage",
+    icon: "🔧",
+    phases: [
+      {
+        name: "Großes Entrümpeln",
+        steps: [
+          { text: "Rollstuhl raus", detail: "Sozialkaufhaus oder Rotes Kreuz anrufen für Abholung" },
+          { text: "Gehhilfen raus", detail: "" },
+          { text: "Schlauchboot und weißes Objekt raus", detail: "" },
+          { text: "Alle Körbe raus", detail: "" },
+          { text: "Alle Eimer raus", detail: "" },
+          { text: "Alle Plastiksäcke raus", detail: "" },
+          { text: "Holzbretter und Platten raus", detail: "" },
+          { text: "Fensterbrett-Ablage komplett leeren", detail: "" },
+        ]
+      },
+      {
+        name: "Reinigen",
+        steps: [
+          { text: "Boden mit Hochdruckreiniger reinigen", detail: "" },
+          { text: "Wände abwischen wo möglich", detail: "" },
+          { text: "Rote Hängeschränke leeren", detail: "Türen geschlossen lassen – sieht ordentlich aus" },
+          { text: "Feuerlöscher Datum prüfen", detail: "Abgelaufener Löscher wirkt negativ" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "eingang",
+    name: "Eingang",
+    icon: "🌿",
+    phases: [
+      {
+        name: "Außenbereich",
+        steps: [
+          { text: "Tonne an nicht sichtbaren Ort stellen", detail: "" },
+          { text: "Gesamtes Laub wegräumen", detail: "Beete, Ecken, Terrassenpflaster – alles" },
+          { text: "Terrassenpflaster mit Hochdruckreiniger säubern", detail: "" },
+          { text: "Gestrüpp und trockene Äste schneiden", detail: "" },
+          { text: "Alle Weihnachts- und Schneeflocken-Sticker von ALLEN Fenstern", detail: "Küche, Wohnzimmer, Terrassentür, Haustür – überall!" },
+          { text: "Eingangstür putzen", detail: "" },
+          { text: "Alle Glaselemente am Eingang putzen", detail: "" },
+          { text: "Fußmatte reinigen oder ersetzen", detail: "" },
+        ]
+      },
+      {
+        name: "Außenflur",
+        steps: [
+          { text: "Schneeschieber und Besen aus dem Flur räumen", detail: "" },
+          { text: "Schriftzug an der Wand: mit feuchter Bürste rubbeln", detail: "Falls er nicht weggeht: mit weißer Farbe überstreichen" },
+          { text: "Boden kehren", detail: "" },
+          { text: "Boden wischen", detail: "" },
+        ]
+      }
+    ]
+  },
+  {
+    id: "feinschliff",
+    name: "Feinschliff",
+    icon: "✨",
+    phases: [
+      {
+        name: "Alle Räume Kontroll-Runde",
+        steps: [
+          { text: "Wohnzimmer: liegt noch etwas herum?", detail: "" },
+          { text: "Schlafzimmer: alles weg?", detail: "" },
+          { text: "Küche: Arbeitsflächen leer und trocken?", detail: "" },
+          { text: "Bad: sauber, trocken, leer?", detail: "" },
+          { text: "WC: sauber und aufgeräumt?", detail: "" },
+          { text: "Vorzimmer: keine Kartons mehr?", detail: "" },
+          { text: "Alle Fenster nochmals auf Schlieren prüfen", detail: "" },
+          { text: "Alle Türen und Türrahmen abwischen", detail: "" },
+        ]
+      },
+      {
+        name: "Wendeltreppe",
+        steps: [
+          { text: "Alle Figuren von den Treppenstufen entfernen", detail: "Stufen müssen komplett frei sein" },
+          { text: "Treppenstufen abwischen", detail: "" },
+          { text: "Geländer und Metallteile abwischen", detail: "" },
+          { text: "Spinnweben von der Decke", detail: "" },
+          { text: "Gelben Heizkörper darunter abwischen", detail: "" },
+        ]
+      },
+      {
+        name: "Licht und Fotos",
+        steps: [
+          { text: "In jedem Zimmer alle Lampen einschalten", detail: "Prüfen ob alle Birnen funktionieren" },
+          { text: "Alle Vorhänge und Jalousien vollständig öffnen", detail: "" },
+          { text: "Frische Handtücher ins Bad", detail: "Ordentlich gefaltet – ein warmer Akzent" },
+          { text: "Spüle und Bad nochmals blank putzen", detail: "" },
+          { text: "Eingang außen: letzter Laub-Check", detail: "" },
+          { text: "Haustür putzen", detail: "" },
+          { text: "Fertig! Herzlichen Glückwunsch! 🎉", detail: "Du hast das Haus für die Maklerin perfekt vorbereitet!" },
+        ]
+      }
+    ]
+  }
+];
+
+// STATE
+let currentRoom = 0;
+let stepStates = {};
+let autoSpeak = true;
+let speaking = false;
+
+function getStepKey(roomId, phaseIdx, stepIdx) {
+  return `${roomId}_${phaseIdx}_${stepIdx}`;
+}
+
+function getAllSteps() {
+  let all = [];
+  ROOMS.forEach((room, ri) => {
+    room.phases.forEach((phase, pi) => {
+      phase.steps.forEach((step, si) => {
+        all.push({ room, ri, phase, pi, step, si, key: getStepKey(room.id, pi, si) });
+      });
+    });
+  });
+  return all;
+}
+
+function getRoomSteps(roomIdx) {
+  let all = [];
+  const room = ROOMS[roomIdx];
+  room.phases.forEach((phase, pi) => {
+    phase.steps.forEach((step, si) => {
+      all.push({ phase, pi, step, si, key: getStepKey(room.id, pi, si) });
+    });
+  });
+  return all;
+}
+
+function getCurrentRoomFirstIncomplete() {
+  const steps = getRoomSteps(currentRoom);
+  for (let s of steps) {
+    if (!stepStates[s.key]) return s;
+  }
+  return steps[steps.length - 1];
+}
+
+function isRoomComplete(roomIdx) {
+  const room = ROOMS[roomIdx];
+  let allDone = true;
+  room.phases.forEach((phase, pi) => {
+    phase.steps.forEach((step, si) => {
+      const key = getStepKey(room.id, pi, si);
+      if (!stepStates[key]) allDone = false;
+    });
+  });
+  return allDone;
+}
+
+function getTotalProgress() {
+  const all = getAllSteps();
+  const done = all.filter(s => stepStates[s.key]).length;
+  return { done, total: all.length };
+}
+
+function render() {
+  renderTabs();
+  renderHero();
+  renderStepList();
+  renderProgress();
+}
+
+function renderTabs() {
+  const wrap = document.getElementById('room-tabs');
+  wrap.innerHTML = '';
+  ROOMS.forEach((room, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'room-tab' + (i === currentRoom ? ' active' : '') + (isRoomComplete(i) ? ' completed' : '');
+    btn.textContent = room.icon + ' ' + room.name;
+    btn.onclick = () => { currentRoom = i; render(); speakCurrentIfAuto(); };
+    wrap.appendChild(btn);
+  });
+}
+
+function renderHero() {
+  const current = getCurrentRoomFirstIncomplete();
+  document.getElementById('phase-label').textContent = '📍 ' + current.phase.name;
+  const steps = getRoomSteps(currentRoom);
+  const doneCount = steps.filter(s => stepStates[s.key]).length;
+  document.getElementById('current-step-num').textContent = `Schritt ${doneCount + 1} von ${steps.length}`;
+  document.getElementById('current-step-text').textContent = current.step.text;
+  document.getElementById('step-detail').textContent = current.step.detail || '';
+}
+
+function renderStepList() {
+  const wrap = document.getElementById('step-list-wrap');
+  wrap.innerHTML = '';
+  const room = ROOMS[currentRoom];
+  const current = getCurrentRoomFirstIncomplete();
+
+  room.phases.forEach((phase, pi) => {
+    const header = document.createElement('div');
+    header.className = 'phase-header';
+    header.textContent = phase.name;
+    wrap.appendChild(header);
+
+    phase.steps.forEach((step, si) => {
+      const key = getStepKey(room.id, pi, si);
+      const isCurrent = (pi === current.pi && si === current.si);
+      const isDone = !!stepStates[key];
+
+      const item = document.createElement('div');
+      item.className = 'step-item' + (isCurrent ? ' current' : '') + (isDone ? ' done' : '');
+
+      const num = document.createElement('div');
+      num.className = 'step-item-num';
+      num.textContent = si + 1;
+
+      const cb = document.createElement('div');
+      cb.className = 'step-checkbox';
+      cb.textContent = isDone ? '✓' : '';
+
+      const txt = document.createElement('div');
+      txt.className = 'step-item-text';
+      txt.textContent = step.text;
+
+      item.appendChild(num);
+      item.appendChild(cb);
+      item.appendChild(txt);
+
+      item.onclick = () => {
+        if (isCurrent) return;
+        if (isDone) {
+          delete stepStates[key];
+        } else {
+          stepStates[key] = 'done';
+        }
+        render();
+      };
+
+      wrap.appendChild(item);
+
+      if (isCurrent) {
+        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      }
+    });
+  });
+}
+
+function renderProgress() {
+  const { done, total } = getTotalProgress();
+  const pct = total > 0 ? (done / total * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} von ${total} Schritten erledigt`;
+}
+
+function markDone() {
+  const current = getCurrentRoomFirstIncomplete();
+  stepStates[current.key] = 'done';
+  if (isRoomComplete(currentRoom)) {
+    showRoomComplete();
+  } else {
+    render();
+    speakCurrentIfAuto();
+  }
+}
+
+function skipStep() {
+  const current = getCurrentRoomFirstIncomplete();
+  stepStates[current.key] = 'skipped';
+  render();
+  speakCurrentIfAuto();
+}
+
+function showRoomComplete() {
+  render();
+  const room = ROOMS[currentRoom];
+  document.getElementById('room-complete-title').textContent = room.icon + ' ' + room.name + ' – fertig!';
+  document.getElementById('room-complete-text').textContent = 'Fantastisch! Gönn dir kurz eine Pause, dann geht es weiter.';
+  if (currentRoom < ROOMS.length - 1) {
+    document.querySelector('.btn-next-room').textContent = 'Weiter: ' + ROOMS[currentRoom + 1].icon + ' ' + ROOMS[currentRoom + 1].name + ' →';
+  } else {
+    document.querySelector('.btn-next-room').textContent = '🎉 Alles fertig!';
+  }
+  document.getElementById('room-complete').classList.add('show');
+  speak(room.name + ' ist fertig! Großartig! Kurze Pause verdient.');
+}
+
+function nextRoom() {
+  document.getElementById('room-complete').classList.remove('show');
+  if (currentRoom < ROOMS.length - 1) {
+    currentRoom++;
+    render();
+    speakCurrentIfAuto();
+  }
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'de-DE';
+  utt.rate = 0.95;
+  utt.pitch = 1.0;
+  const btn = document.getElementById('speak-btn');
+  btn.classList.add('speaking');
+  document.getElementById('speak-label').textContent = 'Wird vorgelesen...';
+  utt.onend = () => {
+    btn.classList.remove('speaking');
+    document.getElementById('speak-label').textContent = 'Nochmal vorlesen';
+    speaking = false;
+  };
+  utt.onerror = () => {
+    btn.classList.remove('speaking');
+    document.getElementById('speak-label').textContent = 'Nochmal vorlesen';
+    speaking = false;
+  };
+  speaking = true;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakCurrent() {
+  const current = getCurrentRoomFirstIncomplete();
+  let text = current.step.text;
+  if (current.step.detail) text += '. ' + current.step.detail;
+  speak(text);
+}
+
+function speakCurrentIfAuto() {
+  if (autoSpeak) {
+    setTimeout(speakCurrent, 300);
+  }
+}
+
+function toggleAutoSpeak() {
+  autoSpeak = !autoSpeak;
+  const toggle = document.getElementById('auto-speak-toggle');
+  toggle.classList.toggle('on', autoSpeak);
+}
+
+function startApp() {
+  document.getElementById('start-screen').classList.add('hidden');
+  render();
+  setTimeout(speakCurrent, 600);
+}
+
+render();
+</script>
+</body>
+</html>
