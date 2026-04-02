@@ -2,25 +2,27 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tee des Tages</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d1a14;
-    --surface: #122018;
-    --border: rgba(180,210,170,0.12);
-    --accent: #8fc49a;
-    --accent2: #c4a87a;
-    --text: #e8f0e4;
-    --muted: rgba(232,240,228,0.5);
-    --steam: rgba(200,230,200,0.15);
+    --bg: #faf3e8;
+    --surface: #fffdf8;
+    --border: rgba(180,130,70,0.15);
+    --accent: #7a9a5a;
+    --accent2: #c8943a;
+    --text: #2e2010;
+    --muted: rgba(20,10,0,0.72);
+    --gold: #c8943a;
+    --terra: #c4704a;
   }
+  html { font-size: 18px; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Jost', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -37,8 +39,8 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(ellipse at 20% 20%, rgba(60,120,60,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(100,80,40,0.1) 0%, transparent 60%);
+      radial-gradient(ellipse at 20% 20%, rgba(200,148,58,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(196,112,74,0.05) 0%, transparent 60%);
     pointer-events: none;
     z-index: 0;
   }
@@ -60,7 +62,7 @@
   }
 
   .date-label {
-    font-family: 'Jost', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 3px;
@@ -83,7 +85,8 @@
   .tea-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(180,120,40,0.08);
     overflow: hidden;
     margin: 0 0 16px 0;
     animation: fadeUp 0.6s ease both;
@@ -205,22 +208,22 @@
   }
 
   .detail-text {
-    font-size: 12.5px;
+    font-size: 15px;
     line-height: 1.6;
-    color: rgba(232,240,228,0.75);
+    color: rgba(20,10,0,0.72);
     font-weight: 300;
   }
 
   .detail-text strong {
     color: var(--text);
-    font-weight: 500;
+    font-weight: 600;
   }
 
   /* Benefits */
   .benefits-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 2px;
+    background: linear-gradient(135deg,#edf5e8,#f5f0e8);
+    border: 1px solid rgba(122,154,90,0.2);
+    border-radius: 16px;
     padding: 18px 24px;
     margin-bottom: 16px;
     animation: fadeUp 0.6s 0.15s ease both;
@@ -248,15 +251,15 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--accent2);
     margin-top: 6px;
     flex-shrink: 0;
   }
 
   .benefit-text {
-    font-size: 12.5px;
+    font-size: 15px;
     line-height: 1.6;
-    color: rgba(232,240,228,0.75);
+    color: rgba(20,10,0,0.72);
     font-weight: 300;
   }
 
@@ -264,7 +267,7 @@
   .week-nav {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 16px;
     padding: 16px 20px;
     animation: fadeUp 0.6s 0.3s ease both;
   }
@@ -324,7 +327,7 @@
   .timer-section {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: 16px;
     padding: 18px 24px;
     margin-top: 16px;
     text-align: center;
@@ -360,7 +363,7 @@
 
   .timer-bar {
     height: 100%;
-    background: var(--accent);
+    background: var(--accent2);
     border-radius: 1px;
     transition: width 1s linear;
     width: 0%;
@@ -374,7 +377,7 @@
   }
 
   .btn {
-    font-family: 'Jost', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -384,7 +387,7 @@
     background: transparent;
     color: var(--text);
     cursor: pointer;
-    border-radius: 1px;
+    border-radius: 20px;
     transition: all 0.2s;
   }
 
@@ -417,7 +420,7 @@
 
   /* Temp note */
   .temp-note {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--muted);
     font-style: italic;
     margin-top: 6px;
@@ -441,7 +444,7 @@
 <div class="container">
   <header>
     <div class="date-label" id="todayDate"></div>
-    <div class="main-title">Tee des Tages</div>
+    <div class="main-title" style="font-family:'Playfair Display',serif;font-size:22px;font-style:italic;font-weight:400;color:var(--text);">🍵 Mein Tee des Tages</div>
   </header>
 
   <div id="teaCard" class="tea-card">
@@ -481,17 +484,17 @@
   </div>
 
   <div class="benefits-card">
-    <span class="section-label">Wirkung</span>
+    <span class="section-label">Warum dieser Tee mir gut tut</span>
     <div id="benefitsList"></div>
   </div>
 
   <div class="week-nav">
-    <span class="week-label">Wochenplan</span>
+    <span class="week-label">Mein Tee-Ritual der Woche</span>
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
   <div class="timer-section">
-    <span class="section-label">Zieh-Timer</span>
+    <span class="section-label">Zieh-Timer — mit Ruhe</span>
     <span class="timer-label" id="timerLabel">Bereit</span>
     <div class="timer-display" id="timerDisplay">—:——</div>
     <div class="timer-progress">
@@ -499,8 +502,8 @@
     </div>
     <div class="timer-phase" id="timerPhase"></div>
     <div class="timer-btns">
-      <button class="btn primary" id="btnStart" onclick="startTimer()">Start</button>
-      <button class="btn" id="btnReset" onclick="resetTimer()" disabled>Reset</button>
+      <button class="btn primary" id="btnStart" onclick="startTimer()">🍵 Starten</button>
+      <button class="btn" id="btnReset" onclick="resetTimer()" disabled>↺ Neu</button>
     </div>
   </div>
 </div>
@@ -688,7 +691,7 @@ function renderTea(idx) {
   document.getElementById('statTemp').textContent = tea.temp;
   document.getElementById('statZieh').textContent = tea.zieh;
   document.getElementById('tempTip').innerHTML = tea.tempTip;
-  document.getElementById('teaTip').innerHTML = `<strong>Tipp:</strong> ${tea.tip}`;
+  document.getElementById('teaTip').innerHTML = `<strong>🌿 Mein Tipp:</strong> ${tea.tip}`;
 
   const bl = document.getElementById('benefitsList');
   bl.innerHTML = tea.benefits.map(b => `
@@ -740,7 +743,7 @@ function startTimer() {
   timerRunning = true;
   document.getElementById('btnStart').disabled = true;
   document.getElementById('btnReset').disabled = false;
-  document.getElementById('timerPhase').textContent = 'Tee zieht …';
+  document.getElementById('timerPhase').textContent = '🍵 Tee zieht …';
 
   timerInterval = setInterval(() => {
     timerRemaining--;
@@ -751,8 +754,8 @@ function startTimer() {
     if (timerRemaining <= 0) {
       clearInterval(timerInterval);
       timerRunning = false;
-      document.getElementById('timerDisplay').textContent = '✓ Fertig';
-      document.getElementById('timerPhase').textContent = 'Tee ist fertig — guten Genuss! 🍵';
+      document.getElementById('timerDisplay').textContent = '🌿 Fertig';
+      document.getElementById('timerPhase').textContent = 'Dein Tee ist bereit — genieße jeden Schluck. 🍵';
       document.getElementById('timerBar').style.width = '100%';
       document.getElementById('btnStart').disabled = true;
     }

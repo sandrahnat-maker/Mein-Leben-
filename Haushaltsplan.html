@@ -2,1365 +2,406 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Haushaltsplan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mein Zuhause fühlen 🏡</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500;600&display=swap');
 :root{
-  --bg:#F8F4EF; --surface:#FFF; --border:rgba(160,130,90,.15);
-  --accent:#8B6A3E; --g:#5C8A5E; --p:#7B5EA7; --t:#3A8C7C;
-  --red:#C0392B; --text:#1C160E; --muted:rgba(60,45,20,.45);
-  --step-bg:#FDFAF6; --step-active:#FFF8EE; --step-done:#F0F7F0;
+  --bg:#faf3e8;--white:#fffdf8;--text:#2e2010;
+  --muted:rgba(20,10,0,0.58);--gold:#c8943a;--gold2:#e8b86a;
+  --terra:#c4704a;--sage:#7a9a5a;--rose:#c4807a;--lavender:#9a7ab8;
+  --border:rgba(180,130,70,0.15);
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);font-family:'DM Sans',system-ui,sans-serif;color:var(--text);min-height:100vh;padding-bottom:6rem}
+html{font-size:18px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);font-family:'Cormorant Garamond',Georgia,serif;color:var(--text);min-height:100vh;padding-bottom:4rem;}
 
-/* HEADER */
-header{background:rgba(248,244,239,.97);border-bottom:1px solid var(--border);padding:.75rem 1rem .6rem;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
-.htop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem}
-.htitle{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;letter-spacing:.03em}
-.hbadge{font-size:.58rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.1rem}
-.hright{text-align:right}
-.total-min{font-size:1.1rem;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
-.total-lbl{font-size:.55rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+header{
+  background:linear-gradient(135deg,#f5ede0,#faf3e8);
+  border-bottom:1px solid var(--border);
+  padding:1.1rem 1.2rem .9rem;
+  box-shadow:0 1px 8px rgba(180,120,40,0.07);
+  text-align:center;
+}
+.header-title{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;font-weight:400;color:var(--text);margin-bottom:.2rem;}
+.header-sub{font-size:13px;color:var(--muted);font-style:italic;}
 
-/* WOCHENTAG */
-.daystrip{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:.05rem 0 .4rem}
-.dbtn{background:transparent;border:none;cursor:pointer;padding:.22rem 0;display:flex;flex-direction:column;align-items:center;gap:.18rem}
-.dname{font-size:.54rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);transition:color .2s}
-.dnum{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:500;transition:all .2s}
-.dbtn.active .dname{color:var(--accent)}
-.dbtn.active .dnum{background:var(--accent);color:#fff}
-.dbtn.today .dnum{outline:2px solid var(--accent);outline-offset:2px}
-.ddot{width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:.3}
-.dbtn.active .ddot{opacity:1}
+.view{display:none;padding:1.2rem 1rem;}
+.view.active{display:block;}
 
-/* MAIN */
-main{padding:.8rem .9rem 1rem;max-width:540px;margin:0 auto}
+.room-intro{text-align:center;margin-bottom:1.4rem;}
+.room-intro-text{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--text);line-height:1.6;margin-bottom:.4rem;}
+.room-intro-sub{font-size:14px;color:var(--muted);font-style:italic;}
 
-/* PROGRESS */
-.prog-row{display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-bottom:.25rem}
-.prog-wrap{background:rgba(160,130,90,.1);border-radius:3px;height:3px;margin-bottom:.8rem;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--g));border-radius:3px;transition:width .4s}
+.rooms-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.room-card{
+  background:var(--white);border-radius:16px;padding:1.2rem 1rem;
+  text-align:center;cursor:pointer;border:1.5px solid var(--border);
+  transition:all .2s;box-shadow:0 2px 10px rgba(180,120,40,0.06);
+}
+.room-card:active{transform:scale(.97);}
+.room-card.selected{border-color:var(--gold);background:linear-gradient(135deg,#fdf6e0,#faf3e8);}
+.room-icon{font-size:2rem;margin-bottom:.5rem;}
+.room-name{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--text);}
+.room-card.selected .room-name{color:var(--gold);}
 
-/* AUDIO CONTROLLER */
-.audio-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:.9rem 1rem;margin-bottom:.9rem;box-shadow:0 2px 12px rgba(150,110,50,.07)}
-.audio-now{margin-bottom:.6rem}
-.audio-label{font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.18rem}
-.audio-task{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;color:var(--text);line-height:1.3;min-height:1.5rem}
-.audio-sub{font-size:.67rem;color:var(--muted);margin-top:.12rem;line-height:1.4}
-.audio-timer{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem}
-.timer-display{font-size:2rem;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
-.timer-of{font-size:.6rem;color:var(--muted);margin-top:.15rem}
-.timer-bar-wrap{flex:1;margin-left:.8rem}
-.timer-bar-bg{background:rgba(160,130,90,.1);border-radius:4px;height:6px;overflow:hidden}
-.timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--g));border-radius:4px;transition:width .5s linear}
-.next-label{font-size:.58rem;color:var(--muted);margin-top:.3rem}
-.audio-btns{display:flex;gap:.5rem}
-.btn-main{flex:1;padding:.65rem;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem}
-.btn-main:active{transform:scale(.97)}
-.btn-main.running{background:var(--g)}
-.btn-main.done-all{background:#2E7D4F}
-.btn-skip{padding:.65rem .8rem;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-skip:active{background:rgba(0,0,0,.04)}
-.btn-prev{padding:.65rem .8rem;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:inherit;transition:all .15s}
-.voice-bar{display:flex;align-items:center;justify-content:space-between;margin-top:.55rem;padding-top:.55rem;border-top:1px solid var(--border)}
-.voice-lbl{font-size:.6rem;color:var(--muted)}
-.voice-toggle{display:flex;align-items:center;gap:.5rem}
-.toggle-sw{width:32px;height:18px;border-radius:9px;background:rgba(160,130,90,.2);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
-.toggle-sw.on{background:var(--accent)}
-.toggle-sw::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle-sw.on::after{left:16px}
+.q-card{
+  background:var(--white);border-radius:18px;padding:1.4rem 1.2rem;
+  margin-bottom:1rem;border:1px solid var(--border);
+  box-shadow:0 2px 12px rgba(180,120,40,0.07);
+}
+.q-step{font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:.6rem;}
+.q-text{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;font-weight:400;color:var(--text);line-height:1.5;margin-bottom:1.1rem;}
+.q-room-name{color:var(--gold);}
 
-/* ── MICRO-STEPS PANEL ── */
-.steps-panel{background:var(--surface);border:1px solid rgba(139,106,62,.25);border-radius:14px;margin-bottom:.9rem;overflow:hidden;box-shadow:0 2px 16px rgba(139,106,62,.08);position:relative;z-index:10}
-.steps-panel.hidden{display:none!important}
-.steps-header{padding:.75rem 1rem .6rem;background:rgba(139,106,62,.06);border-bottom:1px solid rgba(139,106,62,.12)}
-.steps-task-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:var(--text)}
-.steps-meta{font-size:.6rem;color:var(--muted);margin-top:.1rem}
-.steps-progress{display:flex;align-items:center;gap:.5rem;margin-top:.5rem}
-.steps-prog-bar{flex:1;height:4px;background:rgba(139,106,62,.1);border-radius:3px;overflow:hidden}
-.steps-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--g));border-radius:3px;transition:width .3s}
-.steps-prog-lbl{font-size:.58rem;color:var(--accent);font-weight:600;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem;}
+.chip{
+  padding:.38rem .9rem;border-radius:20px;font-size:14px;
+  font-family:'Cormorant Garamond',serif;cursor:pointer;
+  border:1.5px solid var(--border);background:var(--bg);
+  color:var(--text);transition:all .2s;
+}
+.chip:active{transform:scale(.96);}
+.chip.on{color:#fff;}
+.chip.on.sage{background:var(--sage);border-color:var(--sage);}
+.chip.on.rose{background:var(--rose);border-color:var(--rose);}
+.chip.on.lavender{background:var(--lavender);border-color:var(--lavender);}
+.chip.on.terra{background:var(--terra);border-color:var(--terra);}
+.chip.on.gold{background:var(--gold);border-color:var(--gold);}
 
-/* UTENSILIEN */
-.utensils-block{padding:.65rem 1rem;border-bottom:1px solid rgba(139,106,62,.1);background:rgba(255,249,240,.5)}
-.utensils-label{font-size:.54rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
-.utensils-list{display:flex;flex-wrap:wrap;gap:.3rem}
-.utensil-chip{background:#FFF3E0;border:1px solid rgba(139,106,62,.2);border-radius:6px;padding:.18rem .45rem;font-size:.66rem;font-weight:500;color:var(--accent);display:flex;align-items:center;gap:.25rem}
-.utensil-chip.got{background:#E8F5E9;border-color:rgba(92,138,94,.3);color:var(--g)}
-.utensil-chip.got::before{content:'✓ '}
+.ta{
+  width:100%;border:1.5px solid var(--border);border-radius:12px;
+  padding:.9rem 1rem;font-family:'Cormorant Garamond',serif;
+  font-size:16px;color:var(--text);background:var(--bg);
+  resize:none;min-height:90px;line-height:1.6;
+}
+.ta::placeholder{color:var(--muted);font-style:italic;}
+.ta:focus{outline:none;border-color:var(--gold);}
 
-/* EINZELNE STEPS */
-.step-list{padding:.5rem .7rem}
-.step-item{display:flex;gap:.6rem;padding:.55rem .5rem;border-radius:9px;margin-bottom:.25rem;transition:all .2s;cursor:pointer;align-items:flex-start}
-.step-item.step-active{background:var(--step-active);border:1px solid rgba(139,106,62,.25)}
-.step-item.step-done{background:var(--step-done);opacity:.65}
-.step-item.step-pending{background:transparent}
-.step-nr{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:.05rem;transition:all .2s}
-.step-nr.nr-active{background:var(--accent);color:#fff}
-.step-nr.nr-done{background:var(--g);color:#fff}
-.step-nr.nr-pending{background:rgba(139,106,62,.1);color:var(--muted)}
-.step-content{flex:1;min-width:0}
-.step-text{font-size:.8rem;font-weight:500;line-height:1.4;color:var(--text)}
-.step-item.step-done .step-text{text-decoration:line-through;color:var(--muted)}
-.step-item.step-active .step-text{font-weight:600;color:var(--accent)}
-.step-detail{font-size:.67rem;color:var(--muted);margin-top:.2rem;line-height:1.45;font-style:italic}
-.step-btns{display:flex;gap:.4rem;margin-top:.55rem;padding:0 .5rem .5rem}
-.btn-step-done{flex:1;padding:.55rem;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-step-done:active{transform:scale(.97)}
-.btn-step-done.done-step{background:var(--g)}
-.btn-step-back{padding:.55rem .75rem;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer;font-family:inherit}
-.btn-step-skip-task{padding:.55rem .75rem;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer;font-family:inherit}
+.needs-label{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:.6rem;margin-top:.8rem;display:block;}
 
-/* ALL DONE WITHIN STEPS */
-.steps-all-done{padding:1rem;text-align:center;display:none}
-.steps-all-done.show{display:block}
-.steps-all-done .check-big{font-size:2rem;margin-bottom:.3rem}
-.steps-all-done p{font-size:.75rem;color:var(--muted)}
+.affirmation-card{
+  background:linear-gradient(150deg,#f5ede0,#fdf6ee,#f0ede8);
+  border-radius:18px;padding:1.6rem 1.4rem;
+  text-align:center;border:1px solid rgba(200,148,58,0.2);
+  box-shadow:0 4px 20px rgba(180,120,40,0.1);
+  margin-bottom:1rem;
+  animation:fadeIn .5s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.affirmation-icon{font-size:2.5rem;margin-bottom:.8rem;}
+.affirmation-room{font-size:12px;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:.5rem;}
+.affirmation-feeling{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;color:var(--text);margin-bottom:.4rem;line-height:1.5;}
+.affirmation-need{font-size:14px;color:var(--muted);font-style:italic;margin-bottom:1rem;line-height:1.6;}
+.affirmation-text{
+  font-family:'Playfair Display',serif;font-size:17px;font-style:italic;
+  color:var(--terra);line-height:1.7;padding:.85rem 1rem;
+  background:rgba(255,253,248,.8);border-radius:12px;
+  border-left:3px solid var(--gold2);text-align:left;
+}
 
-/* AUFGABENLISTE */
-.section-day{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:.85rem 0 .4rem .05rem}
-.task-row{display:flex;align-items:center;gap:.55rem;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.5rem .7rem;margin-bottom:.3rem;transition:all .2s;position:relative;overflow:hidden;cursor:pointer}
-.task-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:9px 0 0 9px}
-.task-row.current::before{background:var(--accent);width:4px}
-.task-row.current{border-color:rgba(139,106,62,.4);background:rgba(251,240,224,.4)}
-.task-row.done-t{opacity:.38}
-.task-row.done-t .tname{text-decoration:line-through}
-.task-row.monthly::before{background:var(--p)}
-.tnr{font-size:.6rem;color:var(--muted);width:1.2rem;flex-shrink:0;text-align:center}
-.tinfo2{flex:1;min-width:0}
-.tname{font-size:.79rem;font-weight:500;line-height:1.3}
-.ttip2{font-size:.64rem;color:var(--muted);margin-top:.05rem;line-height:1.35}
-.tmin2{font-size:.56rem;color:var(--accent);font-weight:600;flex-shrink:0;background:rgba(139,106,62,.08);padding:.07rem .3rem;border-radius:5px;white-space:nowrap}
-.freq-chip{display:inline-flex;font-size:.52rem;background:#F0E8FB;color:#7B5EA7;padding:.05rem .32rem;border-radius:5px;margin-left:.25rem;font-weight:600;vertical-align:middle}
-.steps-badge{font-size:.52rem;background:rgba(139,106,62,.1);color:var(--accent);padding:.05rem .32rem;border-radius:5px;margin-left:.25rem;font-weight:600;vertical-align:middle}
+.btn-primary{
+  width:100%;background:var(--gold);color:#fff;border:none;
+  border-radius:30px;padding:.7rem 1.5rem;font-size:16px;
+  font-family:'Cormorant Garamond',serif;cursor:pointer;
+  transition:all .2s;margin-top:.8rem;display:block;
+}
+.btn-primary:active{transform:scale(.98);opacity:.9;}
+.btn-secondary{
+  width:100%;background:transparent;color:var(--muted);
+  border:1.5px solid var(--border);border-radius:30px;
+  padding:.6rem 1.5rem;font-size:15px;font-family:'Cormorant Garamond',serif;
+  cursor:pointer;transition:all .2s;margin-top:.5rem;display:block;
+}
+.btn-secondary:active{transform:scale(.98);}
 
-/* DONE BANNER */
-.done-banner{background:linear-gradient(135deg,#2E7D4F,#3A8C7C);border-radius:14px;padding:1.2rem 1rem;text-align:center;margin-bottom:.8rem;display:none}
-.done-banner.show{display:block}
-.done-banner h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#fff;font-weight:400;margin-bottom:.3rem}
-.done-banner p{font-size:.72rem;color:rgba(255,255,255,.8)}
+.nav-dots{display:flex;justify-content:center;gap:.5rem;padding:.6rem 0 1rem;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s;}
+.dot.active{background:var(--gold);width:20px;border-radius:4px;}
+
+.history-title{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--muted);text-align:center;margin-bottom:1rem;}
+.history-empty{text-align:center;font-size:14px;color:var(--muted);font-style:italic;padding:2rem 0;}
+.history-item{
+  background:var(--white);border-radius:14px;padding:.9rem 1rem;
+  margin-bottom:.6rem;border:1px solid var(--border);
+}
+.history-date{font-size:12px;color:var(--muted);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}
+.history-room{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--text);}
+.history-details{font-size:13px;color:var(--muted);font-style:italic;margin-top:.25rem;line-height:1.6;}
+
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--white);border-top:1px solid var(--border);
+  display:flex;padding:.5rem 0;
+  box-shadow:0 -2px 12px rgba(180,120,40,0.07);
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:.2rem;background:none;border:none;cursor:pointer;padding:.4rem 0;
+  font-family:'Cormorant Garamond',serif;
+}
+.bnav-icon{font-size:1.3rem;}
+.bnav-label{font-size:11px;color:var(--muted);}
+.bnav-btn.on .bnav-label{color:var(--gold);}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="htop">
-    <div>
-      <div class="htitle">🏠 Haushaltsblock</div>
-      <div class="hbadge">Schritt für Schritt · max. 30 Min.</div>
-    </div>
-    <div class="hright">
-      <div class="total-min" id="totalMin">0</div>
-      <div class="total-lbl">Min heute</div>
-    </div>
-  </div>
-  <div class="daystrip" id="ds"></div>
+  <div class="header-title">🏡 Mein Zuhause fühlen</div>
+  <div class="header-sub">Was braucht mein Raum heute?</div>
 </header>
-<main>
-  <div class="prog-row"><span id="plbl">0 von 0 erledigt</span><span id="ppct">0%</span></div>
-  <div class="prog-wrap"><div class="prog-fill" id="pb" style="width:0%"></div></div>
 
-  <!-- KLASSISCHE STEUERUNG -->
-  <div class="audio-card" id="audioCard">
-    <div class="audio-now">
-      <div class="audio-label">Aktuelle Aufgabe</div>
-      <div class="audio-task" id="curTask">Tippe Start zum Beginnen</div>
-      <div class="audio-sub" id="curTip"></div>
+<!-- RAUM WÄHLEN -->
+<div class="view active" id="view-rooms">
+  <div class="room-intro">
+    <div class="room-intro-text">In welchem Raum<br>möchtest du heute innehalten?</div>
+    <div class="room-intro-sub">Wähle einen Raum — und höre hin.</div>
+  </div>
+  <div class="rooms-grid">
+    <div class="room-card" data-room="Wohnzimmer" data-icon="🛋️" onclick="selectRoom(this)">
+      <div class="room-icon">🛋️</div><div class="room-name">Wohnzimmer</div>
     </div>
-    <div class="audio-timer">
-      <div>
-        <div class="timer-display" id="timerDisp">0:00</div>
-        <div class="timer-of" id="timerOf"></div>
-      </div>
-      <div class="timer-bar-wrap">
-        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timerBar" style="width:0%"></div></div>
-        <div class="next-label" id="nextLbl"></div>
-      </div>
+    <div class="room-card" data-room="Küche" data-icon="🍳" onclick="selectRoom(this)">
+      <div class="room-icon">🍳</div><div class="room-name">Küche</div>
     </div>
-    <div class="audio-btns">
-      <button class="btn-prev" id="btnPrev" onclick="prevTask()">⏮</button>
-      <button class="btn-main" id="btnMain" onclick="mainAction()">▶ Start</button>
-      <button class="btn-skip" id="btnSkip" onclick="skipTask()">⏭︎</button>
+    <div class="room-card" data-room="Schlafzimmer" data-icon="🌙" onclick="selectRoom(this)">
+      <div class="room-icon">🌙</div><div class="room-name">Schlafzimmer</div>
     </div>
-    <div class="voice-bar">
-      <span class="voice-lbl" id="voiceLbl">🔈 Ansage: Aus</span>
-      <div class="voice-toggle">
-        <button class="toggle-sw" id="voiceSw" onclick="toggleVoice()"></button>
-        <span style="font-size:.62rem;color:var(--muted)">Ansage</span>
-      </div>
+    <div class="room-card" data-room="Bad" data-icon="🛁" onclick="selectRoom(this)">
+      <div class="room-icon">🛁</div><div class="room-name">Bad</div>
+    </div>
+    <div class="room-card" data-room="Vorzimmer" data-icon="🚪" onclick="selectRoom(this)">
+      <div class="room-icon">🚪</div><div class="room-name">Vorzimmer</div>
+    </div>
+    <div class="room-card" data-room="Atelier" data-icon="🎨" onclick="selectRoom(this)">
+      <div class="room-icon">🎨</div><div class="room-name">Atelier</div>
+    </div>
+    <div class="room-card" data-room="Essplatz" data-icon="🪑" onclick="selectRoom(this)">
+      <div class="room-icon">🪑</div><div class="room-name">Essplatz</div>
+    </div>
+    <div class="room-card" data-room="Vorraum" data-icon="🧹" onclick="selectRoom(this)">
+      <div class="room-icon">🧹</div><div class="room-name">Vorraum</div>
+    </div>
+    <div class="room-card" data-room="Klo" data-icon="🪴" onclick="selectRoom(this)">
+      <div class="room-icon">🪴</div><div class="room-name">Klo</div>
     </div>
   </div>
+</div>
 
-  <!-- MICRO-STEPS PANEL (wird dynamisch befüllt) -->
-  <div class="steps-panel hidden" id="stepsPanel">
-    <div class="steps-header">
-      <div class="steps-task-name" id="stTaskName"></div>
-      <div class="steps-meta" id="stTaskMeta"></div>
-      <div class="steps-progress">
-        <div class="steps-prog-bar"><div class="steps-prog-fill" id="stProgFill" style="width:0%"></div></div>
-        <div class="steps-prog-lbl" id="stProgLbl">0/0</div>
-      </div>
-    </div>
-    <div class="utensils-block hidden" id="utensilsBlock">
-      <div class="utensils-label">🧹 Benötigte Utensilien</div>
-      <div class="utensils-list" id="utensilsList"></div>
-    </div>
-    <div class="step-list" id="stepList"></div>
-    <div class="steps-all-done" id="stepsAllDone">
-      <div class="check-big">✅</div>
-      <p>Aufgabe erledigt!</p>
-    </div>
-    <div class="step-btns">
-      <button class="btn-step-back" id="btnStepBack" onclick="stepBack()">← Zurück</button>
-      <button class="btn-step-done" id="btnStepNext" onclick="stepNext()">✓ Schritt erledigt</button>
-      <button class="btn-step-skip-task" onclick="skipFromSteps()">Überspringen ⏭</button>
-    </div>
+<!-- FÜHLEN -->
+<div class="view" id="view-feel">
+  <div class="nav-dots">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
   </div>
-
-  <div class="done-banner" id="doneBanner">
-    <h2>✨ Fertig!</h2>
-    <p id="doneText">Alle Aufgaben erledigt.</p>
+  <div class="q-card">
+    <div class="q-step">Schritt 1 · Fühlen</div>
+    <div class="q-text">Wie fühlt sich <span class="q-room-name" id="feelRoomName"></span> gerade an?</div>
+    <div class="chips" id="feelChips">
+      <div class="chip" data-color="sage" onclick="toggleChip(this)">🌿 ruhig & stimmig</div>
+      <div class="chip" data-color="gold" onclick="toggleChip(this)">✨ lebendig</div>
+      <div class="chip" data-color="terra" onclick="toggleChip(this)">🍂 schwer & voll</div>
+      <div class="chip" data-color="rose" onclick="toggleChip(this)">🌸 sanft & warm</div>
+      <div class="chip" data-color="lavender" onclick="toggleChip(this)">💜 unruhig</div>
+      <div class="chip" data-color="terra" onclick="toggleChip(this)">🌫️ stagnierend</div>
+      <div class="chip" data-color="sage" onclick="toggleChip(this)">🌬️ frisch & klar</div>
+      <div class="chip" data-color="rose" onclick="toggleChip(this)">🕯️ gemütlich</div>
+    </div>
+    <textarea class="ta" id="feelText" placeholder="Oder beschreibe es mit deinen eigenen Worten..."></textarea>
   </div>
+  <button class="btn-primary" onclick="goToNeeds()">Weiter →</button>
+  <button class="btn-secondary" onclick="showView('view-rooms')">‹ Zurück</button>
+</div>
 
-  <div id="taskList"></div>
-</main>
+<!-- BRAUCHEN -->
+<div class="view" id="view-needs">
+  <div class="nav-dots">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+  <div class="q-card">
+    <div class="q-step">Schritt 2 · Lauschen</div>
+    <div class="q-text">Was braucht <span class="q-room-name" id="needRoomName"></span> gerade von mir?</div>
+    <div class="chips" id="needChips">
+      <div class="chip" data-color="sage" onclick="toggleChip(this)">🌬️ Luft & Lüften</div>
+      <div class="chip" data-color="gold" onclick="toggleChip(this)">🕯️ Licht & Wärme</div>
+      <div class="chip" data-color="terra" onclick="toggleChip(this)">🧹 leichtes Aufräumen</div>
+      <div class="chip" data-color="rose" onclick="toggleChip(this)">🌸 ein schönes Detail</div>
+      <div class="chip" data-color="sage" onclick="toggleChip(this)">🌱 Pflanzen gießen</div>
+      <div class="chip" data-color="lavender" onclick="toggleChip(this)">✨ Energie reinigen</div>
+      <div class="chip" data-color="terra" onclick="toggleChip(this)">📦 etwas weggeben</div>
+      <div class="chip" data-color="gold" onclick="toggleChip(this)">🛋️ nichts — es ist gut so</div>
+      <div class="chip" data-color="rose" onclick="toggleChip(this)">🎨 einen kreativen Touch</div>
+      <div class="chip" data-color="sage" onclick="toggleChip(this)">🔇 Stille & Ruhe</div>
+    </div>
+    <span class="needs-label">Noch etwas das du spürst oder weißt?</span>
+    <textarea class="ta" id="needText" placeholder="Ein Gedanke, eine Idee, ein Gefühl..."></textarea>
+  </div>
+  <button class="btn-primary" onclick="saveAndShow()">🌿 Speichern & Innehalten</button>
+  <button class="btn-secondary" onclick="showView('view-feel')">‹ Zurück</button>
+</div>
+
+<!-- AFFIRMATION -->
+<div class="view" id="view-affirm">
+  <div class="nav-dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+  <div class="affirmation-card">
+    <div class="affirmation-icon" id="affirmIcon"></div>
+    <div class="affirmation-room" id="affirmRoom"></div>
+    <div class="affirmation-feeling" id="affirmFeeling"></div>
+    <div class="affirmation-need" id="affirmNeed"></div>
+    <div class="affirmation-text" id="affirmText"></div>
+  </div>
+  <button class="btn-primary" onclick="showView('view-history')" style="margin-top:0">Alle Räume ansehen →</button>
+  <button class="btn-secondary" onclick="startNew()">Neuen Raum fühlen</button>
+</div>
+
+<!-- VERLAUF -->
+<div class="view" id="view-history">
+  <div class="history-title">Meine Raumgefühle</div>
+  <div id="historyList"></div>
+  <button class="btn-primary" onclick="startNew()">🌿 Neuen Raum fühlen</button>
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav-btn on" id="bnav-home" onclick="startNew()">
+    <div class="bnav-icon">🏡</div>
+    <div class="bnav-label">Fühlen</div>
+  </button>
+  <button class="bnav-btn" id="bnav-hist" onclick="openHistory()">
+    <div class="bnav-icon">🌿</div>
+    <div class="bnav-label">Verlauf</div>
+  </button>
+</div>
+
 <script>
-// ── MICRO-STEPS DATEN ─────────────────────────────────────────────────────
-// Jede Aufgabe hat: utensilien[], steps[]
-// Jeder Step: {text, detail (optional)}
-var STEPS = {
-  // LÜFTEN
-  5: {
-    utensilien: [],
-    steps: [
-      {text: "Schlafzimmer-Fenster öffnen", detail: "Griff ganz drehen – auf Kipp oder ganz auf"},
-      {text: "Wohnzimmer-Fenster öffnen", detail: "Querlüften: gegenüberliegende Fenster öffnen schafft Durchzug"},
-      {text: "Küchen-Fenster öffnen", detail: "Auch den Dunstabzug kurz einschalten wenn vorhanden"},
-      {text: "Badezimmer-Tür aufmachen", detail: "So lüftet auch das Bad ohne Fenster mit aus"},
-      {text: "5 Minuten warten", detail: "Jetzt schon Heizung abdrehen – spart Energie!"},
-      {text: "Alle Fenster wieder schließen", detail: "Alle Zimmer kontrollieren – keines vergessen"},
-    ]
-  },
-  // HEIZUNG
-  6: {
-    utensilien: [],
-    steps: [
-      {text: "Schlafzimmer-Heizkörper auf 0 oder Stern ❄️", detail: "Während der Lüftung nicht heizen – Energie sparen"},
-      {text: "Wohnzimmer-Heizkörper auf 0 oder Stern ❄️", detail: "Nur solange die Fenster offen sind"},
-      {text: "Küche – Heizkörper prüfen und abstellen", detail: "Falls vorhanden"},
-      {text: "Nach dem Lüften: Heizung wieder anstellen", detail: "Auf gewünschte Stufe zurückdrehen"},
-    ]
-  },
-  // KATZENKLO
-  3: {
-    utensilien: ["Schaufel / Sieb", "Müllbeutel", "Frisches Katzenstreu", "Ggf. Handschuhe"],
-    steps: [
-      {text: "Müllbeutel bereitlegen", detail: "Einen kleinen Beutel oder alten Plastiksack nehmen"},
-      {text: "Klumpen und Häufchen mit der Siebschaufel heraussieben", detail: "Eimer oder Beutel direkt darunterhalten"},
-      {text: "Beutel gut zuknoten", detail: "Geruchsdicht verknoten, nicht zu voll füllen"},
-      {text: "Beutel zum Mülleimer bringen", detail: "Am besten gleich in den Gang-Mülleimer"},
-      {text: "Frisches Streu nachfüllen", detail: "Ca. 3–4 cm Schicht – nicht zu wenig, dann klumpt es schlecht"},
-      {text: "Schaufel kurz abwischen oder abspülen", detail: "Mit Zeitungspapier abstreifen oder kurz abspülen"},
-    ]
-  },
-  // BETT MACHEN
-  1: {
-    utensilien: [],
-    steps: [
-      {text: "Decke zurückschlagen – Matratze auslüften lassen", detail: "Kurz offen lassen während du die Polster machst"},
-      {text: "Polster aufschütteln und zurechtlegen", detail: "Kräftig schütteln – Federn oder Füllung verteilen sich"},
-      {text: "Leintuch glattziehen", detail: "Falten rausziehen, Ecken einstecken"},
-      {text: "Decke auflegen und glattstreichen", detail: "Gleichmäßig verteilen, Überhang auf beiden Seiten gleich"},
-      {text: "Zierkissen oder zweite Decke drapieren", detail: "Falls vorhanden – macht's ordentlicher"},
-    ]
-  },
-  // KÜCHE AUFRÄUMEN
-  2: {
-    utensilien: ["Mikrofasertuch (feucht)", "Allzweckreiniger oder Essigreiniger", "Küchenrolle"],
-    steps: [
-      {text: "Geschirr vom Vortag in die Spülmaschine räumen", detail: "Oder in die Spüle stapeln wenn noch dreckig"},
-      {text: "Arbeitsfläche links von der Spüle abräumen", detail: "Alles was nicht dorthin gehört, weggeben"},
-      {text: "Arbeitsfläche links abwischen", detail: "Nasses Tuch mit etwas Reiniger – Krümel und Flecken weg"},
-      {text: "Arbeitsfläche rechts vom Herd abräumen und abwischen", detail: "Gleich vorgehen"},
-      {text: "Herdplatten abwischen", detail: "Lauwarmes Wasser + Tuch – bei hartnäckigem: Backofenspray kurz einwirken"},
-      {text: "Herdrahmen und Seiten abwischen", detail: "Oft vergessen – Fettspritzer sammeln sich hier"},
-      {text: "Spüle kurz auswischen", detail: "Mit feuchtem Tuch oder Schwamm kurz durchwischen"},
-    ]
-  },
-  // WÄSCHE STARTEN
-  22: {
-    utensilien: ["Waschmittel (flüssig oder Pulver)", "Weichspüler (optional)", "Wäschekorb"],
-    steps: [
-      {text: "Wäschekorb holen und zur Waschmaschine bringen", detail: ""},
-      {text: "Wäsche sortieren – nur die richtige Farbe heute einladen", detail: "Heute: sieh auf den Wochenplan welche Farbe dran ist"},
-      {text: "Wäsche in die Trommel laden", detail: "Nicht zu voll – Trommel sollte noch eine Handbreit Platz haben"},
-      {text: "Waschmittel einfüllen", detail: "In die Schublade: Hauptwäsche-Fach (II) – Dosierung laut Packung"},
-      {text: "Weichspüler einfüllen (optional)", detail: "In das ✿-Fach – nicht zu viel, sonst Rückstände"},
-      {text: "Richtiges Programm wählen und starten", detail: "Dunkel: 30°, Hell: 40–60°, Bunt: 40° – Schontrommel wenn empfindlich"},
-    ]
-  },
-  // WOHNZIMMER STAUB
-  10: {
-    utensilien: ["Staubtuch oder Mikrofasertuch trocken", "Ev. Glasreiniger für TV"],
-    steps: [
-      {text: "Staubtuch nehmen – trockenes Mikrofasertuch", detail: "Kein feuchtes Tuch – Staub wird sonst verschmiert"},
-      {text: "Obere Regalböden abwischen", detail: "Von links nach rechts, von oben nach unten"},
-      {text: "Bücher/Deko kurz wegheben und darunter wischen", detail: "Nur kurz – nicht alles ausräumen"},
-      {text: "TV-Bildschirm abwischen", detail: "Nur trockenes Mikrofasertuch – kein Spray direkt auf den Schirm!"},
-      {text: "TV-Standfuß und dahinter wischen", detail: "Kabel nicht verheddern"},
-      {text: "Couchtisch abwischen", detail: "Alles kurz wegschieben, Tisch komplett wischen"},
-      {text: "Fensterbrett abwischen", detail: "Oft voller Staub – nicht vergessen"},
-    ]
-  },
-  // WOHNZIMMER SAUGEN
-  11: {
-    utensilien: ["Staubsauger", "Ev. Polsteraufsatz"],
-    steps: [
-      {text: "Staubsauger holen und anschließen", detail: "Richtige Düse: breite Bodendüse für Hartboden oder Teppich"},
-      {text: "Couch-Kissen abnehmen und auf die Seite legen", detail: "So kommt man an den Boden darunter"},
-      {text: "Unter der Couch saugen", detail: "Düse flach einführen – hier sammeln sich Haare und Staub!"},
-      {text: "Couch selbst absaugen (Sitz und Lehne)", detail: "Polsteraufsatz verwenden wenn vorhanden"},
-      {text: "Unter den Sesseln saugen", detail: "Sessel kurz zur Seite schieben wenn möglich"},
-      {text: "Teppich in der Mitte saugen", detail: "Gleichmäßige Bahnen, nicht zu schnell ziehen"},
-      {text: "Ränder und Ecken des Zimmers saugen", detail: "Düse schräg halten für Ecken"},
-      {text: "Staubsauger wegräumen", detail: ""},
-    ]
-  },
-  // VORZIMMER FEGEN
-  12: {
-    utensilien: ["Besen oder Handfeger", "Kehrschaufel", "Ev. Schuhlöffel"],
-    steps: [
-      {text: "Schuhe vom Boden ins Regal räumen", detail: "Jedes Paar ins Regal – kein Schuh soll am Boden stehen bleiben"},
-      {text: "Taschen und Jacken aufhängen", detail: "Alles an den Haken oder in den Schrank"},
-      {text: "Besen nehmen und Staub/Dreck zusammenfegen", detail: "Von den Ecken zur Mitte hin fegen"},
-      {text: "Unter das Schuhregalbrett fegen", detail: "Dort sammelt sich viel Dreck – nicht vergessen!"},
-      {text: "Schmutz mit Kehrschaufel aufnehmen", detail: ""},
-      {text: "In den Mülleimer leeren und Besen wegräumen", detail: ""},
-    ]
-  },
-  // MÜLL RAUSBRINGEN
-  13: {
-    utensilien: ["Neue Müllsäcke", "Ev. Handschuhe"],
-    steps: [
-      {text: "Küchen-Mülleimer leeren", detail: "Sack herausnehmen und zuknoten"},
-      {text: "Bad-Mülleimer leeren", detail: "Meist ein kleiner Eimer – auch wenn nicht voll"},
-      {text: "Schlafzimmer-Mülleimer leeren (falls vorhanden)", detail: ""},
-      {text: "Alle Säcke zum Müllraum / vor die Tür bringen", detail: "Richtiger Müllbehälter: Restmüll, Papier, Gelber Sack"},
-      {text: "Neue Müllsäcke einlegen", detail: "Alle Eimer sofort wieder ausrüsten"},
-    ]
-  },
-  // BÜGELN
-  14: {
-    utensilien: ["Bügeleisen", "Bügelbrett", "Bügelhilfe / Sprühflasche (optional)", "Aufgehängte Kleidung"],
-    steps: [
-      {text: "Bügelbrett aufstellen und Bügeleisen einschalten", detail: "Temperatur je nach Stoff: Baumwolle höher, Synthetik niedrig"},
-      {text: "Während das Eisen aufheizt: Kleidung sortieren", detail: "Von empfindlich (niedrig) zu hitzeresistent (hoch) sortieren"},
-      {text: "Empfindliche Stücke zuerst bügeln (kühles Eisen)", detail: "Synthetik, Seide, feine Blusen"},
-      {text: "Hemden und Blusen bügeln", detail: "Kragen zuerst, dann Schultern, dann Rücken, dann Vorderseiten"},
-      {text: "Hosen bügeln", detail: "Bügelfalte ausrichten, beide Seiten"},
-      {text: "Kleidung sofort auf Bügel hängen", detail: "Nicht stapeln – sonst wieder Falten"},
-      {text: "Bügeleisen ausschalten und abkühlen lassen", detail: "Bügelbrett erst wegklappen wenn Eisen kalt ist"},
-    ]
-  },
-  // SCHLAFZIMMER STAUB
-  20: {
-    utensilien: ["Staubtuch oder Mikrofasertuch trocken", "Ev. Glasreiniger für Spiegel"],
-    steps: [
-      {text: "Staubtuch nehmen", detail: "Trockenes Mikrofasertuch"},
-      {text: "Oberkante der Schränke abwischen", detail: "Oft vergessen – dort sammelt sich viel"},
-      {text: "Schrankfront und Türgriffe abwischen", detail: ""},
-      {text: "Nachttisch links abwischen", detail: "Dinge kurz wegschieben und drunter wischen"},
-      {text: "Nachttisch rechts abwischen", detail: ""},
-      {text: "Spiegel abwischen", detail: "Trockenes Tuch – oder Glasreiniger für streifenfreies Ergebnis"},
-      {text: "Fensterbrett abwischen", detail: ""},
-    ]
-  },
-  // SCHLAFZIMMER SAUGEN
-  21: {
-    utensilien: ["Staubsauger", "Ev. Flachsaugaufsatz"],
-    steps: [
-      {text: "Staubsauger holen", detail: "Flachen Aufsatz vorbereiten für unter dem Bett"},
-      {text: "Unter das Bett saugen – rechts", detail: "Flach einführen – HIER sammelt sich am meisten Staub!"},
-      {text: "Unter das Bett saugen – links", detail: "Auch die Mitte nicht vergessen"},
-      {text: "Boden neben dem Bett saugen", detail: "Beide Seiten"},
-      {text: "Schrankvorfläche saugen", detail: "Bereich vor den Schränken"},
-      {text: "Restlichen Boden in Bahnen saugen", detail: "Gleichmäßige Bahnen von der Ecke weg zur Türe hin"},
-      {text: "Staubsauger wegräumen", detail: ""},
-    ]
-  },
-  // SCHUHE PUTZEN
-  23: {
-    utensilien: ["Schuhbürste", "Schuhcreme (passende Farbe)", "Altes Tuch oder Zeitungspapier"],
-    steps: [
-      {text: "Schuhe herausholen – alle die gereinigt werden", detail: "Auf Zeitungspapier stellen"},
-      {text: "Grobe Verschmutzungen mit trockener Bürste abkratzen", detail: "Sohlen, Seiten, Ecken"},
-      {text: "Oberfläche mit feuchtem Tuch abwischen", detail: "Schmutz und Salz entfernen – trocknen lassen"},
-      {text: "Schuhcreme aufragen (wenn Lederschuhe)", detail: "Dünne Schicht gleichmäßig verreiben"},
-      {text: "Einwirken lassen – 1–2 Minuten", detail: ""},
-      {text: "Mit Bürste auf Hochglanz polieren", detail: "Kreisende Bewegungen – je länger, desto schöner"},
-      {text: "Schuhe zurück ins Regal stellen", detail: "Zeitungspapier entsorgen"},
-    ]
-  },
-  // BAD BADEWANNE
-  30: {
-    utensilien: ["Badreiniger / Allzweckreiniger", "Schwamm oder Schrubber", "Küchenrolle oder altes Tuch"],
-    steps: [
-      {text: "Reiniger in die Badewanne sprühen", detail: "Gleichmäßig verteilen – Ränder, Boden, Abfluss"},
-      {text: "2–3 Minuten einwirken lassen", detail: "Währenddessen Waschbecken vorbereiten oder warten"},
-      {text: "Mit feuchtem Schwamm schrubben", detail: "Wasserlinie und Kalkrand besonders gründlich"},
-      {text: "Abfluss: Haare entfernen (mit Küchenrolle aufheben)", detail: "Eklig aber wichtig – verhindert Verstopfung"},
-      {text: "Mit klarem Wasser abspülen", detail: "Brause oder Kübel – alles Reinigungsmittel abspülen"},
-      {text: "Wannenrand trocken abwischen", detail: "Streifenfreier Abschluss"},
-    ]
-  },
-  // WASCHBECKEN ARMATUREN
-  31: {
-    utensilien: ["Allzweckreiniger oder Zitronenreiniger", "Mikrofasertuch", "Ev. alter Zahnbürste"],
-    steps: [
-      {text: "Reiniger auf Waschbecken sprühen", detail: "Besonders Kalkrand und unter dem Rand"},
-      {text: "Mit feuchtem Tuch schrubben", detail: "Kalkflecken brauchen etwas Druck"},
-      {text: "Armaturen (Wasserhahn) mit Zitronenreiniger einreiben", detail: "Kalk löst sich durch Säure – einwirken lassen"},
-      {text: "Seifenspender und Ablagefläche reinigen", detail: ""},
-      {text: "Alles mit klarem Wasser abspülen", detail: ""},
-      {text: "Armaturen mit trockenem Tuch polieren", detail: "Streifenfrei – glänzt dann schön"},
-      {text: "Waschbecken-Außenseite abwischen", detail: "Unterseite und Seiten"},
-    ]
-  },
-  // SPIEGEL + BAD-BODEN
-  32: {
-    utensilien: ["Glasreiniger", "Mikrofasertuch oder Zeitungspapier", "Wischmopp oder Aufnehmer", "Bodenwischwasser"],
-    steps: [
-      {text: "Glasreiniger auf Spiegel sprühen", detail: "Gleichmäßig – nicht zu viel"},
-      {text: "Mit trockenem Mikrofasertuch oder Zeitungspapier wischen", detail: "Kreisende Bewegungen – streifenfrei"},
-      {text: "Spiegel Rahmen abwischen", detail: "Falls vorhanden"},
-      {text: "Wischmopp/Aufnehmer vorbereiten", detail: "Eimer mit warmem Wasser und Bodenreiniger füllen"},
-      {text: "Boden fegen oder grob absaugen", detail: "Haare und Schmutz zuerst weg"},
-      {text: "Boden feucht wischen – von der Ecke zur Türe", detail: "Nicht zu nass – Holz/Laminat verträgt kein stehendes Wasser"},
-      {text: "Mopp ausspülen und trocknen lassen", detail: ""},
-    ]
-  },
-  // KLO BECKEN
-  33: {
-    utensilien: ["WC-Reiniger", "WC-Bürste", "Desinfektionsspray oder Allzweckreiniger", "Einwegtücher oder altes Tuch"],
-    steps: [
-      {text: "WC-Reiniger innen ins Becken sprühen", detail: "Unter den Rand – dort bildet sich Kalk und Bakterien"},
-      {text: "Einwirken lassen – 2–3 Minuten", detail: "Jetzt Außenseite reinigen"},
-      {text: "WC-Sitz (Deckel) oben abwischen", detail: "Desinfektionsspray + Einwegtuch"},
-      {text: "WC-Sitz Unterseite abwischen", detail: "Oft vergessen – besonders gründlich!"},
-      {text: "WC-Außenseite abwischen: hinten, Seiten, Spülkasten", detail: "Überall wo Hände drankommen"},
-      {text: "WC-Becken innen mit Bürste schrubben", detail: "Unter dem Rand und im Abfluss"},
-      {text: "Spülen", detail: ""},
-      {text: "WC-Bürste kurz in die Schüssel halten, nochmal spülen", detail: "Bürste so reinigen"},
-    ]
-  },
-  // KLO BODEN
-  34: {
-    utensilien: ["Aufnehmer / Feudel", "Bodenwischwasser", "Bodenreiniger"],
-    steps: [
-      {text: "Wischmopp oder Aufnehmer mit Wasser und Reiniger vorbereiten", detail: "Kleiner Eimer – nur wenig Wasser nötig"},
-      {text: "Rund ums WC wischen – besonders darunter und dahinter", detail: "Dort sammeln sich Spritzer – immer zuletzt!"},
-      {text: "Restlichen Boden wischen", detail: "Von der Ecke zur Türe hin"},
-      {text: "Aufnehmer ausspülen", detail: ""},
-    ]
-  },
-  // KÜCHE GERÄTE
-  40: {
-    utensilien: ["Allzweckreiniger", "Mikrofasertuch feucht", "Küchenrolle"],
-    steps: [
-      {text: "Toaster: Krümelschublade herausziehen und über Mülleimer leeren", detail: "Toaster NIE in der Nähe von Wasser reinigen!"},
-      {text: "Toaster Außenseite abwischen", detail: "Leicht feuchtes Tuch – dann trocken"},
-      {text: "Mikrowelle innen: feuchtes Tuch", detail: "Bei Spritzern: kurz eine Tasse Wasser drin erhitzen – Dampf löst alles"},
-      {text: "Mikrowelle außen und Türgriff abwischen", detail: ""},
-      {text: "Kaffeemaschine außen abwischen", detail: "Kalkflecken mit Zitronenreiniger"},
-      {text: "Arbeitsflächen komplett abwischen", detail: "Alles wegräumen was nicht hingehört"},
-    ]
-  },
-  // KÜCHE TEPPICH SAUGEN
-  41: {
-    utensilien: ["Staubsauger", "Ev. Teppichaufsatz"],
-    steps: [
-      {text: "Staubsauger holen und Teppichaufsatz aufstecken", detail: ""},
-      {text: "Teppich von der Mitte aus in Bahnen saugen", detail: "Gleichmäßige Bewegungen"},
-      {text: "Ränder des Teppichs gründlich saugen", detail: "Hier häufen sich Krümel"},
-      {text: "Teppich umdrehen und Unterseite kurz absaugen", detail: "Nicht immer nötig, aber 1x/Woche gut"},
-      {text: "Teppich wieder hinlegen", detail: ""},
-    ]
-  },
-  // KÜCHE BODEN WISCHEN
-  42: {
-    utensilien: ["Wischmopp", "Eimer mit Wasser", "Bodenreiniger"],
-    steps: [
-      {text: "Küchenteppich zur Seite legen", detail: ""},
-      {text: "Boden grob fegen oder absaugen", detail: "Krümel zuerst weg"},
-      {text: "Eimer: warmes Wasser + Bodenreiniger", detail: "Nicht zu viel Reiniger – sonst klebriger Rückstand"},
-      {text: "Boden wischen – Ecken und unter Kühlschrank", detail: "Von der Fensterseite zur Tür"},
-      {text: "Unter den Schränken wischen (Sockelleisten)", detail: "Häufig vergessen"},
-      {text: "Teppich wieder hinlegen wenn Boden trocken", detail: "Kurz warten – nasser Boden + Teppich = Schimmel"},
-    ]
-  },
-  // SPÜLMASCHINE
-  43: {
-    utensilien: [],
-    steps: [
-      {text: "Spülmaschine öffnen und prüfen ob fertig gespült", detail: "Kontrolllampe oder feuchter Dampf als Zeichen"},
-      {text: "Besteckkorb herausnehmen und ausräumen", detail: "Messer, Gabeln, Löffel sortiert einräumen"},
-      {text: "Unterkorb ausräumen – Töpfe, Pfannen, großes Geschirr", detail: ""},
-      {text: "Oberkorb ausräumen – Gläser und Tassen", detail: "Gläser vorsichtig – oft noch warm"},
-      {text: "Neues Geschirr von der Arbeitsfläche einräumen", detail: "Teller: großer Abstand damit Wasser rankommt"},
-      {text: "Besteck einfüllen", detail: "Messer mit Klinge nach unten"},
-      {text: "Spültabs einlegen und Maschine starten", detail: "Wenn voll genug – kein Halblauf nötig"},
-    ]
-  },
-  // HANDTÜCHER WECHSELN
-  50: {
-    utensilien: ["Frische Handtücher aus dem Schrank"],
-    steps: [
-      {text: "Bad: altes Handtuch abhängen", detail: "In den Wäschekorb werfen"},
-      {text: "Frisches Handtuch aufhängen", detail: "Gleichmäßig über die Stange – nicht knautschen"},
-      {text: "Küche: Küchenhandtuch vom Haken", detail: "In den Wäschekorb"},
-      {text: "Frisches Küchentuch aufhängen", detail: ""},
-      {text: "Wäschekorb zur Maschine stellen wenn voll", detail: ""},
-    ]
-  },
-  // GESCHIRRTUCHER WECHSELN
-  51: {
-    utensilien: ["Frische Geschirrtücher"],
-    steps: [
-      {text: "Altes Geschirrtuch nehmen", detail: "Auch wenn es noch 'sauber' aussieht – feuchte Tücher = Bakterienherd"},
-      {text: "In den Wäschekorb werfen", detail: ""},
-      {text: "Frisches Geschirrtuch bereitlegen", detail: "Neben der Spüle oder am Herd-Griff"},
-    ]
-  },
-  // VORZIMMER AUFRÄUMEN
-  52: {
-    utensilien: [],
-    steps: [
-      {text: "Alle Schuhe vom Boden ins Regal", detail: "Paarweise aufstellen – Absätze nach hinten"},
-      {text: "Jacken und Mäntel auf Bügel oder Haken", detail: "Nicht übereinanderhängen"},
-      {text: "Taschen und Rucksäcke verstauen", detail: "An den Haken oder in den Schrank"},
-      {text: "Schlüssel, Post und Kleinkram sortieren", detail: "Briefpost öffnen oder stapeln"},
-      {text: "Boden kurz drüberschauen", detail: "Haare, Dreck – wenn viel: Besen nehmen"},
-    ]
-  },
-  // WÄSCHE AUFHÄNGEN
-  53: {
-    utensilien: ["Wäscheständer", "Wäscheklammern", "Ev. Wäscheleine"],
-    steps: [
-      {text: "Wäscheständer aufstellen", detail: "An einer Stelle mit Luft – nicht in der Ecke"},
-      {text: "Größere Teile zuerst aufhängen", detail: "Hemden, Hosen, Laken – brauchen viel Platz"},
-      {text: "Socken und Unterwäsche an den Rand", detail: "Mit Klammern fixieren"},
-      {text: "Kleidung gut ausschütteln vor dem Aufhängen", detail: "Weniger Falten, trocknet gleichmäßiger"},
-      {text: "Wäschekorb leer?", detail: "Fertig – Maschine leeren wenn noch was drin"},
-    ]
-  },
-  // MÜLL FREITAG
-  54: {
-    utensilien: ["Neue Müllsäcke"],
-    steps: [
-      {text: "Küchen-Mülleimer leeren", detail: "Sack raus, zuknoten"},
-      {text: "Bad-Mülleimer leeren", detail: ""},
-      {text: "Alle Säcke zum Müllraum bringen", detail: "Richtige Tonne nicht vergessen"},
-      {text: "Neue Säcke einlegen", detail: ""},
-      {text: "Restmüll-Tonne rausstellen wenn Abholtag", detail: "Wiener Müllkalender prüfen"},
-    ]
-  },
-  // SA HANDTÜCHER
-  60: {
-    utensilien: ["Frische Handtücher"],
-    steps: [
-      {text: "Bad-Handtuch wechseln", detail: "Altes in den Wäschekorb"},
-      {text: "Frisches aufhängen", detail: ""},
-      {text: "Gästeklo-Handtuch prüfen", detail: "Falls vorhanden – wechseln wenn nötig"},
-    ]
-  },
-  // KLO SCHNELLREINIGUNG
-  61: {
-    utensilien: ["WC-Reiniger", "WC-Bürste", "Desinfektionstuch"],
-    steps: [
-      {text: "WC-Reiniger innen einsprühen", detail: "Kurz einwirken"},
-      {text: "WC-Sitz und Deckel abwischen", detail: "Desinfektionstuch – oben und unten"},
-      {text: "Mit WC-Bürste schrubben", detail: "Schnell aber gründlich"},
-      {text: "Spülen", detail: ""},
-    ]
-  },
-  // TIERBETTEN
-  62: {
-    utensilien: ["Wäschekorb", "Fusselroller (optional)"],
-    steps: [
-      {text: "Lottes Bett/Decke holen", detail: ""},
-      {text: "Draußen oder über Badewanne kräftig ausschütteln", detail: "Tierhaare lösen sich durch Schütteln"},
-      {text: "Katzenbetten und Liegedecken ausschütteln", detail: "Rudi und Timmy nicht vergessen"},
-      {text: "Fusselroller drüberziehen wenn noch viel Haare", detail: "Optional aber wirksam"},
-      {text: "Zurücklegen", detail: "Alles wieder an den gewohnten Platz"},
-    ]
-  },
-  // SA WÄSCHE
-  63: {
-    utensilien: ["Wäscheständer", "Wäscheklammern"],
-    steps: [
-      {text: "Maschine öffnen und prüfen ob fertig", detail: ""},
-      {text: "Wäscheständer aufstellen", detail: ""},
-      {text: "Große Teile zuerst aufhängen", detail: ""},
-      {text: "Kleines sortieren und aufhängen", detail: ""},
-      {text: "Wäschekorb leer – Maschine schließen", detail: ""},
-    ]
-  },
-  // ALLE BÖDEN SAUGEN SO
-  70: {
-    utensilien: ["Staubsauger", "Verschiedene Aufsätze"],
-    steps: [
-      {text: "Staubsauger vorbereiten – richtiger Aufsatz", detail: "Hartboden-Aufsatz oder Teppichbürste"},
-      {text: "Wohnzimmer saugen", detail: "Unter Couch, um Tisch, Ecken"},
-      {text: "Schlafzimmer saugen", detail: "Unter Bett, vor Schränken"},
-      {text: "Küche saugen", detail: "Teppich anheben, darunter saugen"},
-      {text: "Vorzimmer saugen", detail: "Unter Schuhregal nicht vergessen"},
-      {text: "Bad und Klo saugen", detail: "Kurz aber wirksam vor dem Wischen"},
-      {text: "Staubsauger leeren wenn voll", detail: "Beutel/Behälter kontrollieren"},
-    ]
-  },
-  // BÖDEN WISCHEN SO
-  71: {
-    utensilien: ["Wischmopp", "2 Eimer oder 1 Eimer mit Reiniger", "Bodenreiniger"],
-    steps: [
-      {text: "Eimer mit warmem Wasser und Bodenreiniger befüllen", detail: "Nicht zu viel Reiniger"},
-      {text: "Bad-Boden wischen", detail: "Von der Ecke zur Tür"},
-      {text: "Klo-Boden wischen", detail: "Rund ums WC besonders gründlich"},
-      {text: "Küchenboden wischen", detail: "Teppich zur Seite, wischen, zurücklegen"},
-      {text: "Wasser wechseln wenn schmutzig", detail: "Dreckiges Wasser macht mehr Schmutz als weg"},
-      {text: "Mopp auswringen und spülen", detail: ""},
-    ]
-  },
-  // MONATLICH: BETTWÄSCHE
-  80: {
-    utensilien: ["Frische Bettwäsche aus dem Schrank", "Wäschekorb"],
-    steps: [
-      {text: "Polsterbezüge abziehen", detail: "Kräftig ausschütteln dann in den Korb"},
-      {text: "Bettbezug abziehen", detail: "Decke herausschütteln – Decke zur Seite"},
-      {text: "Leintuch abziehen", detail: "Matratze kurz auslüften lassen"},
-      {text: "Alles in den Wäschekorb", detail: "Zur Maschine – Bettwäsche bei 60° waschen"},
-      {text: "Frisches Leintuch aufziehen", detail: "Ecken unter die Matratze stecken"},
-      {text: "Frischen Bettbezug aufziehen", detail: "Decke einschütteln – Ecken reindrücken"},
-      {text: "Polsterbezüge aufziehen", detail: ""},
-      {text: "Bett machen", detail: "Alles glattziehen"},
-    ]
-  },
-  // MONATLICH: FUGEN
-  81: {
-    utensilien: ["Schimmelspray", "Alte Zahnbürste", "Handschuhe!", "Lüften nicht vergessen"],
-    steps: [
-      {text: "Handschuhe anziehen!", detail: "Schimmelspray ist chemisch – nicht mit bloßen Händen!"},
-      {text: "Fenster öffnen", detail: "Immer beim Arbeiten mit Schimmelspray lüften"},
-      {text: "Spray auf Badezimmerfugen sprühen", detail: "Besonders Duschwannenrand, Fliesenfugen"},
-      {text: "10 Minuten einwirken lassen", detail: "Nicht abwischen – einwirken ist wichtig"},
-      {text: "Mit alter Zahnbürste in die Fugen schrubben", detail: "Bei starkem Schimmel mehrmals behandeln"},
-      {text: "Mit klarem Wasser abspülen", detail: ""},
-      {text: "Gut trocknen lassen und weiter lüften", detail: ""},
-    ]
-  },
-  // MONATLICH: BETTDECKEN LÜFTEN
-  82: {
-    utensilien: [],
-    steps: [
-      {text: "Bettdecke aus dem Bett nehmen", detail: ""},
-      {text: "Über Fensterbank oder Wäscheständer legen", detail: "Ans offene Fenster – frische Luft"},
-      {text: "Polster ebenfalls ans Fenster legen", detail: ""},
-      {text: "2 Stunden lüften lassen", detail: "Milben sterben durch UV-Licht und frische Luft"},
-      {text: "Bettdecke und Polster klopfen", detail: "Kräftig abklopfen bevor sie wieder rein kommen"},
-      {text: "Zurück aufs Bett legen", detail: ""},
-    ]
-  },
-  // MONATLICH: KÜHLSCHRANK
-  90: {
-    utensilien: ["Allzweckreiniger oder Essigwasser", "Schwamm", "Küchenrolle", "Kühltasche (optional)"],
-    steps: [
-      {text: "Kühlschrank ausleeren – Essen in die Kühltasche", detail: "Abgelaufenes sofort entsorgen"},
-      {text: "Gemüsefach herausnehmen und in der Spüle waschen", detail: "Warmes Wasser und Spülmittel"},
-      {text: "Alle Fächer und Böden abwischen", detail: "Essigwasser oder Allzweckreiniger"},
-      {text: "Türdichtungen abwischen", detail: "Dort bildet sich Schimmel – gründlich!"},
-      {text: "Türfächer innen abwischen", detail: ""},
-      {text: "Kühlschrank von außen abwischen", detail: "Türgriff und Außenseite"},
-      {text: "Gemüsefach trocknen und einsetzen", detail: ""},
-      {text: "Lebensmittel wieder einräumen", detail: "Abgelaufenes nicht mehr rein"},
-    ]
-  },
-  // MONATLICH: FENSTER PUTZEN
-  91: {
-    utensilien: ["Glasreiniger", "Zeitungspapier oder Fensterleder", "Eimer mit warmem Wasser (optional)"],
-    steps: [
-      {text: "Fensterbrett abstauben", detail: "Trockenes Tuch – zuerst Staub weg"},
-      {text: "Glasreiniger auf Fensterscheibe sprühen", detail: "Gleichmäßig – nicht zu viel"},
-      {text: "Mit Zeitungspapier wischen", detail: "Kreisende Bewegungen – Zeitung hinterlässt keine Streifen!"},
-      {text: "Ecken mit gefaltetem Zeitungsstück", detail: ""},
-      {text: "Von innen alle Fenster so behandeln", detail: "Zimmer für Zimmer"},
-      {text: "Rahmen abwischen", detail: "Feuchtes Tuch über Rahmen und Griffe"},
-    ]
-  },
-  // MONATLICH: COUCH ABSAUGEN
-  92: {
-    utensilien: ["Staubsauger", "Polster-/Haarbürsten-Aufsatz"],
-    steps: [
-      {text: "Tier-/Haarbürsten-Aufsatz auf Staubsauger", detail: "Der spezielle Aufsatz ist wichtig für Tierhaare"},
-      {text: "Alle Kissen abnehmen", detail: "Kurz ausschütteln"},
-      {text: "Sitzfläche der Couch saugen", detail: "Gründlich in den Ritzen"},
-      {text: "Lehnen und Seiten saugen", detail: ""},
-      {text: "Rückseite der Couch (wenn zugänglich)", detail: ""},
-      {text: "Kissen einzeln absaugen", detail: "Beide Seiten"},
-      {text: "Kissen wieder auflegen", detail: ""},
-    ]
-  },
-  // MONATLICH: HANDTÜCHER 60°
-  93: {
-    utensilien: ["Alle Handtücher sammeln", "Waschmittel"],
-    steps: [
-      {text: "Alle Handtücher zusammensammeln", detail: "Bad, Küche, Gäste-WC"},
-      {text: "Separat in die Maschine laden", detail: "Nur Handtücher – keine andere Wäsche dazu"},
-      {text: "Waschmittel einfüllen", detail: "Etwas mehr als üblich"},
-      {text: "Programm: 60°C", detail: "Kein Schongang – Hygiene-Tiefenreinigung"},
-      {text: "Starten", detail: "Nach dem Waschen gut aufhängen oder trocknen lassen"},
-    ]
-  },
-  // MONATLICH: HERD BACKROHR
-  94: {
-    utensilien: ["Backofenreiniger / Entfetter", "Schwamm mit Kratzerseite", "Handschuhe!", "Alte Zeitung"],
-    steps: [
-      {text: "Handschuhe anziehen", detail: "Entfetter ist ätzend"},
-      {text: "Backofen-Rost herausnehmen", detail: "In die Spüle legen"},
-      {text: "Entfetter in den Backofen sprühen", detail: "Gleichmäßig auf alle Wände"},
-      {text: "Herdplatten mit Entfetter besprühen", detail: "Rund um die Platten"},
-      {text: "15–20 Minuten einwirken lassen", detail: "Jetzt Rost in der Spüle einweichen lassen"},
-      {text: "Backofen auswischen", detail: "Schmutz löst sich jetzt leicht – Kratzerseite verwenden"},
-      {text: "Backofen mit feuchtem Tuch nachwischen", detail: "Kein Reinigungsmittel-Rückstand"},
-      {text: "Rost schrubben und abspülen", detail: ""},
-      {text: "Rost wieder einlegen", detail: ""},
-      {text: "Herd abwischen", detail: ""},
-    ]
-  },
+var currentRoom = '';
+var currentIcon = '';
+
+var AFFIRMATIONS = {
+  'ruhig':    'Dieser Raum trägt mich. Ich darf hier einfach sein.',
+  'lebendig': 'Leben strömt durch diesen Raum — und durch mich.',
+  'schwer':   'Ich erkenne, was der Raum trägt. Leichter werden darf ein sanfter Prozess sein.',
+  'warm':     'Wärme und Geborgenheit — ich habe mir einen schönen Ort geschaffen.',
+  'unruhig':  'Ich atme tief. Der Raum darf zur Ruhe kommen — ich auch.',
+  'stagnierend': 'Neues kann nur entstehen, wenn altes Platz macht. Ich beginne sanft.',
+  'klar':     'Klarheit im Raum — Klarheit in mir. Ich schätze dieses Geschenk.',
+  'gemütlich':'Hier ist mein Zuhause. Warm, mein, lebendig.',
+  'gut so':   'Manchmal ist das Schönste, innezuhalten und zu erkennen: Es ist gut so.',
+  'default':  'Ich sorge für meinen Raum mit Liebe — und mein Raum sorgt für mich.'
 };
 
-// ── AUFGABEN DATEN ────────────────────────────────────────────────────────
-var DAILY = [
-  {id:5, t:"Lüften: alle Fenster auf", m:2, tip:"Alle Zimmer Fenster öffnen – 5 Min stoßlüften",
-   voice:"Lüften. Alle Fenster in allen Zimmern öffnen. Fünf Minuten Stoßlüften."},
-  {id:6, t:"Heizung abdrehen", m:1, tip:"Alle Heizkörper auf 0 oder Frostschutz während Lüften",
-   voice:"Heizung abdrehen. Alle Heizkörper auf Null stellen während die Fenster offen sind."},
-  {id:3, t:"Katzenklo reinigen", m:3, tip:"Täglich ausmisten",
-   voice:"Katzenklo reinigen. Ausmisten, frisches Streu nachfüllen. Drei Minuten."},
-  {id:1, t:"Bett machen", m:2, tip:"Sofort nach dem Aufstehen",
-   voice:"Bett machen. Decke aufschütteln, Polster zurechtlegen. Zwei Minuten."},
-  {id:2, t:"Küche aufräumen + Herd abwischen", m:4, tip:"Arbeitsflächen frei, Herd sauber",
-   voice:"Küche aufräumen. Arbeitsflächen freiräumen und Herd abwischen. Vier Minuten."},
-];
-
-var WAESCHE_DAYS = [1,2,3,4,5,6];
-var WAESCHE_TYPES = {
-  1: {t:"Wäsche: Dunkel", tip:"Schwarz & dunkle Farben – 30°", voice:"Wäsche starten. Heute dunkle Wäsche."},
-  2: {t:"Wäsche: Dunkel", tip:"Schwarz & dunkle Farben – 30°", voice:"Wäsche starten. Heute dunkle Wäsche."},
-  3: {t:"Wäsche: Hell", tip:"Weiß & helle Farben – 60° möglich", voice:"Wäsche starten. Heute helle Wäsche."},
-  4: {t:"Wäsche: Hell", tip:"Weiß & helle Farben – 60° möglich", voice:"Wäsche starten. Heute helle Wäsche."},
-  5: {t:"Wäsche: Bunt", tip:"Bunte Farben gemischt – 40°", voice:"Wäsche starten. Heute bunte Wäsche."},
-  6: {t:"Wäsche: Bunt", tip:"Bunte Farben gemischt – 40°", voice:"Wäsche starten. Heute bunte Wäsche."},
-};
-var WAESCHE_TASK = {id:22, t:"Wäsche starten", m:5, tip:"Maschine einfüllen – läuft während du putzt",
-  voice:"Wäsche starten. Maschine einfüllen und Programm starten."};
-
-var WEEKLY = {
-  1: [
-    {id:10,t:"Wohnzimmer: Staub wischen",m:5,tip:"Von oben nach unten – Regale, TV, Tisch",voice:"Wohnzimmer. Staub wischen. Von oben nach unten. Fünf Minuten."},
-    {id:11,t:"Wohnzimmer saugen",m:8,tip:"Unter Couch & Sessel",voice:"Wohnzimmer saugen. Unter der Couch nicht vergessen. Acht Minuten."},
-    {id:12,t:"Vorzimmer fegen",m:4,tip:"Schuhe wegräumen, Boden fegen",voice:"Vorzimmer. Schuhe wegräumen und Boden fegen. Vier Minuten."},
-    {id:13,t:"Mist rausbringen",m:3,tip:"Alle Eimer leeren",voice:"Müll rausbringen. Alle Eimer leeren. Drei Minuten."},
-    {id:14,t:"Bügeln",m:30,tip:"Wöchentlich Mo – Hemden, Blusen, Hosen",voice:"Bügeln. Wöchentlicher Bügelblock. Dreißig Minuten."},
-  ],
-  2: [
-    {id:20,t:"Schlafzimmer: Staub wischen",m:5,tip:"Schränke oben, Nachttische, Spiegel",voice:"Schlafzimmer. Staub wischen. Fünf Minuten."},
-    {id:21,t:"Schlafzimmer saugen",m:8,tip:"Unter dem Bett – Staubsammler",voice:"Schlafzimmer saugen. Unter das Bett saugen. Acht Minuten."},
-    {id:23,t:"Schuhe putzen",m:5,tip:"Straßenschuhe reinigen & pflegen",voice:"Schuhe putzen. Straßenschuhe reinigen. Fünf Minuten."},
-  ],
-  3: [
-    {id:30,t:"Bad: Badewanne reinigen",m:6,tip:"Reiniger einwirken lassen, dann schrubben",voice:"Badezimmer. Badewanne reinigen. Sechs Minuten."},
-    {id:31,t:"Bad: Waschbecken & Armaturen",m:4,tip:"Kalkflecken mit Zitronenreiniger",voice:"Waschbecken und Armaturen putzen. Vier Minuten."},
-    {id:32,t:"Bad: Spiegel + Boden wischen",m:5,tip:"Glasreiniger streifenfrei",voice:"Spiegel mit Glasreiniger, dann Boden wischen. Fünf Minuten."},
-    {id:33,t:"Klo: Becken innen & außen",m:4,tip:"WC-Reiniger innen, außen abwischen",voice:"Klo reinigen. WC-Reiniger einwirken lassen. Vier Minuten."},
-    {id:34,t:"Klo: Boden wischen",m:3,tip:"Immer letzter Schritt",voice:"Klo-Boden wischen. Drei Minuten."},
-  ],
-  4: [
-    {id:40,t:"Küche: Arbeitsflächen & Geräte",m:5,tip:"Toaster, Mikrowelle, Kaffeemaschine",voice:"Küche. Arbeitsflächen abwischen. Fünf Minuten."},
-    {id:41,t:"Küche: Teppich saugen",m:5,tip:"Küchenteppich gründlich absaugen",voice:"Küchenteppich saugen. Fünf Minuten."},
-    {id:42,t:"Küche: Boden wischen",m:7,tip:"Um den Teppich herum wischen",voice:"Küchenboden wischen. Sieben Minuten."},
-    {id:43,t:"Spülmaschine aus-/einräumen",m:5,tip:"Beim Warten auf den Kaffee",voice:"Spülmaschine ausräumen und neu einräumen. Fünf Minuten."},
-  ],
-  5: [
-    {id:50,t:"Handtücher wechseln",m:3,tip:"Bad- & Küchenhandtücher",voice:"Handtücher wechseln. Drei Minuten."},
-    {id:51,t:"Geschirrtücher wechseln",m:2,tip:"Wöchentlich – Bakterienherd wenn feucht",voice:"Geschirrtücher wechseln. Zwei Minuten."},
-    {id:52,t:"Vorzimmer aufräumen",m:4,tip:"Schuhe, Jacken, Taschen",voice:"Vorzimmer aufräumen. Vier Minuten."},
-    {id:53,t:"Wäsche aufhängen",m:5,tip:"Von Di-Wäsche",voice:"Wäsche aufhängen. Fünf Minuten."},
-    {id:54,t:"Mist rausbringen",m:3,tip:"Vor dem Wochenende",voice:"Müll rausbringen. Drei Minuten."},
-  ],
-  6: [
-    {id:60,t:"Handtücher wechseln (2. Wechsel)",m:3,tip:"Sa = 2. Wechsel der Woche",voice:"Handtücher wechseln. Drei Minuten."},
-    {id:61,t:"Klo: Schnellreinigung",m:5,tip:"WC-Sitz + Becken innen",voice:"Klo Schnellreinigung. Fünf Minuten."},
-    {id:62,t:"Tierbetten ausschütteln",m:5,tip:"Decken & Kissen – Tierhaare entfernen",voice:"Tierbetten ausschütteln. Fünf Minuten."},
-    {id:63,t:"Wäsche aufhängen",m:5,tip:"Sa-Wäsche fertig machen",voice:"Wäsche aufhängen. Fünf Minuten."},
-  ],
-  0: [
-    {id:70,t:"Alle Böden saugen",m:12,tip:"Alle Räume in einem Durchgang",voice:"Alle Böden saugen. Zwölf Minuten."},
-    {id:71,t:"Bad, Klo & Küche: Boden wischen",m:8,tip:"Die wichtigsten Böden nach dem Saugen",voice:"Böden wischen. Acht Minuten."},
-  ],
-};
-
-var MONTHLY = [
-  {id:80,t:"Bettwäsche wechseln",m:10,freq:"2× / Monat",type:"textilien",tip:"Alle 2 Wochen So",voice:"Bettwäsche wechseln. Zehn Minuten."},
-  {id:81,t:"Fugen: Schimmelspray",m:5,freq:"2× / Monat",type:"putzen",tip:"Alle 2 Wochen Mi",voice:"Fugen behandeln. Schimmelspray einsprühen. Fünf Minuten."},
-  {id:82,t:"Bettdecken & Polster lüften",m:5,freq:"2× / Monat",type:"textilien",tip:"2h am offenen Fenster",voice:"Bettdecken und Polster lüften. Fünf Minuten."},
-  {id:90,t:"Kühlschrank reinigen",m:15,freq:"1× / Monat",type:"putzen",tip:"Vor dem Großeinkauf",voice:"Kühlschrank ausräumen und reinigen. Fünfzehn Minuten."},
-  {id:91,t:"Fenster putzen (innen)",m:20,freq:"1× / Monat",type:"putzen",tip:"Glasreiniger + Zeitungspapier",voice:"Fenster putzen. Zwanzig Minuten."},
-  {id:92,t:"Couch & Polster absaugen",m:10,freq:"1× / Monat",type:"putzen",tip:"Tier-/Haaraufsatz verwenden",voice:"Couch und Polster absaugen. Zehn Minuten."},
-  {id:93,t:"Handtücher bei 60°C waschen",m:5,freq:"1× / Monat",type:"textilien",tip:"Hygienische Tiefenreinigung",voice:"Handtücher bei sechzig Grad waschen. Fünf Minuten."},
-  {id:94,t:"Herd & Backrohr reinigen",m:20,freq:"1× / Monat",type:"putzen",tip:"Entfetter einwirken lassen",voice:"Herd und Backrohr reinigen. Zwanzig Minuten."},
-];
-
-// ── STATE ─────────────────────────────────────────────────────────────────
-var DN = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-var KEY = 'haushalt_v6';
-var today = new Date(); today.setHours(0,0,0,0);
-var selDay = today.getDay();
-var checked = {};
-var voiceOn = false;
-var isRunning = false;
-var isPaused = false;
-var curIdx = -1;
-var timerSec = 0;
-var timerTotal = 0;
-var timerInterval = null;
-var synth = window.speechSynthesis;
-var germanVoice = null;
-
-// Micro-Steps State
-var stepsMode = false;       // ob Schritt-Modus aktiv
-var stepsTaskId = -1;        // aktuell gezeigter Task
-var stepsCurrentStep = 0;    // aktuell aktiver Step-Index
-var stepsDone = {};          // welche Steps fertig: "taskid_stepidx" => true
-
-function loadVoices() {
-  if (!synth) return;
-  var voices = synth.getVoices();
-  var pref = ['Anna','Helena','Katrin','Marlene','Google Deutsch'];
-  germanVoice = null;
-  for (var pi=0; pi<pref.length; pi++) {
-    for (var vi=0; vi<voices.length; vi++) {
-      if (voices[vi].name.indexOf(pref[pi]) >= 0) { germanVoice = voices[vi]; break; }
-    }
-    if (germanVoice) break;
-  }
-  if (!germanVoice) {
-    for (var vi2=0; vi2<voices.length; vi2++) {
-      if (voices[vi2].lang && voices[vi2].lang.startsWith('de')) { germanVoice = voices[vi2]; break; }
-    }
-  }
-  var lbl = document.getElementById('voiceLbl');
-  if (lbl) lbl.textContent = voiceOn ? (germanVoice ? '🔊 Ansage: An – '+germanVoice.name.split(' ')[0] : '🔊 Ansage: An') : '🔈 Ansage: Aus';
-}
-if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = loadVoices;
-}
-setTimeout(loadVoices, 500);
-
-function speak(text) {
-  if (!voiceOn || !synth) return;
-  try {
-    synth.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'de-DE'; u.rate = 0.9; u.pitch = 1.0; u.volume = 1.0;
-    if (germanVoice) u.voice = germanVoice;
-    synth.speak(u);
-  } catch(e) {}
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  document.getElementById('bnav-home').classList.toggle('on', id !== 'view-history');
+  document.getElementById('bnav-hist').classList.toggle('on', id === 'view-history');
+  window.scrollTo(0,0);
 }
 
-// ── STORAGE ───────────────────────────────────────────────────────────────
-function load() {
-  try {
-    var raw = localStorage.getItem(KEY);
-    if (raw) checked = JSON.parse(raw);
-    var sd = localStorage.getItem(KEY+'_d');
-    var td = today.toISOString().slice(0,10);
-    if (sd !== td) {
-      var nc = {};
-      for (var k in checked) { if (k.indexOf('m_')===0) nc[k]=checked[k]; }
-      checked = nc;
-      save(); localStorage.setItem(KEY+'_d', td);
-    }
-  } catch(e) {}
-}
-function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(checked)); } catch(e){}
-  try { if(window.parent) window.parent._haushalt_data = JSON.stringify(checked); } catch(e){}
-}
-function isDone(id, monthly) { return !!checked[(monthly?'m_':'t_')+id]; }
-function setDone(id, monthly, val) { checked[(monthly?'m_':'t_')+id] = val; save(); }
-
-// ── TASKS ─────────────────────────────────────────────────────────────────
-function getTasks() {
-  var out = [];
-  var lueften = DAILY.find(function(t){ return t.id === 5; });
-  if (lueften) out.push({task:lueften, monthly:false});
-  if (WAESCHE_DAYS.indexOf(selDay) >= 0) {
-    var wt = WAESCHE_TYPES[selDay];
-    var wtask = wt ? {id:22, t:wt.t, m:5, tip:wt.tip, voice:wt.voice} : WAESCHE_TASK;
-    out.push({task:wtask, monthly:false});
-  }
-  var weekly = WEEKLY[selDay] || [];
-  weekly.forEach(function(t){ out.push({task:t, monthly:false}); });
-  DAILY.filter(function(t){ return t.id !== 5; }).forEach(function(t){ out.push({task:t, monthly:false}); });
-  return out;
-}
-function getMonthlyForDay() {
-  return MONTHLY.filter(function(t){
-    var dow = [80,82].indexOf(t.id)>=0 ? 0 : [81].indexOf(t.id)>=0 ? 3 :
-              [90,94].indexOf(t.id)>=0 ? 4 : [91].indexOf(t.id)>=0 ? 6 :
-              [92].indexOf(t.id)>=0 ? 1 : 5;
-    return dow === selDay;
+function selectRoom(card) {
+  document.querySelectorAll('.room-card').forEach(function(c){ c.classList.remove('selected'); });
+  card.classList.add('selected');
+  currentRoom = card.getAttribute('data-room');
+  currentIcon = card.getAttribute('data-icon');
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.classList.remove('on','sage','rose','lavender','terra','gold');
   });
-}
-function getDayMin() {
-  return getTasks().filter(function(e){ return !isDone(e.task.id,false); })
-    .reduce(function(s,e){ return s+e.task.m; }, 0);
-}
-function getTotalMin() {
-  return getTasks().reduce(function(s,e){ return s+e.task.m; }, 0);
+  document.getElementById('feelText').value = '';
+  document.getElementById('needText').value = '';
+  document.getElementById('feelRoomName').textContent = currentRoom;
+  document.getElementById('needRoomName').textContent = currentRoom;
+  setTimeout(function(){ showView('view-feel'); }, 150);
 }
 
-// ── MICRO-STEPS ───────────────────────────────────────────────────────────
-function openSteps(taskId) {
-  var data = STEPS[taskId];
-  if (!data) return; // kein Step-Modus wenn keine Daten
-
-  stepsMode = true;
-  stepsTaskId = taskId;
-
-  // Ersten nicht fertigen Step finden
-  stepsCurrentStep = 0;
-  for (var i=0; i<data.steps.length; i++) {
-    if (!stepsDone[taskId+'_'+i]) { stepsCurrentStep = i; break; }
-    if (i === data.steps.length-1) stepsCurrentStep = data.steps.length; // alle fertig
-  }
-
-  renderStepsPanel();
-  document.getElementById('stepsPanel').classList.remove('hidden');
-  document.getElementById('stepsPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
-
-  if (voiceOn) {
-    var task = findTask(taskId);
-    if (task && data.steps[stepsCurrentStep]) {
-      speak('Schritt ' + (stepsCurrentStep+1) + ': ' + data.steps[stepsCurrentStep].text);
-    }
-  }
-}
-
-function findTask(id) {
-  var all = getTasks().concat(MONTHLY.map(function(t){ return {task:t, monthly:true}; }));
-  for (var i=0; i<all.length; i++) if (all[i].task.id === id) return all[i];
-  return null;
-}
-
-function renderStepsPanel() {
-  var data = STEPS[stepsTaskId];
-  if (!data) return;
-  var entry = findTask(stepsTaskId);
-  var taskName = entry ? entry.task.t : '';
-  var totalSteps = data.steps.length;
-  var doneCount = 0;
-  for (var i=0; i<totalSteps; i++) if (stepsDone[stepsTaskId+'_'+i]) doneCount++;
-
-  document.getElementById('stTaskName').textContent = taskName;
-  document.getElementById('stTaskMeta').textContent = totalSteps + ' Schritte';
-  var pct = totalSteps > 0 ? Math.round(doneCount/totalSteps*100) : 0;
-  document.getElementById('stProgFill').style.width = pct + '%';
-  document.getElementById('stProgLbl').textContent = doneCount + '/' + totalSteps;
-
-  // Utensilien
-  var uBlock = document.getElementById('utensilsBlock');
-  var uList = document.getElementById('utensilsList');
-  if (data.utensilien && data.utensilien.length > 0) {
-    uBlock.classList.remove('hidden');
-    uList.innerHTML = data.utensilien.map(function(u){
-      return '<span class="utensil-chip">🧹 '+u+'</span>';
-    }).join('');
+function toggleChip(chip) {
+  var color = chip.getAttribute('data-color') || 'gold';
+  if (chip.classList.contains('on')) {
+    chip.classList.remove('on','sage','rose','lavender','terra','gold');
   } else {
-    uBlock.classList.add('hidden');
-  }
-
-  // Steps
-  var stList = document.getElementById('stepList');
-  var h = '';
-  for (var i=0; i<totalSteps; i++) {
-    var step = data.steps[i];
-    var isDoneStep = !!stepsDone[stepsTaskId+'_'+i];
-    var isActive = (i === stepsCurrentStep) && !isDoneStep;
-    var cls = isDoneStep ? 'step-done' : (isActive ? 'step-active' : 'step-pending');
-    var nrCls = isDoneStep ? 'nr-done' : (isActive ? 'nr-active' : 'nr-pending');
-    h += '<div class="step-item '+cls+'" onclick="jumpStep('+i+')">'
-      + '<div class="step-nr '+nrCls+'">'+(isDoneStep?'✓':(i+1))+'</div>'
-      + '<div class="step-content">'
-      + '<div class="step-text">'+step.text+'</div>'
-      + (step.detail ? '<div class="step-detail">'+step.detail+'</div>' : '')
-      + '</div>'
-      + '</div>';
-  }
-  stList.innerHTML = h;
-
-  // Alle fertig?
-  var allDone = doneCount >= totalSteps;
-  document.getElementById('stepsAllDone').className = 'steps-all-done' + (allDone ? ' show' : '');
-  var btnNext = document.getElementById('btnStepNext');
-  if (allDone) {
-    btnNext.textContent = '✅ Aufgabe abschließen';
-    btnNext.className = 'btn-step-done done-step';
-  } else {
-    btnNext.textContent = '✓ Schritt erledigt';
-    btnNext.className = 'btn-step-done';
+    chip.classList.add('on', color);
   }
 }
 
-function stepNext() {
-  var data = STEPS[stepsTaskId];
-  if (!data) return;
-  var totalSteps = data.steps.length;
+function getSelected(containerId) {
+  var chips = document.querySelectorAll('#' + containerId + ' .chip.on');
+  return Array.from(chips).map(function(c){ return c.textContent.trim(); });
+}
 
-  // Prüfen ob alle fertig
-  var allDone = true;
-  for (var i=0; i<totalSteps; i++) if (!stepsDone[stepsTaskId+'_'+i]) { allDone = false; break; }
+function goToNeeds() {
+  showView('view-needs');
+}
 
-  if (allDone) {
-    // Aufgabe als erledigt markieren
-    setDone(stepsTaskId, false, true);
-    closeSteps();
-    renderProgress();
-    renderList();
-    // Nächste Aufgabe starten
-    if (isRunning) {
-      curIdx++;
-      var next = getNextUndone(curIdx);
-      if (next === -1) { finishAll(); } else { curIdx = next; startTask(curIdx); }
-    }
+function getAffirmation(feelings, needs) {
+  var all = feelings.concat(needs).join(' ').toLowerCase();
+  for (var key in AFFIRMATIONS) {
+    if (key !== 'default' && all.indexOf(key) >= 0) return AFFIRMATIONS[key];
+  }
+  return AFFIRMATIONS['default'];
+}
+
+function saveAndShow() {
+  var feelings = getSelected('feelChips');
+  var feelExtra = document.getElementById('feelText').value.trim();
+  if (feelExtra) feelings.push(feelExtra);
+
+  var needs = getSelected('needChips');
+  var needExtra = document.getElementById('needText').value.trim();
+  if (needExtra) needs.push(needExtra);
+
+  var feelText = feelings.length ? feelings.join(', ') : 'still beobachtend';
+  var needText = needs.length ? needs.join(', ') : 'einfach innehalten';
+  var affirmText = getAffirmation(feelings, needs);
+
+  document.getElementById('affirmIcon').textContent = currentIcon;
+  document.getElementById('affirmRoom').textContent = currentRoom;
+  document.getElementById('affirmFeeling').textContent = '"' + feelText + '"';
+  document.getElementById('affirmNeed').textContent = 'Es braucht: ' + needText;
+  document.getElementById('affirmText').textContent = affirmText;
+
+  try {
+    var entries = JSON.parse(localStorage.getItem('raumgefuehl_v1') || '[]');
+    entries.unshift({room:currentRoom, icon:currentIcon, feelings:feelings, needs:needs, date:new Date().toISOString()});
+    if (entries.length > 50) entries = entries.slice(0,50);
+    localStorage.setItem('raumgefuehl_v1', JSON.stringify(entries));
+  } catch(e) {}
+
+  showView('view-affirm');
+}
+
+function renderHistory() {
+  var entries = [];
+  try { entries = JSON.parse(localStorage.getItem('raumgefuehl_v1') || '[]'); } catch(e) {}
+  var el = document.getElementById('historyList');
+  if (!entries.length) {
+    el.innerHTML = '<div class="history-empty">Noch kein Raum gefühlt.<br>Beginne heute 🌿</div>';
     return;
   }
-
-  // Aktuellen Step als fertig markieren
-  if (stepsCurrentStep < totalSteps) {
-    stepsDone[stepsTaskId+'_'+stepsCurrentStep] = true;
-  }
-
-  // Nächsten offenen Step finden
-  for (var i=stepsCurrentStep+1; i<totalSteps; i++) {
-    if (!stepsDone[stepsTaskId+'_'+i]) { stepsCurrentStep = i; break; }
-    if (i === totalSteps-1) stepsCurrentStep = totalSteps; // alle fertig
-  }
-
-  renderStepsPanel();
-
-  // Vorlesen
-  if (voiceOn && data.steps[stepsCurrentStep]) {
-    speak('Schritt '+(stepsCurrentStep+1)+': '+data.steps[stepsCurrentStep].text);
-  }
-
-  // Auto-scroll zum aktiven Step
-  setTimeout(function(){
-    var active = document.querySelector('.step-active');
-    if (active) active.scrollIntoView({behavior:'smooth', block:'nearest'});
-  }, 100);
+  var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var months = ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  el.innerHTML = entries.slice(0,20).map(function(e) {
+    var d = new Date(e.date);
+    var dateStr = days[d.getDay()]+', '+d.getDate()+'. '+months[d.getMonth()]+' · '+
+      String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+' Uhr';
+    return '<div class="history-item">' +
+      '<div class="history-date">'+dateStr+'</div>' +
+      '<div class="history-room">'+e.icon+' '+e.room+'</div>' +
+      '<div class="history-details">' +
+        (e.feelings&&e.feelings.length ? '💭 '+e.feelings.join(' · ')+'<br>' : '') +
+        (e.needs&&e.needs.length ? '🌿 '+e.needs.join(' · ') : '') +
+      '</div></div>';
+  }).join('');
 }
 
-function stepBack() {
-  // Letzten erledigten Step rückgängig
-  var data = STEPS[stepsTaskId];
-  if (!data) return;
-  if (stepsCurrentStep > 0) {
-    stepsDone[stepsTaskId+'_'+(stepsCurrentStep-1)] = false;
-    stepsCurrentStep = Math.max(0, stepsCurrentStep-1);
-  }
-  renderStepsPanel();
+function openHistory() {
+  renderHistory();
+  showView('view-history');
 }
 
-function jumpStep(idx) {
-  stepsCurrentStep = idx;
-  renderStepsPanel();
+function startNew() {
+  document.querySelectorAll('.room-card').forEach(function(c){ c.classList.remove('selected'); });
+  showView('view-rooms');
 }
-
-function closeSteps() {
-  stepsMode = false;
-  document.getElementById('stepsPanel').classList.add('hidden');
-}
-
-function skipFromSteps() {
-  closeSteps();
-  skipTask();
-}
-
-// ── NAVIGATION ────────────────────────────────────────────────────────────
-function getNextUndone(from) {
-  var tasks = getTasks();
-  for (var i = from; i < tasks.length; i++) {
-    if (!isDone(tasks[i].task.id, false)) return i;
-  }
-  return -1;
-}
-
-function mainAction() {
-  if (curIdx === -1 || !isRunning) { startBlock(); } else { togglePause(); }
-}
-
-function startBlock() {
-  if (isRunning && !isPaused) return;
-  var tasks = getTasks();
-  if (curIdx === -1) curIdx = 0;
-  var next = getNextUndone(curIdx);
-  if (next === -1) { finishAll(); return; }
-  curIdx = next;
-  isRunning = true; isPaused = false;
-  startTask(curIdx);
-}
-
-function startTask(idx) {
-  var tasks = getTasks();
-  if (idx >= tasks.length) { finishAll(); return; }
-  var entry = tasks[idx];
-  var t = entry.task;
-  timerTotal = t.m * 60;
-  timerSec = 0;
-
-  document.getElementById('curTask').textContent = t.t;
-  document.getElementById('curTip').textContent = t.tip || '';
-  document.getElementById('timerOf').textContent = 'von ' + t.m + ' Min';
-
-  var nextEntry = null;
-  for (var i = idx+1; i < tasks.length; i++) {
-    if (!isDone(tasks[i].task.id, false)) { nextEntry = tasks[i]; break; }
-  }
-  document.getElementById('nextLbl').textContent = nextEntry ? 'Danach: ' + nextEntry.task.t : 'Letzte Aufgabe!';
-
-  var btn = document.getElementById('btnMain');
-  btn.className = 'btn-main running';
-  btn.innerHTML = '⏸ Pause';
-
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(tickTimer, 1000);
-
-  if (voiceOn) speak(t.voice || t.t + '. ' + t.m + ' Minuten.');
-
-  // Micro-Steps automatisch öffnen wenn vorhanden
-  var stData = STEPS[t.id];
-  if (stData) {
-    stepsDone = {}; // Steps zurücksetzen beim Start
-    stepsCurrentStep = 0;
-    openSteps(t.id);
-  } else {
-    closeSteps();
-  }
-
-  updateTimerUI();
-  renderList();
-}
-
-function tickTimer() {
-  if (isPaused) return;
-  timerSec++;
-  updateTimerUI();
-  if (timerSec >= timerTotal) {
-    clearInterval(timerInterval);
-    var tasks = getTasks();
-    if (curIdx < tasks.length) {
-      setDone(tasks[curIdx].task.id, false, true);
-      if (voiceOn) {
-        setTimeout(function() {
-          var tasks2 = getTasks();
-          var next = getNextUndone(curIdx+1);
-          if (next === -1) { speak('Fertig! Alle Aufgaben erledigt. Großartig!'); }
-          else { speak('Zeit abgelaufen. Weiter mit: ' + tasks2[next].task.t); }
-        }, 300);
-      }
-    }
-    curIdx++;
-    var next2 = getNextUndone(curIdx);
-    if (next2 === -1) { finishAll(); }
-    else { curIdx = next2; setTimeout(function(){ startTask(curIdx); }, 800); }
-    renderProgress(); renderList();
-  }
-}
-
-function updateTimerUI() {
-  var rem = Math.max(0, timerTotal - timerSec);
-  var m = Math.floor(rem/60), s = rem%60;
-  document.getElementById('timerDisp').textContent = m + ':' + (s<10?'0':'')+s;
-  var pct = timerTotal > 0 ? Math.min(100, timerSec/timerTotal*100) : 0;
-  document.getElementById('timerBar').style.width = pct + '%';
-}
-
-function togglePause() {
-  isPaused = !isPaused;
-  var btn = document.getElementById('btnMain');
-  if (isPaused) { btn.className='btn-main'; btn.innerHTML='▶ Weiter'; if (voiceOn) speak('Pause.'); }
-  else { btn.className='btn-main running'; btn.innerHTML='⏸ Pause'; if (voiceOn) speak('Weiter.'); }
-}
-
-function skipTask() {
-  if (!isRunning) return;
-  clearInterval(timerInterval);
-  closeSteps();
-  var tasks = getTasks();
-  if (curIdx < tasks.length) { if (voiceOn) speak(tasks[curIdx].task.t + ' übersprungen.'); }
-  curIdx++;
-  var next = getNextUndone(curIdx);
-  if (next === -1) { finishAll(); return; }
-  curIdx = next;
-  startTask(curIdx);
-}
-
-function prevTask() {
-  if (curIdx <= 0) return;
-  clearInterval(timerInterval);
-  closeSteps();
-  curIdx = Math.max(0, curIdx-1);
-  var tasks = getTasks();
-  if (curIdx < tasks.length) setDone(tasks[curIdx].task.id, false, false);
-  isRunning = true; isPaused = false;
-  startTask(curIdx);
-}
-
-function finishAll() {
-  clearInterval(timerInterval);
-  isRunning = false; curIdx = -1;
-  closeSteps();
-  var btn = document.getElementById('btnMain');
-  btn.className = 'btn-main done-all'; btn.innerHTML = '↺ Nochmal';
-  document.getElementById('curTask').textContent = 'Alle Aufgaben erledigt!';
-  document.getElementById('curTip').textContent = '';
-  document.getElementById('timerDisp').textContent = '0:00';
-  document.getElementById('timerBar').style.width = '100%';
-  document.getElementById('nextLbl').textContent = '';
-  document.getElementById('doneBanner').className = 'done-banner show';
-  var tasks = getTasks();
-  var totalM = tasks.reduce(function(s,e){ return s+e.task.m; }, 0);
-  document.getElementById('doneText').textContent = 'Super! ' + totalM + ' Minuten Haushaltsblock abgeschlossen.';
-  renderProgress(); renderList();
-}
-
-function toggleVoice() {
-  voiceOn = !voiceOn;
-  var sw = document.getElementById('voiceSw');
-  sw.className = 'toggle-sw' + (voiceOn?' on':'');
-  loadVoices();
-  if (voiceOn && synth) { setTimeout(function(){ speak('Ansage aktiviert.'); }, 200); }
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────────
-function renderStrip() {
-  var h=''; var ord=[1,2,3,4,5,6,0];
-  ord.forEach(function(d){
-    var isSel=d===selDay, isToday=d===today.getDay();
-    var has = (WEEKLY[d]||[]).length > 0;
-    h+='<button class="dbtn'+(isSel?' active':'')+(isToday?' today':'')+'" onclick="selD('+d+')">'
-      +'<span class="dname">'+DN[d]+'</span>'
-      +'<span class="dnum">'+DN[d][0]+'</span>'
-      +(has?'<span class="ddot"></span>':'<span style="height:3px"></span>')
-      +'</button>';
-  });
-  document.getElementById('ds').innerHTML = h;
-}
-
-function selD(d) {
-  if (isRunning) { if(!confirm('Laufenden Block abbrechen?')) return; clearInterval(timerInterval); isRunning=false; curIdx=-1; closeSteps(); }
-  selDay = d; renderStrip(); renderProgress(); renderAll();
-}
-
-function renderProgress() {
-  var tasks = getTasks();
-  var done = tasks.filter(function(e){ return isDone(e.task.id,false); }).length;
-  var total = tasks.length;
-  var pct = total ? Math.round(done/total*100) : 0;
-  document.getElementById('plbl').textContent = done + ' von ' + total + ' erledigt';
-  document.getElementById('ppct').textContent = pct + '%';
-  document.getElementById('pb').style.width = pct + '%';
-  document.getElementById('totalMin').textContent = getTotalMin();
-}
-
-function renderList() {
-  var tasks = getTasks();
-  var monthly = getMonthlyForDay();
-  var h = '';
-
-  if (WAESCHE_DAYS.indexOf(selDay) >= 0) {
-    var wDone = isDone(WAESCHE_TASK.id, false);
-    var isCurW = isRunning && curIdx === 0;
-    var hasSteps = !!STEPS[22];
-    h += '<div class="section-day">🧺 Zuerst: Wäsche</div>';
-    h += '<div class="task-row'+(wDone?' done-t':'')+(isCurW?' current':'')+'" onclick="'+(hasSteps?'openSteps(22)':'')+'">'
-      +'<span class="tnr">1</span>'
-      +'<div class="tinfo2"><div class="tname">'+WAESCHE_TASK.t+(hasSteps?'<span class="steps-badge">Schritte</span>':'')+'</div><div class="ttip2">'+WAESCHE_TASK.tip+'</div></div>'
-      +'<span class="tmin2">'+WAESCHE_TASK.m+' Min</span>'
-      +'</div>';
-  }
-
-  var weekly = WEEKLY[selDay] || [];
-  if (weekly.length) {
-    h += '<div class="section-day">Wochenschwerpunkt ' + DN[selDay] + '</div>';
-    weekly.forEach(function(t, wi) {
-      var done = isDone(t.id, false);
-      var isCur = isRunning && curIdx === wi;
-      var hasSteps = !!STEPS[t.id];
-      h += '<div class="task-row'+(done?' done-t':'')+(isCur?' current':'')+'" onclick="'+(hasSteps?'openSteps('+t.id+')':'')+'">'
-        +'<span class="tnr">'+(wi+1)+'</span>'
-        +'<div class="tinfo2"><div class="tname">'+t.t+(hasSteps?'<span class="steps-badge">Schritte</span>':'')+'</div><div class="ttip2">'+t.tip+'</div></div>'
-        +'<span class="tmin2">'+t.m+' Min</span>'
-        +'</div>';
-    });
-  }
-
-  h += '<div class="section-day">💨 Täglich: Lüften + Routine</div>';
-  var wlen = weekly.length;
-  DAILY.forEach(function(t, di) {
-    var globalIdx = wlen + di;
-    var done = isDone(t.id, false);
-    var isCur = isRunning && curIdx === globalIdx;
-    var hasSteps = !!STEPS[t.id];
-    h += '<div class="task-row'+(done?' done-t':'')+(isCur?' current':'')+'" onclick="'+(hasSteps?'openSteps('+t.id+')':'')+'">'
-      +'<span class="tnr">'+(wlen+di+1)+'</span>'
-      +'<div class="tinfo2"><div class="tname">'+t.t+(hasSteps?'<span class="steps-badge">Schritte</span>':'')+'</div><div class="ttip2">'+t.tip+'</div></div>'
-      +'<span class="tmin2">'+t.m+' Min</span>'
-      +'</div>';
-  });
-
-  if (monthly.length) {
-    h += '<div class="section-day" style="color:var(--p)">Monatlich</div>';
-    monthly.forEach(function(t) {
-      var done = isDone(t.id, true);
-      var hasSteps = !!STEPS[t.id];
-      h += '<div class="task-row monthly'+(done?' done-t':'')+'" onclick="'+(hasSteps?'openSteps('+t.id+')':'')+'">'
-        +'<span class="tnr" style="color:var(--p)">○</span>'
-        +'<div class="tinfo2"><div class="tname">'+t.t+'<span class="freq-chip">'+t.freq+'</span>'+(hasSteps?'<span class="steps-badge">Schritte</span>':'')+'</div><div class="ttip2">'+t.tip+'</div></div>'
-        +'<span class="tmin2" style="color:var(--p)">~'+t.m+' Min</span>'
-        +'</div>';
-    });
-  }
-
-  document.getElementById('taskList').innerHTML = h;
-}
-
-function renderAll() {
-  var btn = document.getElementById('btnMain');
-  if (!isRunning) { btn.className='btn-main'; btn.innerHTML='▶ Start'; }
-  document.getElementById('curTask').textContent = 'Tippe Start zum Beginnen';
-  document.getElementById('curTip').textContent = '';
-  document.getElementById('timerDisp').textContent = '0:00';
-  document.getElementById('timerOf').textContent = '';
-  document.getElementById('timerBar').style.width = '0%';
-  document.getElementById('nextLbl').textContent = '';
-  document.getElementById('doneBanner').className = 'done-banner';
-  renderList();
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-load(); renderStrip(); renderProgress(); renderAll();
 </script>
 </body>
 </html>

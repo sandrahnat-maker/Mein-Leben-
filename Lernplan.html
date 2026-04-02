@@ -2,48 +2,55 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lernplan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#faf3e8;--white:#fffdf8;--text:#2e2010;
+  --muted:rgba(20,10,0,0.55);--gold:#c8943a;--sage:#7a9a5a;
+  --terra:#c4704a;--border:rgba(180,130,70,0.15);--rose:#c4807a;
+}
+html{font-size:18px;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f7f3ee;color:#1a1a2e;padding:.8rem;padding-bottom:3rem}
-h1{font-size:1.05rem;font-weight:700;color:#8B6020;margin-bottom:.2rem}
-.sub{font-size:.72rem;color:#9a8060;margin-bottom:.8rem}
-.modul{background:#fff;border-radius:12px;margin-bottom:.7rem;border:1px solid #e8ddd0;overflow:hidden}
-.modul-hdr{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;cursor:pointer}
-.mh-migration{background:#FDE8E8}
-.mh-grammatik{background:#E8FDE8}
-.mh-aesthetisch{background:#E8F0FD}
-.mh-lehrskizze{background:#F0E8FD}
-.mh-praktikum{background:#FDF5E8}
-.modul-name{font-size:.88rem;font-weight:700;color:#2c2416}
-.modul-prog{font-size:.68rem;color:#8B6020;font-weight:600}
-.abgabe{font-size:.7rem;background:#FDE8E8;color:#B03030;padding:.2rem .6rem;margin:.3rem .8rem;border-radius:6px;display:inline-block;font-weight:600}
-.progress-bar{height:3px;background:#e8ddd0}
-.progress-fill{height:100%;transition:width .3s}
-.fill-migration{background:#B03030}
-.fill-grammatik{background:#2E7D4F}
+body{font-family:'Cormorant Garamond',Georgia,serif;background:var(--bg);color:var(--text);padding:.9rem;padding-bottom:3rem}
+h1{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;font-weight:400;color:var(--text);margin-bottom:.2rem}
+.sub{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:1rem}
+.modul{background:var(--white);border-radius:14px;margin-bottom:.8rem;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 8px rgba(180,120,40,0.05)}
+.modul-hdr{display:flex;align-items:center;justify-content:space-between;padding:.7rem .9rem;cursor:pointer}
+.mh-migration{background:linear-gradient(90deg,#fdf0e8,#faf3e8)}
+.mh-grammatik{background:linear-gradient(90deg,#edf5e8,#faf3e8)}
+.mh-aesthetisch{background:linear-gradient(90deg,#e8f0fd,#faf3e8)}
+.mh-lehrskizze{background:linear-gradient(90deg,#f0e8fd,#faf3e8)}
+.mh-praktikum{background:linear-gradient(90deg,#fdf5e8,#faf3e8)}
+.modul-name{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;font-weight:400;color:var(--text)}
+.modul-prog{font-size:13px;color:var(--gold);font-weight:600}
+.abgabe{font-size:13px;background:rgba(196,112,74,0.1);color:var(--terra);padding:.25rem .7rem;margin:.3rem .9rem;border-radius:8px;display:inline-block;font-weight:600;border:1px solid rgba(196,112,74,0.2)}
+.progress-bar{height:3px;background:var(--border)}
+.progress-fill{height:100%;transition:width .3s;border-radius:2px}
+.fill-migration{background:var(--terra)}
+.fill-grammatik{background:var(--sage)}
 .fill-aesthetisch{background:#4A7FA8}
 .fill-lehrskizze{background:#7B5EA7}
-.fill-praktikum{background:#8B6020}
+.fill-praktikum{background:var(--gold)}
 .aufgaben{padding:.3rem 0}
-.aufgabe{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem .8rem;border-bottom:1px solid #f5ede0;cursor:pointer;transition:background .15s}
+.aufgabe{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem .9rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
 .aufgabe:last-child{border:none}
-.aufgabe:active{background:#f0e4d0}
-.aufgabe.done{opacity:.45}
-.check{width:22px;height:22px;border-radius:50%;border:2px solid #c5b99a;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:.05rem;transition:all .15s;font-size:.8rem}
-.check.on{background:#2E7D4F;border-color:#2E7D4F;color:#fff}
+.aufgabe:active{background:rgba(200,148,58,0.06)}
+.aufgabe.done{opacity:.4}
+.check{width:22px;height:22px;border-radius:50%;border:2px solid rgba(180,130,70,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:.1rem;transition:all .15s;font-size:13px}
+.check.on{background:var(--sage);border-color:var(--sage);color:#fff}
 .aufg-body{flex:1}
-.aufg-datum{font-size:.65rem;color:#b08040;font-weight:600}
-.aufg-text{font-size:.82rem;color:#2c2416;margin-top:.05rem}
-.aufg-text.done-text{text-decoration:line-through;color:#9a8060}
-.aufg-dauer{font-size:.65rem;color:#9a8060}
-.reset-btn{position:fixed;bottom:1rem;right:1rem;background:#8B6020;color:#fff;border:none;border-radius:20px;padding:.4rem 1rem;font-size:.75rem;cursor:pointer;font-family:inherit}
+.aufg-datum{font-size:12px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.aufg-text{font-size:15px;color:var(--text);margin-top:.15rem;line-height:1.4}
+.aufg-text.done-text{text-decoration:line-through;color:var(--muted)}
+.aufg-dauer{font-size:12px;color:var(--muted);margin-top:.1rem;font-style:italic}
+.reset-btn{position:fixed;bottom:1rem;right:1rem;background:var(--gold);color:#fff;border:none;border-radius:20px;padding:.45rem 1.1rem;font-size:14px;cursor:pointer;font-family:'Cormorant Garamond',serif}
 </style>
 </head>
 <body>
-<h1>&#128214; Lernplan &#8211; Sandra Hnat-Gerersdorfer</h1>
-<p class="sub">8. Maerz &#8211; 21. Juni 2026 &middot; <a href="https://moodle.univie.ac.at" target="_blank">Moodle</a></p>
+<h1>📚 Mein Lernplan</h1>
+<p class="sub">Sandra Hnat-Gerersdorfer · März–Juni 2026 · <a href="https://moodle.univie.ac.at" target="_blank" style="color:var(--gold)">Moodle öffnen</a></p>
 
 <div class="modul">
 <div class="modul-hdr mh-migration" onclick="toggleModul('migration')">
@@ -85,6 +92,46 @@ h1{font-size:1.05rem;font-weight:700;color:#8B6020;margin-bottom:.2rem}
 </div>
 
 <div class="modul">
+<div class="modul-hdr" style="background:linear-gradient(90deg,#fdf5e0,#faf3e8)" onclick="toggleModul('portfolio')">
+<span class="modul-name">🎓 Portfolio & Abschlussgespräch</span>
+<span class="modul-prog" id="prog-portfolio">0/9</span>
+</div>
+<span class="abgabe">🔔 Portfolio: 30.08.2026 · Gespräch: 25.09.2026 · Zertifikat: Oktober 2026</span>
+<div class="progress-bar"><div class="progress-fill" style="background:var(--gold)" id="fill-portfolio"></div></div>
+<div class="aufgaben" id="list-portfolio"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr" style="background:linear-gradient(90deg,#fde8f0,#faf3e8)" onclick="toggleModul('fehlerkorrektur')">
+<span class="modul-name">🎥 IV. Fehlerkorrektur & Fehlerkultur</span>
+<span class="modul-prog" id="prog-fehlerkorrektur">0/6</span>
+</div>
+<span class="abgabe">🔔 Abgabe: Sa 17.05.2026 · M2 Pflichtaufgabe</span>
+<div class="progress-bar"><div class="progress-fill" style="background:var(--rose)" id="fill-fehlerkorrektur"></div></div>
+<div class="aufgaben" id="list-fehlerkorrektur"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr" style="background:linear-gradient(90deg,#e8f5e8,#faf3e8)" onclick="toggleModul('lehrskizze_detail')">
+<span class="modul-name">📝 V. Detaillierte Lehrskizze</span>
+<span class="modul-prog" id="prog-lehrskizze_detail">0/7</span>
+</div>
+<span class="abgabe">🔔 Abgabe: So 07.06.2026 · M3 Pflichtaufgabe</span>
+<div class="progress-bar"><div class="progress-fill" style="background:var(--sage)" id="fill-lehrskizze_detail"></div></div>
+<div class="aufgaben" id="list-lehrskizze_detail"></div>
+</div>
+
+<div class="modul">
+<div class="modul-hdr" style="background:linear-gradient(90deg,#f0e8fd,#faf3e8)" onclick="toggleModul('kulturreflexiv')">
+<span class="modul-name">🌍 VI. Kulturreflexiv kompetente Lehrkraft</span>
+<span class="modul-prog" id="prog-kulturreflexiv">0/6</span>
+</div>
+<span class="abgabe">🔔 Abgabe: So 28.06.2026 · M4 Pflichtaufgabe</span>
+<div class="progress-bar"><div class="progress-fill" style="background:#7B5EA7" id="fill-kulturreflexiv"></div></div>
+<div class="aufgaben" id="list-kulturreflexiv"></div>
+</div>
+
+<div class="modul">
 <div class="modul-hdr mh-praktikum" onclick="toggleModul('praktikum')">
 <span class="modul-name">&#127979; Unterrichtspraktikum</span>
 <span class="modul-prog" id="prog-praktikum">0/12</span>
@@ -94,41 +141,41 @@ h1{font-size:1.05rem;font-weight:700;color:#8B6020;margin-bottom:.2rem}
 <div class="aufgaben" id="list-praktikum"></div>
 </div>
 
-<button class="reset-btn" onclick="resetAll()">&#8634; Zuruecksetzen</button>
+<button class="reset-btn" onclick="resetAll()">↺ Zurücksetzen</button>
 
 <script>
 var TASKS = {
   migration: [
-    {id:'m1', datum:'Do 19.03.', text:'Konzett (2019) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
-    {id:'m2', datum:'Do 19.03. Abend', text:'Garcia (2017) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
-    {id:'m3', datum:'Fr 20.03.', text:'Plutzar (2016/2019) lesen + Notizen', dauer:'1 Std.'},
-    {id:'m4', datum:'Fr 20.03.', text:'Don Bosco + Logbuch Neuland + Notizen', dauer:'1 Std.'},
-    {id:'m5', datum:'Mo 23.03. Abend', text:'Synthese-Fragen + roten Faden entwickeln', dauer:'2 Std.'},
-    {id:'m6', datum:'Di 24.03.', text:'Einleitung + Abschnitt 1 schreiben', dauer:'2 Std.'},
-    {id:'m7', datum:'Mi 25.03.', text:'Abschnitt 2 schreiben (Don Bosco & Logbuch)', dauer:'2 Std.'},
-    {id:'m8', datum:'Mi 25.03. Nachm.', text:'Abschnitt 3 schreiben (Plutzar)', dauer:'1 Std.'},
-    {id:'m9', datum:'Do 26.03.', text:'Ueberarbeiten + Zitate + Quellenangaben', dauer:'2 Std.'},
-    {id:'m10', datum:'Fr 27.03.', text:'Korrekturlesen + finales Layout', dauer:'1 Std.'},
-    {id:'m11', datum:'So 29.03.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+    {id:'m1', datum:'Do 19.03. ✓', text:'Konzett (2019) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
+    {id:'m2', datum:'Do 19.03. Abend ✓', text:'Garcia (2017) lesen + Leitfragen ausfuellen', dauer:'2 Std.'},
+    {id:'m3', datum:'Fr 20.03. ✓', text:'Plutzar (2016/2019) lesen + Notizen', dauer:'1 Std.'},
+    {id:'m4', datum:'Fr 20.03. ✓', text:'Don Bosco + Logbuch Neuland + Notizen', dauer:'1 Std.'},
+    {id:'m5', datum:'Mo 23.03. Abend ✓', text:'Synthese-Fragen + roten Faden entwickeln', dauer:'2 Std.'},
+    {id:'m6', datum:'Di 24.03. ✓', text:'Einleitung + Abschnitt 1 schreiben', dauer:'2 Std.'},
+    {id:'m7', datum:'Mi 25.03. ✓', text:'Abschnitt 2 schreiben (Don Bosco & Logbuch)', dauer:'2 Std.'},
+    {id:'m8', datum:'Mi 25.03. Nachm. ✓', text:'Abschnitt 3 schreiben (Plutzar)', dauer:'1 Std.'},
+    {id:'m9', datum:'Do 26.03. ✓', text:'Ueberarbeiten + Zitate + Quellenangaben', dauer:'2 Std.'},
+    {id:'m10', datum:'Fr 27.03. ✓', text:'Korrekturlesen + finales Layout', dauer:'1 Std.'},
+    {id:'m11', datum:'So 29.03. ✓', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
   ],
   grammatik: [
-    {id:'g1', datum:'Mo 30.03.', text:'Aufgabenstellung lesen + Text auswaehlen', dauer:'1,5 Std.'},
-    {id:'g2', datum:'Di 31.03.', text:'Analytischen Zyklus planen (Niveau A + B)', dauer:'2 Std.'},
-    {id:'g3', datum:'Mi 01.04.', text:'Suche-X + Sammeln & Sortieren + Tafelbild', dauer:'2 Std.'},
-    {id:'g4', datum:'Do 02.04.', text:'Regelbildung + Recyclingaktivitaet', dauer:'2 Std.'},
-    {id:'g5', datum:'Fr 03.04.', text:'Dialog + freiere Aktivitaet', dauer:'2 Std.'},
-    {id:'g6', datum:'So 05.04.', text:'Arbeitsblatter erstellen', dauer:'2 Std.'},
-    {id:'g7', datum:'Mo 06.04.', text:'Ueberarbeiten + Hypothesen & Regelformulierung', dauer:'2 Std.'},
-    {id:'g8', datum:'Di 07.04.', text:'Korrekturlesen + Quellenangaben', dauer:'1,5 Std.'},
-    {id:'g9', datum:'So 12.04.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+    {id:'g1', datum:'Do 02.04.', text:'Aufgabenstellung lesen + Text auswählen', dauer:'1,5 Std.'},
+    {id:'g2', datum:'Fr 03.04.', text:'Analytischen Zyklus planen (Niveau A + B)', dauer:'2 Std.'},
+    {id:'g3', datum:'Sa 04.04.', text:'Suche-X + Sammeln & Sortieren + Tafelbild', dauer:'2 Std.'},
+    {id:'g4', datum:'So 05.04.', text:'Regelbildung + Recyclingaktivität', dauer:'2 Std.'},
+    {id:'g5', datum:'Mo 06.04.', text:'Dialog + freiere Aktivität', dauer:'2 Std.'},
+    {id:'g6', datum:'Di 07.04.', text:'Arbeitsblätter erstellen', dauer:'2 Std.'},
+    {id:'g7', datum:'Mi 08.04.', text:'Überarbeiten + Hypothesen & Regelformulierung', dauer:'2 Std.'},
+    {id:'g8', datum:'Fr 10.04.', text:'Korrekturlesen + Quellenangaben', dauer:'1,5 Std.'},
+    {id:'g9', datum:'So 12.04.', text:'🔴 ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
   ],
   aesthetisch: [
-    {id:'a1', datum:'Di 24.03. Nachm.', text:'Thema + Material suchen', dauer:'2 Std.'},
-    {id:'a2', datum:'Mi 25.03. Nachm.', text:'Material sichten + Lernziele formulieren', dauer:'2 Std.'},
-    {id:'a3', datum:'Do 26.03.', text:'Aufgaben entwerfen', dauer:'2 Std.'},
-    {id:'a4', datum:'Fr 27.03.', text:'Kommentar (ca. 1 Seite) schreiben', dauer:'2 Std.'},
-    {id:'a5', datum:'Fr 10.04.', text:'Aufgaben finalisieren + Loesungen + Quellen', dauer:'2 Std.'},
-    {id:'a6', datum:'Sa 26.04.', text:'&#128308; ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+    {id:'a1', datum:'Di 24.03. ✓', text:'Thema + Material suchen', dauer:'2 Std.'},
+    {id:'a2', datum:'Mi 25.03. ✓', text:'Material sichten + Lernziele formulieren', dauer:'2 Std.'},
+    {id:'a3', datum:'Do 26.03. ✓', text:'Aufgaben entwerfen', dauer:'2 Std.'},
+    {id:'a4', datum:'Fr 27.03. ✓', text:'Kommentar (ca. 1 Seite) schreiben', dauer:'2 Std.'},
+    {id:'a5', datum:'Di 14.04.', text:'Aufgaben finalisieren + Lösungen + Quellen', dauer:'2 Std.'},
+    {id:'a6', datum:'Sa 26.04.', text:'🔴 ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
   ],
   lehrskizze: [
     {id:'l1', datum:'Mi 18.03.', text:'Lehrskizze fertigstellen \u2013 Unterricht 25.3.', dauer:'1,5 Std.'},
@@ -139,6 +186,42 @@ var TASKS = {
     {id:'l6', datum:'Mi 29.04.', text:'Lehrskizze ausarbeiten \u2013 Unterricht 11.5.', dauer:'2 Std.'},
     {id:'l7', datum:'Mo 11.05. bis 18:00', text:'Lehrskizze auf Moodle hochladen!', dauer:'15 Min.'},
     {id:'l8', datum:'Mo 11.05.', text:'&#127979; UNTERRICHTEN \u2013 Runde 2 (Ute Bock)', dauer:'Praxis'},
+  ],
+  portfolio: [
+    {id:'po1', datum:'Mo 06.07.', text:'Alle Pflichtaufgaben sichten — welche überarbeiten?', dauer:'1 Std.'},
+    {id:'po2', datum:'Di 07.07.', text:'Teaching Philosophy Statement schreiben (meine pädagogische Haltung)', dauer:'3 Std.'},
+    {id:'po3', datum:'Mi 08.07.', text:'Gewählte Pflichtaufgabe überarbeiten & verbessern', dauer:'3 Std.'},
+    {id:'po4', datum:'Do 09.07.', text:'Abschlussreflexion schreiben (Lernweg, Erkenntnisse, Wachstum)', dauer:'2 Std.'},
+    {id:'po5', datum:'Fr 10.07.', text:'Deckblatt + Inhaltsverzeichnis + Anhang zusammenstellen', dauer:'1,5 Std.'},
+    {id:'po6', datum:'Mo 20.07.', text:'Gesamtes Portfolio Korrekturlesen + Layout finalisieren', dauer:'2 Std.'},
+    {id:'po7', datum:'So 30.08.', text:'🔴 PORTFOLIO Abgabe auf Moodle!', dauer:'30 Min.'},
+    {id:'po8', datum:'Mo 14.09.', text:'Schwerpunkt-Pflichtaufgabe für Gespräch vorbereiten', dauer:'2 Std.'},
+    {id:'po9', datum:'Fr 25.09.', text:'🎓 ABSCHLUSSGESPRÄCH (20–30 Min.) — Zertifikat im Oktober!', dauer:'Mündlich'},
+  ],
+  fehlerkorrektur: [
+    {id:'fk1', datum:'Mo 04.05.', text:'Videosequenz auswählen & einmal ansehen', dauer:'1 Std.'},
+    {id:'fk2', datum:'Di 05.05.', text:'Videoanalyse: Fehlerreaktionen, Wartezeit, Selbstkorrektur beobachten', dauer:'2 Std.'},
+    {id:'fk3', datum:'Mi 06.05.', text:'Beobachtungen strukturieren + Bericht schreiben', dauer:'2 Std.'},
+    {id:'fk4', datum:'Do 07.05.', text:'Empfehlungen auf Basis Literatur formulieren', dauer:'1,5 Std.'},
+    {id:'fk5', datum:'Fr 08.05.', text:'Korrekturlesen + Quellenangaben + Layout', dauer:'1 Std.'},
+    {id:'fk6', datum:'So 17.05.', text:'🔴 ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+  ],
+  lehrskizze_detail: [
+    {id:'ls1', datum:'Di 19.05.', text:'Unterrichtsszenario wählen + Lernziele formulieren', dauer:'1,5 Std.'},
+    {id:'ls2', datum:'Mi 20.05.', text:'Rahmenbedingungen & Zielgruppe beschreiben', dauer:'1 Std.'},
+    {id:'ls3', datum:'Do 21.05.', text:'AVIVA-Modell anwenden — Phasen planen', dauer:'2 Std.'},
+    {id:'ls4', datum:'Fr 22.05.', text:'Materialien erstellen & beilegen', dauer:'2 Std.'},
+    {id:'ls5', datum:'Sa 23.05.', text:'Lehrskizze ausformulieren + Teillernziele', dauer:'2 Std.'},
+    {id:'ls6', datum:'Mo 01.06.', text:'Überarbeiten + Korrekturlesen', dauer:'1,5 Std.'},
+    {id:'ls7', datum:'So 07.06.', text:'🔴 ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
+  ],
+  kulturreflexiv: [
+    {id:'kr1', datum:'Mo 09.06.', text:'3 Texte aus Basislektüre auswählen & lesen', dauer:'3 Std.'},
+    {id:'kr2', datum:'Di 10.06.', text:'Leitfragen bearbeiten: Bedeutung kulturreflexiven Lernens', dauer:'2 Std.'},
+    {id:'kr3', datum:'Mi 11.06.', text:'Herausforderungen & kritische Anmerkungen formulieren', dauer:'2 Std.'},
+    {id:'kr4', datum:'Do 12.06.', text:'Essay schreiben + Bezug auf Modulinhalte', dauer:'2 Std.'},
+    {id:'kr5', datum:'Fr 13.06.', text:'Überarbeiten + Zitate + Quellenangaben', dauer:'1,5 Std.'},
+    {id:'kr6', datum:'So 28.06.', text:'🔴 ABGABE auf Moodle hochladen!', dauer:'30 Min.'},
   ],
   praktikum: [
     {id:'p1', datum:'Di 24.03.', text:'&#128065; Hospitation Runde 1 \u2013 UP DaZ/DaF', dauer:'Praxis'},
@@ -158,6 +241,15 @@ var TASKS = {
 
 var KEY = 'lernplan_v2';
 var checked = JSON.parse(localStorage.getItem(KEY) || '{}');
+// Bereits erledigte Aufgaben vormarkieren (nur wenn noch nicht gespeichert)
+if (Object.keys(checked).length === 0) {
+  // Migration (m1-m11), Aesthetisch (a1-a6), Lehrskizze Runden 1 (l1-l5), Praktikum Runde 1 (p1-p4)
+  ['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11',
+   'a1','a2','a3','a4',
+   'l1','l2','l3','l4','l5',
+   'p1','p2','p3','p4'].forEach(function(id){ checked[id] = true; });
+  localStorage.setItem(KEY, JSON.stringify(checked));
+}
 function save(){ localStorage.setItem(KEY, JSON.stringify(checked)); }
 
 function render(){
@@ -191,7 +283,7 @@ function toggleModul(id){
 }
 
 function resetAll(){
-  if(confirm('Alle Haken zuruecksetzen?')){ checked={}; save(); render(); }
+  if(confirm('Alle Schritte zurücksetzen?')){ checked={}; save(); render(); }
 }
 render();
 </script>

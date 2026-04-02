@@ -2,45 +2,48 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>💊 Rudi, Timmy & Lotte – Medikamentenplan</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     --rudi: #2563a8;
     --rudi-light: #dbeafe;
     --rudi-mid: #93c5fd;
-    --timmy: #c2410c;
-    --timmy-light: #ffedd5;
-    --timmy-mid: #fdba74;
-    --ok: #15803d;
-    --ok-light: #dcfce7;
-    --warn: #b45309;
-    --warn-light: #fef3c7;
-    --danger: #b91c1c;
-    --danger-light: #fee2e2;
-    --bg: #f8f7f4;
-    --card: #ffffff;
-    --text: #1c1917;
-    --muted: #78716c;
-    --border: #e7e5e4;
+    --timmy: #c4704a;
+    --timmy-light: #fdf0e0;
+    --timmy-mid: #e8b86a;
+    --ok: #7a9a5a;
+    --ok-light: #edf5e8;
+    --warn: #c8943a;
+    --warn-light: #fdf6e0;
+    --danger: #c4704a;
+    --danger-light: #fde8dc;
+    --bg: #faf3e8;
+    --card: #fffdf8;
+    --text: #2e2010;
+    --muted: rgba(20,10,0,0.58);
+    --border: rgba(180,130,70,0.15);
   }
+  html { font-size: 18px; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
   }
 
   header {
-    background: var(--text);
-    color: white;
-    padding: 2rem 2rem 1.5rem;
+    background: linear-gradient(135deg,#f5ede0,#faf3e8);
+    color: var(--text);
+    padding: 1.2rem 1.2rem 1rem;
     position: relative;
     overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 8px rgba(180,120,40,0.07);
   }
 
   header::before {
@@ -69,28 +72,31 @@
   }
 
   header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    letter-spacing: -0.02em;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0;
     margin-bottom: 0.25rem;
+    color: var(--text);
   }
 
   header p {
     font-size: 0.875rem;
-    color: rgba(255,255,255,0.55);
+    color: var(--muted);
     font-weight: 300;
   }
 
   #today-display {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.4);
+    color: var(--muted);
     margin-top: 0.5rem;
   }
 
   .summary-bar {
-    background: white;
+    background: var(--card);
     border-bottom: 1px solid var(--border);
-    padding: 0.75rem 2rem;
+    padding: 0.75rem 1.2rem;
   }
 
   .summary-inner {
@@ -119,11 +125,11 @@
   main {
     max-width: 900px;
     margin: 0 auto;
-    padding: 1.5rem 2rem 3rem;
+    padding: 1rem 1rem 3rem;
   }
 
   .section-title {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 1.3rem;
     margin: 1.5rem 0 0.75rem;
     display: flex;
@@ -132,7 +138,7 @@
   }
 
   .section-title .badge {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.2rem 0.6rem;
@@ -189,13 +195,14 @@
 
   .med-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 17px;
   }
 
   .med-info {
-    font-size: 0.8rem;
+    font-size: 14px;
     color: var(--muted);
     margin-top: 0.15rem;
+    font-style: italic;
   }
 
   .med-details {
@@ -230,7 +237,7 @@
   }
 
   .days-left {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 1.6rem;
     line-height: 1;
   }
@@ -281,7 +288,7 @@
   }
 
   .btn-new-pack {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.78rem;
     font-weight: 600;
     padding: 0.35rem 0.9rem;
@@ -310,7 +317,7 @@
   }
 
   .btn-edit {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.75rem;
     font-weight: 500;
     padding: 0.3rem 0.7rem;
@@ -367,7 +374,7 @@
   }
 
   .modal h3 {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
@@ -384,7 +391,7 @@
 
   .modal input {
     width: 100%;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.9rem;
     padding: 0.5rem 0.75rem;
     border: 1.5px solid var(--border);
@@ -404,7 +411,7 @@
   }
 
   .modal-btn {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 0.85rem;
     font-weight: 600;
     padding: 0.5rem 1rem;

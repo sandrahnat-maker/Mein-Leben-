@@ -2,89 +2,91 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lottes Runden 🐾</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap');
   :root {
-    --bg:#F7F2EB; --card:#FFF; --accent:#8B6020; --accent2:#C4873A;
-    --text:#1E1A14; --muted:#8A7D6A; --border:rgba(139,96,32,.15);
+    --bg:#faf3e8; --white:#fffdf8; --gold:#c8943a; --gold2:#e8b86a;
+    --terra:#c4704a; --sage:#7a9a5a; --text:#2e2010;
+    --muted:rgba(40,20,5,0.65); --border:rgba(180,130,70,0.15);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;padding:1.5rem 1rem 3rem;}
-  h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--accent);text-align:center;margin-bottom:.2rem;}
-  .subtitle{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:1.4rem;}
+  html{font-size:18px;}
+  body{background:var(--bg);font-family:'Cormorant Garamond',Georgia,serif;color:var(--text);min-height:100vh;padding:1.5rem 1rem 3rem;}
+  h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-style:italic;font-weight:400;color:var(--gold);text-align:center;margin-bottom:.25rem;}
+  .subtitle{text-align:center;color:var(--muted);font-size:.88rem;font-style:italic;margin-bottom:1.4rem;}
   .today-card{
-    background:linear-gradient(135deg,#8B6020,#C4873A);
-    border-radius:18px;padding:1.3rem 1.1rem;color:#fff;
-    margin-bottom:1.4rem;box-shadow:0 8px 24px rgba(139,96,32,.3);
+    background:linear-gradient(135deg,#c4704a,#c8943a,#e8b86a);
+    border-radius:18px;padding:1.4rem 1.2rem;color:#fff;
+    margin-bottom:1.4rem;box-shadow:0 8px 28px rgba(196,112,74,.25);
     position:relative;overflow:hidden;
   }
-  .today-card::before{content:'🐾';position:absolute;right:.8rem;top:.6rem;font-size:3rem;opacity:.2;pointer-events:none;}
-  .today-label{font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.8;margin-bottom:.25rem;}
-  .today-day{font-family:'Playfair Display',serif;font-size:1.35rem;margin-bottom:.5rem;}
-  .today-route{font-size:.84rem;line-height:1.8;opacity:.95;margin-bottom:.9rem;}
-  .arr{color:rgba(255,255,255,.6);margin:0 .2rem;}
-  .arr-dark{color:var(--accent2);margin:0 .2rem;}
+  .today-card::before{content:'🐾';position:absolute;right:.9rem;top:.7rem;font-size:3.5rem;opacity:.18;pointer-events:none;}
+  .today-label{font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-bottom:.3rem;font-family:'Cormorant Garamond',serif;}
+  .today-day{font-family:'Playfair Display',serif;font-size:1.4rem;font-style:italic;margin-bottom:.55rem;}
+  .today-route{font-size:.92rem;line-height:1.9;opacity:.97;margin-bottom:1rem;}
+  .arr{color:rgba(255,255,255,.55);margin:0 .25rem;}
+  .arr-dark{color:var(--gold2);margin:0 .25rem;}
   .btn-row{display:flex;gap:.6rem;flex-wrap:wrap;}
   .btn-maps{
-    background:#fff;color:var(--accent);border:none;border-radius:30px;
-    padding:.5rem 1.1rem;font-size:.82rem;font-weight:700;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
+    background:#fff;color:var(--terra);border:none;border-radius:30px;
+    padding:.52rem 1.15rem;font-size:.88rem;font-weight:600;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
     display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;
   }
   .btn-speak{
-    background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);
-    color:#fff;border-radius:30px;padding:.5rem 1.1rem;font-size:.82rem;font-weight:600;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
+    background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);
+    color:#fff;border-radius:30px;padding:.52rem 1.15rem;font-size:.88rem;font-weight:400;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
     display:inline-flex;align-items:center;gap:.4rem;
   }
-  .days-grid{display:flex;flex-direction:column;gap:.7rem;}
-  .day-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;}
-  .day-card.today-day{border-color:var(--accent);box-shadow:0 4px 16px rgba(139,96,32,.15);}
-  .day-header{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;cursor:pointer;}
-  .day-left{display:flex;align-items:center;gap:.6rem;}
-  .day-name{font-weight:600;font-size:.92rem;}
-  .day-tag{font-size:.65rem;background:var(--bg);color:var(--muted);border-radius:20px;padding:.12rem .55rem;font-weight:600;}
-  .today-day .day-tag{background:var(--accent);color:#fff;}
-  .day-dur{font-size:.72rem;color:var(--muted);}
-  .chevron{color:var(--muted);font-size:.75rem;transition:transform .2s;display:inline-block;}
+  .btn-osmand{
+    background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.45);
+    color:#fff;border-radius:30px;padding:.52rem 1.15rem;font-size:.88rem;font-weight:400;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;
+  }
+  .days-grid{display:flex;flex-direction:column;gap:.75rem;}
+  .day-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);overflow:hidden;box-shadow:0 1px 8px rgba(180,120,40,0.05);}
+  .day-card.today-day{border-color:var(--gold);box-shadow:0 4px 18px rgba(200,148,58,.15);}
+  .day-header{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.1rem;cursor:pointer;}
+  .day-left{display:flex;align-items:center;gap:.65rem;}
+  .day-name{font-weight:600;font-size:1rem;}
+  .day-tag{font-size:.72rem;background:var(--bg);color:var(--muted);border-radius:20px;padding:.14rem .6rem;font-weight:600;}
+  .today-day .day-tag{background:var(--gold);color:#fff;}
+  .day-dur{font-size:.8rem;color:var(--muted);font-style:italic;}
+  .chevron{color:var(--gold2);font-size:.8rem;transition:transform .2s;display:inline-block;}
   .day-card.open .chevron{transform:rotate(180deg);}
-  .day-body{display:none;padding:0 1rem .9rem;}
+  .day-body{display:none;padding:0 1.1rem 1rem;}
   .day-card.open .day-body{display:block;}
-  .route-text{font-size:.83rem;line-height:1.9;color:var(--text);margin-bottom:.75rem;}
+  .route-text{font-size:.92rem;line-height:1.95;color:var(--text);margin-bottom:.8rem;}
   .btn-row-small{display:flex;gap:.5rem;flex-wrap:wrap;}
   .btn-maps-small{
-    background:var(--accent);color:#fff;border:none;border-radius:20px;
-    padding:.4rem .95rem;font-size:.75rem;font-weight:700;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
+    background:var(--gold);color:#fff;border:none;border-radius:20px;
+    padding:.42rem 1rem;font-size:.82rem;font-weight:600;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
     display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;
   }
   .btn-speak-small{
-    background:var(--bg);border:1.5px solid var(--border);color:var(--accent);
-    border-radius:20px;padding:.4rem .95rem;font-size:.75rem;font-weight:600;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
+    background:var(--bg);border:1.5px solid var(--border);color:var(--gold);
+    border-radius:20px;padding:.42rem 1rem;font-size:.82rem;font-weight:600;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
     display:inline-flex;align-items:center;gap:.35rem;
   }
   .btn-osmand-small{
-    background:#1a5c38;color:#fff;border:none;border-radius:20px;
-    padding:.4rem .95rem;font-size:.75rem;font-weight:700;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
+    background:var(--sage);color:#fff;border:none;border-radius:20px;
+    padding:.42rem 1rem;font-size:.82rem;font-weight:600;
+    font-family:'Cormorant Garamond',serif;cursor:pointer;
     display:inline-flex;align-items:center;gap:.35rem;text-decoration:none;
   }
-  .btn-osmand{
-    background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.5);
-    color:#fff;border-radius:30px;padding:.5rem 1.1rem;font-size:.82rem;font-weight:700;
-    font-family:'DM Sans',sans-serif;cursor:pointer;
-    display:inline-flex;align-items:center;gap:.4rem;text-decoration:none;
-  }
-  .tip{text-align:center;font-size:.72rem;color:var(--muted);margin-top:1.4rem;line-height:1.6;}
+  .tip{text-align:center;font-size:.82rem;color:var(--muted);font-style:italic;margin-top:1.5rem;line-height:1.7;}
 </style>
 </head>
 <body>
 
 <h1>Lottes Runden 🐾</h1>
-<p class="subtitle">Magdalenenstraße 4 · 1060 Wien</p>
+<p class="subtitle">Unsere tägliche Auszeit — Magdalenenstraße, Wien 6</p>
 
 <div class="today-card">
   <div class="today-label">Heute</div>
@@ -99,7 +101,7 @@
 
 <div class="days-grid" id="daysGrid"></div>
 
-<p class="tip">Tippe auf einen Tag zum Aufklappen<br>🗺 öffnet Google Maps mit Navigation · 🔊 liest die Route vor</p>
+<p class="tip">Tippe auf einen Tag um die Route aufzuklappen 🌿<br>🗺 startet die Navigation · 🔊 liest den Weg vor</p>
 
 <script>
 var BASE = 'https://raw.githubusercontent.com/sandrahnat-maker/Kalender_2203/main/';
@@ -221,7 +223,7 @@ function init() {
       '<div class="day-header" onclick="toggleCard(this.parentElement)">' +
         '<div class="day-left">' +
           '<span class="day-name">' + r.day + '</span>' +
-          '<span class="day-tag">' + (isToday ? 'Heute' : r.short) + '</span>' +
+          '<span class="day-tag">' + (isToday ? '✨ Heute' : r.short) + '</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:.6rem">' +
           '<span class="day-dur">' + r.dur + '</span>' +

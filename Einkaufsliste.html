@@ -2,76 +2,82 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Einkaufsliste</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#faf3e8;--white:#fffdf8;--text:#2e2010;
+  --muted:rgba(20,10,0,0.62);--gold:#c8943a;--gold2:#e8b86a;
+  --sage:#7a9a5a;--border:rgba(180,130,70,0.15);
+}
+html{font-size:18px;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:#faf6f1;color:#2a1a0a;padding:.7rem;padding-bottom:3rem}
-h1{font-size:1rem;font-weight:700;color:#8B6020;text-align:center;margin-bottom:.3rem}
-.sub{font-size:.7rem;color:#aaa;text-align:center;margin-bottom:.7rem}
-.tabs{display:flex;gap:5px;margin-bottom:.6rem}
-.tab{flex:1;padding:.45rem .3rem;border:1.5px solid #e0d0b8;border-radius:10px;background:#fff;font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;color:#8B6020;font-family:inherit}
-.tab.on{background:#8B6020;color:#fff;border-color:#8B6020}
-.week-badge{background:#FFFDE7;border:1px solid #FFD54F;border-radius:8px;padding:.4rem .7rem;font-size:.7rem;color:#6D4C00;margin-bottom:.6rem}
-.progress-wrap{margin-bottom:.7rem}
-.prog-label{display:flex;justify-content:space-between;font-size:.68rem;color:#999;margin-bottom:.25rem}
-.prog-bar{height:4px;background:#DDD;border-radius:99px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,#2E7D32,#F9A825);border-radius:99px;transition:width .4s}
-.group-hdr{border-radius:8px;padding:.45rem .7rem;margin-bottom:.35rem;font-weight:700;font-size:.72rem;display:flex;justify-content:space-between}
-.item{display:flex;gap:.6rem;align-items:flex-start;background:#fff;border-radius:9px;padding:.5rem .65rem;margin-bottom:.3rem;border:1.5px solid rgba(0,0,0,.05);cursor:pointer;transition:all .2s}
-.item.done{opacity:.5}
-.item.done .iname{text-decoration:line-through}
-.icb{width:19px;height:19px;border-radius:5px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
-.iname{font-size:.82rem;font-weight:600;font-family:sans-serif}
-.idetail{font-size:.68rem;color:#888;margin-top:1px;font-family:sans-serif}
-.btns{display:flex;gap:6px;margin-top:.7rem}
-.btn{flex:1;background:#fff;border:1.5px solid #e0d0b8;color:#999;border-radius:8px;padding:.45rem;font-size:.7rem;cursor:pointer;font-family:inherit}
-.btn.save{background:#8B6020;border-color:#8B6020;color:#fff;font-weight:700}
-.tip-box{background:#E8F5E9;border-radius:10px;padding:.6rem .8rem;border:1px solid #A5D6A7;margin-top:.7rem;font-size:.7rem;color:#2E7D32;line-height:1.7;font-family:sans-serif}
-.main-tabs{display:flex;gap:5px;margin-bottom:.7rem}
-.main-tab{flex:1;padding:.55rem .3rem;border:2px solid rgba(0,0,0,.1);border-radius:12px;background:rgba(255,255,255,.5);font-size:.78rem;font-weight:400;cursor:pointer;text-align:center;color:#888;font-family:inherit}
-.main-tab.on{border-color:#2E7D32;color:#2E7D32;background:rgba(255,255,255,.97);font-weight:700}
-.brand-hdr{border-radius:10px;padding:.6rem .8rem;margin-bottom:.5rem}
-.brand-title{font-weight:700;font-size:.82rem}
-.brand-sub{font-size:.68rem;opacity:.8;margin-top:.1rem}
-.brand-where{font-size:.65rem;color:#888;margin-top:.15rem;font-family:sans-serif}
-.pflege-app{font-size:.65rem;font-weight:700;margin-top:.15rem}
+body{font-family:'Cormorant Garamond',Georgia,serif;background:var(--bg);color:var(--text);padding:.8rem;padding-bottom:3rem}
+h1{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;font-weight:400;color:var(--text);text-align:center;margin-bottom:.3rem}
+.sub{font-size:13px;color:var(--muted);font-style:italic;text-align:center;margin-bottom:.8rem}
+.tabs{display:flex;gap:5px;margin-bottom:.7rem}
+.tab{flex:1;padding:.5rem .3rem;border:1.5px solid var(--border);border-radius:11px;background:var(--white);font-size:13px;font-weight:400;cursor:pointer;text-align:center;color:var(--gold);font-family:'Cormorant Garamond',serif}
+.tab.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+.week-badge{background:linear-gradient(135deg,#fdf6e0,#f8f0d8);border:1px solid rgba(200,148,58,0.2);border-radius:11px;padding:.45rem .8rem;font-size:14px;color:var(--text);margin-bottom:.7rem;font-style:italic}
+.progress-wrap{margin-bottom:.8rem}
+.prog-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:.3rem}
+.prog-bar{height:5px;background:rgba(180,130,70,0.15);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--sage),var(--gold));border-radius:99px;transition:width .4s}
+.group-hdr{border-radius:10px;padding:.5rem .8rem;margin-bottom:.4rem;font-weight:600;font-size:14px;display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif}
+.item{display:flex;gap:.65rem;align-items:flex-start;background:var(--white);border-radius:12px;padding:.55rem .75rem;margin-bottom:.35rem;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;box-shadow:0 1px 6px rgba(180,120,40,0.04)}
+.item.done{opacity:.45}.item.done .iname{text-decoration:line-through}
+.icb{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.iname{font-size:16px;font-weight:600}
+.idetail{font-size:13px;color:var(--muted);margin-top:2px;font-style:italic}
+.btns{display:flex;gap:6px;margin-top:.8rem}
+.btn{flex:1;background:var(--white);border:1.5px solid var(--border);color:var(--muted);border-radius:10px;padding:.5rem;font-size:14px;cursor:pointer;font-family:'Cormorant Garamond',serif}
+.btn.save{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:600}
+.tip-box{background:linear-gradient(135deg,#edf5e8,#f0f5e8);border-radius:12px;padding:.7rem .9rem;border:1px solid rgba(122,154,90,0.2);margin-top:.8rem;font-size:14px;color:#4a7a2a;line-height:1.7;font-style:italic}
+.main-tabs{display:flex;gap:5px;margin-bottom:.8rem}
+.main-tab{flex:1;padding:.6rem .3rem;border:2px solid var(--border);border-radius:12px;background:rgba(255,253,248,.5);font-size:15px;font-weight:400;cursor:pointer;text-align:center;color:var(--muted);font-family:'Cormorant Garamond',serif}
+.main-tab.on{border-color:var(--sage);color:var(--sage);background:var(--white);font-weight:600}
+.brand-hdr{border-radius:12px;padding:.7rem .9rem;margin-bottom:.55rem}
+.brand-title{font-weight:600;font-size:15px}
+.brand-sub{font-size:13px;opacity:.85;margin-top:.15rem;font-style:italic}
+.brand-where{font-size:13px;color:var(--muted);margin-top:.2rem;font-style:italic}
+.pflege-app{font-size:13px;font-weight:600;margin-top:.2rem}
 </style>
 </head>
 <body>
-<h1>&#128717; Einkaufsliste</h1>
-<p class="sub">Lebensmittel &middot; Pflege &middot; Beauty</p>
+<h1>🛒 Meine Einkaufsliste</h1>
+<p class="sub">Lebensmittel · Pflege · Beauty — mit Liebe eingekauft</p>
 
 <div class="main-tabs">
-  <button class="main-tab on" id="mt0" onclick="switchMain(0)">&#128722; Lebensmittel</button>
-  <button class="main-tab" id="mt1" onclick="switchMain(1)">&#127807; Pflege &amp; Beauty</button>
+  <button class="main-tab on" id="mt0" onclick="switchMain(0)">🌿 Lebensmittel</button>
+  <button class="main-tab" id="mt1" onclick="switchMain(1)">🌸 Pflege & Beauty</button>
 </div>
 
 <div id="food-section">
   <div class="tabs">
-    <button class="tab on" id="wt0" onclick="switchWeek('diese')">&#128197; Diese Woche</button>
-    <button class="tab" id="wt1" onclick="switchWeek('naechste')">&#128198; N&#228;chste Woche</button>
+    <button class="tab on" id="wt0" onclick="switchWeek('diese')">🌿 Diese Woche</button>
+    <button class="tab" id="wt1" onclick="switchWeek('naechste')">✨ Nächste Woche</button>
   </div>
   <div class="week-badge" id="weekInfo"></div>
   <div class="progress-wrap">
-    <div class="prog-label"><span>Im Warenkorb</span><span id="foodCount">0 / 0</span></div>
+    <div class="prog-label"><span>🧺 Im Warenkorb</span><span id="foodCount">0 / 0</span></div>
     <div class="prog-bar"><div class="prog-fill" id="foodBar" style="width:0%"></div></div>
   </div>
   <div id="foodList"></div>
   <div class="btns">
-    <button class="btn" onclick="clearDone()">Erledigte l&#246;schen</button>
-    <button class="btn save" onclick="resetWeek()">Woche zur&#252;cksetzen</button>
+    <button class="btn" onclick="clearDone()">✓ Erledigte löschen</button>
+    <button class="btn save" onclick="resetWeek()">↺ Woche neu starten</button>
   </div>
-  <div class="tip-box">&#128260; <b>Automatisch:</b> Zeigt Zutaten f&#252;r aktuelle + n&#228;chste Woche. Antippen = in den Warenkorb.</div>
+  <div class="tip-box">🌿 <b>So geht's:</b> Zuhause abhaken was schon da ist — dann nur noch kaufen was fehlt.</div>
 </div>
 
 <div id="pflege-section" style="display:none">
   <div class="progress-wrap">
-    <div class="prog-label"><span>Im Warenkorb</span><span id="pflegeCount">0 / 0</span></div>
+    <div class="prog-label"><span>🧺 Im Warenkorb</span><span id="pflegeCount">0 / 0</span></div>
     <div class="prog-bar"><div class="prog-fill" id="pflegeBar" style="width:0%"></div></div>
   </div>
   <div id="pflegeList"></div>
-  <div class="tip-box">&#128048; <b>Nur tierversuchsfreie Produkte</b> - PETA zertifiziert.<br>Lavera: NATRUE. Benecos: BDIH. Kein China-Verkauf.</div>
+  <div class="tip-box">🐾 <b>Nur tierversuchsfrei & natürlich</b> — weil ich mich und die Welt mit Liebe behandle.</div>
 </div>
 
 <script>
