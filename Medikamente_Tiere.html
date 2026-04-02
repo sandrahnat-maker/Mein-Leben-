@@ -534,11 +534,40 @@ const defaultMeds = [
 
 const BUFFER_DAYS = 7;
 
+// ---- STARTWERTE (immer aktiv, egal ob Browser oder PWA) ----
+const DEFAULT_STATE = {
+  "rudi-prednicortone": {"openedDate": "2026-03-07", "packSize": 10},
+  "rudi-atopica":       {"openedDate": "2026-03-13", "packSize": 17},
+  "rudi-gabapentin":    {"openedDate": "2026-04-02", "packSize": 10},
+  "rudi-redonyl":       {"openedDate": "2026-03-13", "packSize": 30},
+  "rudi-remend":        {"openedDate": "2026-02-27", "packSize": 360},
+  "rudi-nexium":        {"openedDate": "2026-02-27", "packSize": 28},
+  "timmy-semintra":     {"openedDate": "2026-03-20", "packSize": 35},
+  "timmy-felimazole":   {"openedDate": "2026-03-06", "packSize": 100},
+  "beide-kalium":       {"openedDate": "2026-04-02", "packSize": 50},
+  "beide-bdecaplex":    {"openedDate": "2026-02-20", "packSize": 150},
+  "beide-cosequin":     {"openedDate": "2026-03-13", "packSize": 45},
+  "lotte-forthyron":    {"openedDate": "2026-02-20", "packSize": 250}
+};
+
 // ---- STORAGE ----
 function loadState() {
   try {
-    return JSON.parse(localStorage.getItem('med-state') || '{}');
-  } catch { return {}; }
+    var stored = JSON.parse(localStorage.getItem('med-state') || '{}');
+    // Merge: DEFAULT_STATE als Basis, localStorage überschreibt nur wenn neuer
+    var merged = Object.assign({}, DEFAULT_STATE);
+    Object.keys(stored).forEach(function(k) {
+      if (stored[k] && stored[k].openedDate) {
+        var storedDate = new Date(stored[k].openedDate);
+        var defaultDate = merged[k] ? new Date(merged[k].openedDate) : new Date(0);
+        // Nimm das neuere Datum
+        if (storedDate >= defaultDate) {
+          merged[k] = stored[k];
+        }
+      }
+    });
+    return merged;
+  } catch(e) { return Object.assign({}, DEFAULT_STATE); }
 }
 
 function saveState(state) {
@@ -722,15 +751,7 @@ function confirmModal() {
   state[modalMedId] = { openedDate, packSize };
   saveState(state);
   closeModal();
-  
-// Vorgeladene Daten (aus alter App übernommen)
-(function() {
-  var existing = localStorage.getItem('med-state');
-  if (!existing || existing === '{}') {
-    localStorage.setItem('med-state', '{"rudi-prednicortone": {"openedDate": "2026-03-07", "packSize": 10}, "rudi-atopica": {"openedDate": "2026-03-13", "packSize": 17}, "rudi-gabapentin": {"openedDate": "2026-03-13", "packSize": 10}, "rudi-redonyl": {"openedDate": "2026-03-13", "packSize": 30}, "rudi-remend": {"openedDate": "2026-02-27", "packSize": 360}, "rudi-nexium": {"openedDate": "2026-02-27", "packSize": 28}, "timmy-semintra": {"openedDate": "2026-03-20", "packSize": 35}, "timmy-felimazole": {"openedDate": "2026-03-06", "packSize": 100}, "beide-kalium": {"openedDate": "2026-03-20", "packSize": 50}, "beide-bdecaplex": {"openedDate": "2026-02-20", "packSize": 150}, "beide-cosequin": {"openedDate": "2026-03-13", "packSize": 45}, "lotte-forthyron": {"openedDate": "2026-02-20", "packSize": 250}}');
-  }
-})();
-render();
+  render();
 }
 
 // Close modal on overlay click
